@@ -1,23 +1,26 @@
 /* Navigation */
 
 .nav-btn {
-    border: 1px solid #d1d5db;
+    border: 1px solid #374151;
     border-radius: 9999px;
     padding: 0.6rem 1rem;
     font-size: 0.875rem;
     font-weight: 500;
+    color: #e5e7eb;
     transition: all 0.2s ease;
 }
 
-/* .nav-btn:hover {
-    background-color: #f3f4f6;
-} */
+.nav-btn:hover {
+    background-color: rgba(109, 40, 217, 0.18);
+    border-color: #6d28d9;
+}
 
 .mobile-nav-btn {
     display: block;
     padding: 0.75rem 1rem;
     border-radius: 0.75rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid #374151;
+    color: #e5e7eb;
 }
 
 
@@ -25,15 +28,16 @@
 
 .service-card {
     overflow: hidden;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #374151;
     border-radius: 1.25rem;
-    background: white;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: #111827;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .service-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 15px 35px rgba(124, 58, 237, 0.16);
+    border-color: #6d28d9;
 }
 
 .service-image-container {
@@ -64,7 +68,7 @@
     justify-content: center;
 
     border-radius: 50%;
-    background: #f3e8ff;
+    background: #2e1065;
 }
 
 
@@ -87,6 +91,7 @@
 
     font-size: 1.25rem;
     font-weight: bold;
+    box-shadow: 0 0 25px rgba(124, 58, 237, 0.25);
 }
 
 
@@ -95,14 +100,16 @@
 .feature-card {
     padding: 1.5rem;
 
-    border: 1px solid #e5e7eb;
+    border: 1px solid #374151;
     border-radius: 1rem;
+    background: #111827;
 
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
 .feature-card:hover {
     transform: translateY(-3px);
+    border-color: #6d28d9;
 }
 
 
@@ -118,8 +125,8 @@
 
     border-radius: 50%;
 
-    background: #f3e8ff;
-    color: #7c3aed;
+    background: #2e1065;
+    color: #a78bfa;
 
     font-weight: bold;
 }
@@ -128,11 +135,12 @@
 /* Footer */
 
 .footer-link {
+    color: #9ca3af;
     transition: color 0.2s ease;
 }
 
 .footer-link:hover {
-    color: white;
+    color: #c4b5fd;
 }
 
 
