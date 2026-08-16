@@ -1,0 +1,234 @@
+/* =================================
+   ServiceHub Admin Login
+================================= */
+
+body {
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+}
+
+
+/* Card */
+
+.admin-card {
+    transition: border-color 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+
+/* Labels */
+
+.input-label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+    color: #d1d5db;
+}
+
+
+/* Input wrapper */
+
+.input-wrapper {
+    position: relative;
+}
+
+
+.input-wrapper > i {
+    position: absolute;
+
+    left: 16px;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: #6b7280;
+
+    pointer-events: none;
+
+    z-index: 2;
+}
+
+
+/* Input */
+
+.form-input {
+    width: 100%;
+
+    min-height: 50px;
+
+    padding: 13px 16px 13px 46px;
+
+    border-radius: 10px;
+
+    border: 1px solid rgba(255, 255, 255, 0.10);
+
+    background: rgba(0, 0, 0, 0.20);
+
+    color: white;
+
+    outline: none;
+
+    transition: all 0.2s ease;
+}
+
+
+.form-input::placeholder {
+    color: #6b7280;
+}
+
+
+.form-input:focus {
+    border-color: rgba(168, 85, 247, 0.70);
+
+    box-shadow:
+        0 0 0 3px rgba(168, 85, 247, 0.08);
+}
+
+
+.password-input {
+    padding-right: 48px;
+}
+
+
+/* Password toggle */
+
+.password-toggle {
+    position: absolute;
+
+    right: 15px;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: #6b7280;
+
+    transition: color 0.2s ease;
+}
+
+
+.password-toggle:hover {
+    color: #a855f7;
+}
+
+
+/* Errors */
+
+.error-message {
+    margin-top: 7px;
+
+    font-size: 13px;
+
+    color: #f87171;
+}
+
+
+.input-error {
+    border-color: rgba(248, 113, 113, 0.70) !important;
+}
+
+
+/* Login button */
+
+.login-button {
+    width: 100%;
+
+    min-height: 50px;
+
+    border-radius: 11px;
+
+    background: #a855f7;
+
+    color: white;
+
+    font-weight: 600;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 9px;
+
+    transition: all 0.2s ease;
+
+    cursor: pointer;
+}
+
+
+.login-button:hover {
+    background: #9333ea;
+
+    box-shadow:
+        0 8px 25px rgba(168, 85, 247, 0.18);
+}
+
+
+.login-button:disabled {
+    opacity: 0.65;
+
+    cursor: not-allowed;
+
+    box-shadow: none;
+}
+
+
+/* Back button */
+
+.back-button {
+    width: 100%;
+
+    min-height: 48px;
+
+    border-radius: 10px;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+    color: #9ca3af;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 9px;
+
+    transition: all 0.2s ease;
+}
+
+
+.back-button:hover {
+    border-color: rgba(168, 85, 247, 0.35);
+
+    background: rgba(168, 85, 247, 0.05);
+
+    color: #d8b4fe;
+}
+
+
+/* Messages */
+
+#adminMessage.success {
+    border-color: rgba(74, 222, 128, 0.20);
+
+    background: rgba(74, 222, 128, 0.08);
+
+    color: #86efac;
+}
+
+
+#adminMessage.error {
+    border-color: rgba(248, 113, 113, 0.20);
+
+    background: rgba(248, 113, 113, 0.08);
+
+    color: #fca5a5;
+}

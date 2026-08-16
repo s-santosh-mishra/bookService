@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Login | ServiceHub</title>
+
+    <!-- Tailwind -->
+    <link rel="stylesheet" href="/Frontend/CSS/output.css">
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/Frontend/Admin/adminLogin.css">
+</head>
+
+
+<body class="min-h-screen bg-[#0b0f19] text-white">
+
+
+    <main class="min-h-screen flex items-center justify-center px-6 py-10">
+
+        <div class="w-full max-w-md">
+
+
+            <!-- Branding -->
+
+            <div class="text-center mb-8">
+
+                <a
+                    href="/Frontend/HTML/index.html"
+                    class="inline-flex items-center gap-2 text-2xl font-bold tracking-wide"
+                >
+
+                    <span class="text-purple-400">
+                        <i class="fa-solid fa-screwdriver-wrench"></i>
+                    </span>
+
+                    <span>
+                        Service<span class="text-purple-400">Hub</span>
+                    </span>
+
+                </a>
+
+
+                <div
+                    class="w-14 h-14 mx-auto mt-7 rounded-2xl
+                           bg-purple-500/10
+                           border border-purple-400/20
+                           flex items-center justify-center
+                           text-purple-400 text-2xl"
+                >
+
+                    <i class="fa-solid fa-shield-halved"></i>
+
+                </div>
+
+
+                <h1 class="text-3xl font-bold mt-5">
+                    Admin Login
+                </h1>
+
+
+                <p class="text-gray-400 mt-2">
+                    Access the ServiceHub administration panel.
+                </p>
+
+            </div>
+
+
+
+            <!-- Login Card -->
+
+            <section
+                class="admin-card rounded-2xl
+                       border border-white/10
+                       bg-[#111827]/90
+                       backdrop-blur-xl
+                       p-7 md:p-9
+                       shadow-2xl"
+            >
+
+
+                <form id="adminLoginForm" novalidate>
+
+
+                    <!-- Admin ID -->
+
+                    <div class="mb-5">
+
+                        <label
+                            for="adminId"
+                            class="input-label"
+                        >
+                            Admin ID
+                        </label>
+
+
+                        <div class="input-wrapper">
+
+                            <i class="fa-solid fa-user-shield"></i>
+
+                            <input
+                                type="text"
+                                id="adminId"
+                                name="adminId"
+                                placeholder="Enter your admin ID"
+                                autocomplete="username"
+                                class="form-input"
+                            >
+
+                        </div>
+
+
+                        <p
+                            id="adminIdError"
+                            class="error-message hidden"
+                        ></p>
+
+                    </div>
+
+
+
+                    <!-- Password -->
+
+                    <div class="mb-3">
+
+                        <label
+                            for="adminPassword"
+                            class="input-label"
+                        >
+                            Password
+                        </label>
+
+
+                        <div class="input-wrapper">
+
+                            <i class="fa-solid fa-lock"></i>
+
+                            <input
+                                type="password"
+                                id="adminPassword"
+                                name="adminPassword"
+                                placeholder="Enter your password"
+                                autocomplete="current-password"
+                                class="form-input password-input"
+                            >
+
+
+                            <button
+                                type="button"
+                                id="togglePassword"
+                                class="password-toggle"
+                            >
+
+                                <i class="fa-solid fa-eye"></i>
+
+                            </button>
+
+                        </div>
+
+
+                        <p
+                            id="passwordError"
+                            class="error-message hidden"
+                        ></p>
+
+                    </div>
+
+
+
+                    <!-- Forgot password -->
+
+                    <p class="text-sm text-gray-500 mb-7">
+
+                        Forgot your password?
+
+                        <span class="text-gray-400">
+                            Please contact the developer.
+                        </span>
+
+                    </p>
+
+
+
+                    <!-- General Message -->
+
+                    <div
+                        id="adminMessage"
+                        class="hidden mb-5
+                               rounded-lg border
+                               px-4 py-3 text-sm"
+                    ></div>
+
+
+
+                    <!-- Login Button -->
+
+                    <button
+                        type="submit"
+                        id="adminLoginButton"
+                        class="login-button"
+                    >
+
+                        <i class="fa-solid fa-right-to-bracket"></i>
+
+                        <span>Admin Login</span>
+
+                    </button>
+
+
+                </form>
+
+
+
+                <!-- Back to normal login -->
+
+                <div class="relative my-7">
+
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-white/10"></div>
+                    </div>
+
+
+                    <div class="relative flex justify-center">
+
+                        <span
+                            class="bg-[#111827]
+                                   px-4
+                                   text-sm
+                                   text-gray-500"
+                        >
+                            Not an administrator?
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <a
+                    href="/Frontend/HTML/login.html"
+                    class="back-button"
+                >
+
+                    <i class="fa-solid fa-arrow-left"></i>
+
+                    Back to Login
+
+                </a>
+
+
+            </section>
+
+
+
+            <!-- Security note -->
+
+            <div class="flex items-center justify-center gap-2 mt-6">
+
+                <i class="fa-solid fa-lock text-purple-400 text-xs"></i>
+
+                <p class="text-xs text-gray-600">
+                    Restricted access · ServiceHub Administration
+                </p>
+
+            </div>
+
+
+            <!-- Footer -->
+
+            <p class="text-center text-xs text-gray-700 mt-5">
+                © 2026 ServiceHub. All rights reserved.
+            </p>
+
+
+        </div>
+
+    </main>
+
+
+    <script src="/Frontend/Admin/AdminLogin.js"></script>
+
+</body>
+
+</html>

@@ -150,3 +150,29 @@ button,
 a {
     -webkit-tap-highlight-color: transparent;
 }
+
+/* Contact & Developer Icons */
+
+.contact-icon {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #2e1065;
+    color: #a78bfa;
+
+    font-size: 1.25rem;
+
+    transition: all 0.2s ease;
+}
+
+.contact-icon:hover {
+    background: #7c3aed;
+    color: white;
+    transform: translateY(-3px);
+}
