@@ -36,9 +36,9 @@ customerRole.addEventListener("click", () => {
     customerRole.classList.add("active");
     workerRole.classList.remove("active");
 
-    idLabel.textContent = "Customer ID";
+    idLabel.textContent = "Email ID";
 
-    userId.placeholder = "Enter your customer ID";
+    userId.placeholder = "Enter your Email ID";
 
     clearValidation();
 
@@ -52,9 +52,9 @@ workerRole.addEventListener("click", () => {
     workerRole.classList.add("active");
     customerRole.classList.remove("active");
 
-    idLabel.textContent = "Worker ID";
+    idLabel.textContent = "Email ID";
 
-    userId.placeholder = "Enter your worker ID";
+    userId.placeholder = "Enter your Email ID";
 
     clearValidation();
 
@@ -107,9 +107,7 @@ loginForm.addEventListener("submit", async (event) => {
         showError(
             userId,
             idError,
-            `${selectedRole === "customer"
-                ? "Customer ID"
-                : "Worker ID"} is required.`
+            "Email ID is required."
         );
 
         isValid = false;
@@ -135,29 +133,6 @@ loginForm.addEventListener("submit", async (event) => {
     }
 
 
-    /*
-        Backend connection will be added here.
-
-        Example:
-
-        const response = await fetch(
-            "http://localhost:5000/api/auth/login",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    role: selectedRole,
-                    userId: idValue,
-                    password: passwordValue
-                })
-            }
-        );
-
-    */
-
-
     loginButton.disabled = true;
 
     loginButton.innerHTML = `
@@ -166,27 +141,74 @@ loginForm.addEventListener("submit", async (event) => {
     `;
 
 
-    /*
-        Temporary simulation.
+    try {
 
-        REMOVE this when backend is connected.
-    */
+        const response = await fetch(
+            "http://localhost:8080/api/auth/login",
+            {
+                method: "POST",
 
-    setTimeout(() => {
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    email: idValue,
+                    password: passwordValue
+                })
+            }
+        );
+
+        let result;
+
+        const contentType = response.headers.get("content-type");
+
+        if (contentType && contentType.includes("application/json")) {
+            result = await response.json();
+        } else {
+            result = await response.text();
+        }
+
+
+        if (!response.ok) {
+
+            const errorMessage =
+                typeof result === "object" && result !== null
+                    ? result.error ||
+                    result.message ||
+                    "Login failed. Please try again."
+                    : result;
+
+            showMessage(
+                errorMessage,
+                "error"
+            );
+
+            return;
+        }
+
+        alert("Login successful!");
+        loginForm.reset();
+
+    } catch (error) {
+
+        console.error("Login error:", error);
 
         showMessage(
-            "Login is ready. Backend authentication will be connected next.",
-            "success"
+            "Unable to connect to the server. Please make sure the backend is running.",
+            "error"
         );
+
+    } finally {
 
         loginButton.disabled = false;
 
         loginButton.innerHTML = `
-            <i class="fa-solid fa-right-to-bracket"></i>
-            <span>Login</span>
-        `;
+        <i class="fa-solid fa-right-to-bracket"></i>
+        <span>Login</span>
+    `;
 
-    }, 800);
+    }
 
 });
 

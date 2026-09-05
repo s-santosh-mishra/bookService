@@ -122,50 +122,57 @@ registerForm.addEventListener("submit", async (event) => {
 
     const formData = {
 
-        name: fullName.value.trim(),
+        fullName: fullName.value.trim(),
 
         age: Number(age.value),
 
-        gender: gender.value,
+        gender: gender.value.toUpperCase(),
 
-        email: email.value.trim() || null,
+        email: email.value.trim(),
 
         phone: phone.value.trim(),
 
-        address: {
+        addressLine1: addressLine1.value.trim(),
 
-            line1: addressLine1.value.trim(),
+        addressLine2:
+            document.getElementById("addressLine2")
+                .value.trim() || null,
 
-            line2:
-                document.getElementById("addressLine2")
-                    .value.trim() || null,
+        landmark:
+            document.getElementById("landmark")
+                .value.trim() || null,
 
-            landmark:
-                document.getElementById("landmark")
-                    .value.trim() || null,
+        city: city.value.trim(),
 
-            city: city.value.trim(),
+        state: state.value,
 
-            state: state.value,
+        pinCode: pincode.value.trim(),
 
-            pincode: pincode.value.trim()
+        password: password.value,
 
-        },
+        confirmPassword: confirmPassword.value,
 
-        password: password.value
-
+        termsAccepted: terms.checked
     };
 
 
     /*
         =================================
-        BACKEND CONNECTION - LATER
+        BACKEND CONNECTION
         =================================
 
-        Example:
+    */
+
+    registerButton.disabled = true;
+
+    registerButton.innerHTML = `
+    <i class="fa-solid fa-spinner fa-spin"></i>
+    <span>Creating account...</span>`;
+
+    try {
 
         const response = await fetch(
-            "http://localhost:5000/api/auth/register",
+            "http://localhost:8080/api/auth/register",
             {
                 method: "POST",
 
@@ -177,46 +184,200 @@ registerForm.addEventListener("submit", async (event) => {
             }
         );
 
-        const result = await response.json();
+
+        let result;
+
+        const contentType = response.headers.get("content-type");
+
+        if (contentType && contentType.includes("application/json")) {
+            result = await response.json();
+        } else {
+            result = await response.text();
+        }
 
         if (!response.ok) {
-            showMessage(result.message, "error");
+
+            const errorMessage =
+                typeof result === "object" && result !== null
+                    ? result.error || result.message || "Registration failed. Please try again."
+                    : result;
+
+            showMessage(
+                errorMessage,
+                "error"
+            );
+
             return;
         }
 
-        window.location.href = "login.html";
+        registerForm.reset();
 
-    */
+        let countdown = 7;
+
+        registerMessage.className =
+            "mt-6 rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-400";
+
+        registerMessage.innerHTML = `
+    <div class="text-center">
+        <p class="font-medium">
+            Registration successful!
+        </p>
+
+        <p class="mt-1">
+            You can now
+            <a
+                href="/bookService/Frontend/HTML/login.html"
+                class="text-purple-400 hover:text-purple-300 font-medium"
+            >
+                Login
+            </a>
+            to your account.
+        </p>
+
+        <p class="mt-2 text-gray-400">
+            Redirecting to login in
+            <span id="countdown">${countdown}</span>
+            seconds...
+        </p>
+    </div>
+`;
+
+        const countdownElement =
+            document.getElementById("countdown");
+
+        const countdownTimer = setInterval(() => {
+
+            countdown--;
+
+            countdownElement.textContent = countdown;
+
+            if (countdown <= 0) {
+
+                clearInterval(countdownTimer);
+
+                window.location.href =
+                    "/bookService/Frontend/HTML/login.html";
+            }
+
+        }, 1000);
 
 
-    registerButton.disabled = true;
+    } catch (error) {
 
-    registerButton.innerHTML = `
-        <i class="fa-solid fa-spinner fa-spin"></i>
-        <span>Creating account...</span>
-    `;
-
-
-    /*
-        Temporary frontend simulation.
-        Remove when backend is connected.
-    */
-
-    setTimeout(() => {
+        console.error("Registration error:", error);
 
         showMessage(
-            "Registration form is ready. Backend connection will be added next.",
-            "success"
+            "Unable to connect to the server. Please make sure the backend is running.",
+            "error"
         );
+
+    } finally {
 
         registerButton.disabled = false;
 
         registerButton.innerHTML = `
+        <i class="fa-solid fa-user-plus"></i>
+        <span>Create Account</span>`;
+
+    }
+
+    registerForm.addEventListener("submit", async (event) => {
+
+        event.preventDefault();
+
+        clearErrors();
+
+        const isValid = validateForm();
+
+        if (!isValid) {
+            return;
+        }
+
+        const formData = {
+
+            fullName: fullName.value.trim(),
+            age: Number(age.value),
+            gender: gender.value.toUpperCase(),
+            email: email.value.trim(),
+            phone: phone.value.trim(),
+
+            addressLine1: addressLine1.value.trim(),
+
+            addressLine2:
+                document.getElementById("addressLine2")
+                    .value.trim() || null,
+
+            landmark:
+                document.getElementById("landmark")
+                    .value.trim() || null,
+
+            city: city.value.trim(),
+            state: state.value,
+            pinCode: pincode.value.trim(),
+
+            password: password.value,
+            confirmPassword: confirmPassword.value,
+            termsAccepted: terms.checked
+        };
+
+        registerButton.disabled = true;
+
+        registerButton.innerHTML = `
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <span>Creating account...</span>
+    `;
+
+        try {
+
+            const response = await fetch(
+                "http://localhost:8080/api/auth/register",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify(formData)
+                }
+            );
+
+            const result = await response.text();
+
+            if (!response.ok) {
+
+                showMessage(
+                    result || "Registration failed. Please try again.",
+                    "error"
+                );
+
+                return;
+            }
+
+            alert("Registration successful!");
+
+            registerForm.reset();
+
+        } catch (error) {
+
+            console.error("Registration error:", error);
+
+            showMessage(
+                "Unable to connect to the server. Please make sure the backend is running.",
+                "error"
+            );
+
+        } finally {
+
+            registerButton.disabled = false;
+
+            registerButton.innerHTML = `
             <i class="fa-solid fa-user-plus"></i>
             <span>Create Account</span>
         `;
+        }
 
-    }, 800);
+    });
 
 });
 

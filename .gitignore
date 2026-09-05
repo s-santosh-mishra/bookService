@@ -1,4 +1,109 @@
+# ==========================================
+# FRONTEND - Node.js
+# ==========================================
+
 **/node_modules/
+
+# Build output
+**/dist/
+
+# Environment variables / secrets
 .env
+.env.*
+!.env.example
+
+# npm logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+
+# ==========================================
+# BACKEND - Spring Boot / Maven
+# ==========================================
+
+# Maven build output
+**/target/
+
+# Compiled Java files
+*.class
+
+# Logs
+*.log
+
+# Maven wrapper generated JAR
+**/.mvn/wrapper/maven-wrapper.jar
+
+
+# ==========================================
+# JAVA / SPRING BOOT - Local files
+# ==========================================
+
+# Keep project source files, ignore generated build files
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+
+# ==========================================
+# INTELLIJ IDEA
+# ==========================================
+
+.idea/
+*.iws
+*.iml
+*.ipr
+
+
+# ==========================================
+# VS CODE
+# ==========================================
+
+.vscode/
+
+
+# ==========================================
+# ECLIPSE / STS
+# ==========================================
+
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+
+
+# ==========================================
+# NETBEANS
+# ==========================================
+
+/nbproject/private/
+/nbbuild/
+/nbdist/
+.nb-gradle/
+
+
+# ==========================================
+# GRADLE
+# ==========================================
+
+.gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+
+# ==========================================
+# OPERATING SYSTEM
+# ==========================================
+
 .DS_Store
-dist/
+Thumbs.db
+
+
+# ==========================================
+# OTHER
+# ==========================================
+
+HELP.md
