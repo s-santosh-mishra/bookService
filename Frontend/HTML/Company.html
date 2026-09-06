@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ServiceHub | Company Information</title>
+
+    <link rel="stylesheet" href="/bookService/Frontend/CSS/output.css">
+    <link rel="stylesheet" href="/bookService/Frontend/CSS/indexCss.css">
+</head>
+
+<body class="bg-gray-950 text-gray-100">
+
+    <!-- NAVBAR -->
+
+    <header class="sticky top-0 z-50 bg-gray-950/90 backdrop-blur-md border-b border-gray-800">
+
+        <nav class="max-w-7xl mx-auto px-6 py-4">
+
+            <div class="flex items-center justify-between">
+
+                <!-- Logo + Company -->
+
+                <a href="/bookService/Frontend/HTML/index.html" class="flex items-center gap-3">
+
+                    <div
+                        class="w-12 h-12 rounded-xl border-2 border-violet-500 flex items-center justify-center overflow-hidden">
+
+                        <span class="text-purple-400">
+                            <i class="fa-solid fa-screwdriver-wrench text-3xl"></i>
+                        </span>
+
+                    </div>
+
+                    <div>
+
+                        <h1 class="text-xl font-bold tracking-tight">
+                            ServiceHub
+                        </h1>
+
+                        <p class="text-xs text-gray-400">
+                            Trusted Services, Anytime Anywhere
+                        </p>
+
+                    </div>
+
+                </a>
+
+
+                <!-- Desktop Navigation -->
+
+                <div class="hidden lg:flex items-center gap-3">
+
+                    <a href="#about"
+                        class="nav-btn border border-gray-700 rounded-full hover:bg-violet-900/40">
+                        About Us
+                    </a>
+
+                    <a href="/bookService/Frontend/HTML/login.html"
+                        class="nav-btn border border-gray-700 rounded-full hover:bg-violet-900/40">
+                        Login
+                    </a>
+
+                    <a href="/bookService/Frontend/HTML/UserRegistration.html"
+                        class="nav-btn border border-violet-600 rounded-full bg-violet-600 text-white hover:bg-violet-700">
+                        Register
+                    </a>
+
+                </div>
+
+
+                <!-- Mobile Menu Button -->
+
+                <button id="mobileMenuButton"
+                    class="lg:hidden border border-gray-700 rounded-full px-4 py-2 text-gray-200 hover:bg-gray-800">
+                    ☰
+                </button>
+
+            </div>
+
+
+            <!-- Mobile Navigation -->
+
+            <div id="mobileMenu"
+                class="lg:hidden mt-4 pb-3 space-y-2 max-h-0 opacity-0 overflow-hidden transition-all duration-300 ease-in-out">
+
+                <a href="/bookService/Frontend/HTML/login.html"
+                    class="mobile-nav-btn">
+                    Login
+                </a>
+
+                <a href="/bookService/Frontend/HTML/UserRegistration.html"
+                    class="mobile-nav-btn bg-violet-600 text-white">
+                    Register
+                </a>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+
+    <!-- COMPANY DOCUMENTATION -->
+
+    <main>
+
+        <!-- PAGE HERO -->
+
+        <section class="relative overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-violet-950/50">
+
+            <div class="max-w-7xl mx-auto px-6 py-20 lg:py-24 min-h-[calc(100vh-73px)]">
+
+                <div class="max-w-3xl">
+
+                    <span
+                        class="inline-block px-4 py-2 rounded-full border border-violet-800 bg-violet-950/40 text-violet-300 text-sm font-medium mb-6">
+                        Company Information
+                    </span>
+
+                    <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+                        Everything you need to know about
+                        <span class="text-violet-400">
+                            ServiceHub.
+                        </span>
+                    </h2>
+
+                    <p class="mt-6 text-lg text-gray-300 max-w-2xl leading-8">
+                        Learn more about who we are, how to reach us, career
+                        opportunities, and the policies that guide our platform.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- DOCUMENT -->
+
+        <section class="max-w-7xl mx-auto px-6 py-20">
+
+            <div class="grid lg:grid-cols-[250px_1fr] gap-12 lg:gap-20">
+
+
+                <!-- INDEX -->
+
+                <aside>
+
+                    <div class="lg:sticky lg:top-28">
+
+                        <p class="text-violet-600 font-semibold text-sm uppercase tracking-wider">
+                            Contents
+                        </p>
+
+                        <nav class="mt-5 space-y-2">
+
+                            <a href="#about"
+                                class="block px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-violet-900/20 transition">
+                                <span class="text-violet-400 mr-2">01</span>
+                                About Us
+                            </a>
+
+                            <a href="#contact"
+                                class="block px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-violet-900/20 transition">
+                                <span class="text-violet-400 mr-2">02</span>
+                                Contact Us
+                            </a>
+
+                            <a href="#careers"
+                                class="block px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-violet-900/20 transition">
+                                <span class="text-violet-400 mr-2">03</span>
+                                Careers
+                            </a>
+
+                            <a href="#privacy"
+                                class="block px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-violet-900/20 transition">
+                                <span class="text-violet-400 mr-2">04</span>
+                                Privacy Policy
+                            </a>
+
+                            <a href="#terms"
+                                class="block px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-violet-900/20 transition">
+                                <span class="text-violet-400 mr-2">05</span>
+                                Terms & Conditions
+                            </a>
+
+                        </nav>
+
+                    </div>
+
+                </aside>
+
+
+                <!-- CONTENT -->
+
+                <article class="max-w-4xl space-y-24">
+
+
+                    <!-- ABOUT US -->
+
+                    <section id="about" class="scroll-mt-28">
+
+                        <span class="text-violet-600 font-semibold text-sm uppercase tracking-wider">
+                            01
+                        </span>
+
+                        <h2 class="text-3xl md:text-4xl font-bold mt-3">
+                            About Us
+                        </h2>
+
+                        <div class="mt-7 space-y-5 text-gray-400 text-lg leading-8">
+
+                            <p>
+                                ServiceHub is a platform designed to make finding
+                                reliable service professionals simple, convenient,
+                                and accessible.
+                            </p>
+
+                            <p>
+                                From electrical repairs to carpentry, plumbing,
+                                cleaning, appliance repair, and painting, ServiceHub
+                                brings everyday service needs together in one place.
+                            </p>
+
+                            <p>
+                                Our goal is to connect customers with skilled
+                                professionals while making the process of finding
+                                a service, requesting assistance, and managing a
+                                booking easier.
+                            </p>
+
+                            <p>
+                                We believe professional services should be easy to
+                                find, straightforward to request, and convenient
+                                to manage.
+                            </p>
+
+                        </div>
+
+                        <a href="#"
+                            class="inline-block mt-6 text-sm text-gray-500 hover:text-violet-400 transition">
+                            ↑ Back to contents
+                        </a>
+
+                    </section>
+
+
+                    <!-- CONTACT US -->
+
+                    <section id="contact" class="scroll-mt-28">
+
+                        <span class="text-violet-600 font-semibold text-sm uppercase tracking-wider">
+                            02
+                        </span>
+
+                        <h2 class="text-3xl md:text-4xl font-bold mt-3">
+                            Contact Us
+                        </h2>
+
+                        <div class="mt-7 space-y-5 text-gray-400 text-lg leading-8">
+
+                            <p>
+                                Have a question, suggestion, or need assistance
+                                with ServiceHub? We are here to help.
+                            </p>
+
+                            <p>
+                                For account, booking, or service-related questions,
+                                please contact us using the available contact
+                                options. Providing relevant details will help us
+                                assist you more efficiently.
+                            </p>
+
+                        </div>
+
+
+                        <div class="mt-8 space-y-5">
+
+                            <div class="border-l-2 border-violet-600 pl-5">
+
+                                <p class="text-sm text-gray-500">
+                                    Email
+                                </p>
+
+                                <a href="mailto:santoshku.mishra03@gmail.com"
+                                    class="text-gray-200 hover:text-violet-400 transition">
+                                    santoshku.mishra03@gmail.com
+                                </a>
+
+                            </div>
+
+
+                            <div class="border-l-2 border-gray-700 pl-5">
+
+                                <p class="text-sm text-gray-500">
+                                    Phone
+                                </p>
+
+                                <a href="tel:+919178299774"
+                                    class="text-gray-200 hover:text-violet-400 transition">
+                                    +91 91782 99774
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                        <a href="#"
+                            class="inline-block mt-6 text-sm text-gray-500 hover:text-violet-400 transition">
+                            ↑ Back to contents
+                        </a>
+
+                    </section>
+
+
+                    <!-- CAREERS -->
+
+                    <section id="careers" class="scroll-mt-28">
+
+                        <span class="text-violet-600 font-semibold text-sm uppercase tracking-wider">
+                            03
+                        </span>
+
+                        <h2 class="text-3xl md:text-4xl font-bold mt-3">
+                            Careers
+                        </h2>
+
+                        <div class="mt-7 space-y-5 text-gray-400 text-lg leading-8">
+
+                            <p>
+                                ServiceHub is being built with the vision of creating
+                                a reliable service ecosystem for customers and skilled
+                                professionals.
+                            </p>
+
+                            <p>
+                                As the platform grows, opportunities may become
+                                available across technology, operations, customer
+                                support, business development, and other areas.
+                            </p>
+
+                            <p>
+                                If you are interested in joining our journey, check
+                                this section for future opportunities.
+                            </p>
+
+                        </div>
+
+
+                        <div class="mt-8 border border-gray-800 rounded-2xl p-6 bg-gray-900/40">
+
+                            <h3 class="text-xl font-bold">
+                                Current Opportunities
+                            </h3>
+
+                            <p class="mt-2 text-gray-400">
+                                There are currently no open positions.
+                                Please check back later for future opportunities.
+                            </p>
+
+                        </div>
+
+                        <a href="#"
+                            class="inline-block mt-6 text-sm text-gray-500 hover:text-violet-400 transition">
+                            ↑ Back to contents
+                        </a>
+
+                    </section>
+
+
+                    <!-- PRIVACY POLICY -->
+
+                    <section id="privacy" class="scroll-mt-28">
+
+                        <span class="text-violet-600 font-semibold text-sm uppercase tracking-wider">
+                            04
+                        </span>
+
+                        <h2 class="text-3xl md:text-4xl font-bold mt-3">
+                            Privacy Policy
+                        </h2>
+
+                        <p class="mt-2 text-sm text-gray-500">
+                            Last updated: September 2026
+                        </p>
+
+
+                        <div class="mt-8 space-y-10 text-gray-400 text-lg leading-8">
+
+
+                            <div>
+
+                                <h3 class="text-xl font-bold text-gray-100 mb-3">
+                                    Information We Collect
+                                </h3>
+
+                                <p>
+                                    When you use ServiceHub, we may collect information
+                                    required to provide and improve our services,
+                                    including account information, contact details,
+                                    service requests, and booking-related information.
+                                </p>
+
+                            </div>
+
+
+                            <div>
+
+                                <h3 class="text-xl font-bold text-gray-100 mb-3">
+                                    How We Use Your Information
+                                </h3>
+
+                                <p>
+                                    Information may be used to create and manage
+                                    accounts, process service requests, facilitate
+                                    communication, manage bookings, provide support,
+                                    and improve the ServiceHub platform.
+                                </p>
+
+                            </div>
+
+
+                            <div>
+
+                                <h3 class="text-xl font-bold text-gray-100 mb-3">
+                                    Information Security
+                                </h3>
+
+                                <p>
+                                    We take reasonable measures to protect information
+                                    associated with your account against unauthorized
+                                    access, alteration, disclosure, or misuse.
+                                </p>
+
+                            </div>
+
+
+                            <div>
+
+                                <h3 class="text-xl font-bold text-gray-100 mb-3">
+                                    Information Sharing
+                                </h3>
+
+                                <p>
+                                    We do not intend to sell personal information.
+                                    Information may be shared when necessary to provide
+                                    requested services, operate the platform, comply
+                                    with applicable legal requirements, or protect
+                                    users and ServiceHub.
+                                </p>
+
+                            </div>
+
+
+                            <div>
+
+                                <h3 class="text-xl font-bold text-gray-100 mb-3">
+                                    Your Choices
+                                </h3>
+
+                                <p>
+                                    You may be able to access, update, or request
+                                    changes to information associated with your
+                                    account. Contact us if you have questions about
+                                    your personal information.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <a href="#"
+                            class="inline-block mt-6 text-sm text-gray-500 hover:text-violet-400 transition">
+                            ↑ Back to contents
+                        </a>
+
+                    </section>
+
+
+                    <!-- TERMS -->
+
+                    <section id="terms" class="scroll-mt-28">
+
+                        <span class="text-violet-600 font-semibold text-sm uppercase tracking-wider">
+                            05
+                        </span>
+
+                        <h2 class="text-3xl md:text-4xl font-bold mt-3">
+                            Terms & Conditions
+                        </h2>
+
+                        <p class="mt-2 text-sm text-gray-500">
+                            Last updated: September 2026
+                        </p>
+
+
+                        <div class="mt-8 space-y-10 text-gray-400 text-lg leading-8">
+
+
+                            <div>
+
+                                <h3 class="text-xl font-bold text-gray-100 mb-3">
+                                    Acceptance of Terms
+                                </h3>
+
+                                <p>
+                                    By accessing or using ServiceHub, you agree to
+                                    comply with these Terms & Conditions. If you do
+                                    not agree, please do not use the platform.
+                                </p>
+
+                            </div>
+
+
+                            <div>
+
+                                <h3 class="text-xl font-bold text-gray-100 mb-3">
+                                    Use of ServiceHub
+                                </h3>
+
+                                <p>
+                                    ServiceHub provides a platform through which
+                                    customers can request services and connect with
+                                    service professionals. Users are expected to
+                                    provide accurate information and use the platform
+                                    responsibly.
+                                </p>
+
+                            </div>
+
+
+                            <div>
+
+                                <h3 class="text-xl font-bold text-gray-100 mb-3">
+                                    Bookings and Services
+                                </h3>
+
+                                <p>
+                                    Service availability, pricing, materials, and
+                                    other conditions may vary depending on the requested
+                                    service and the circumstances of the work.
+                                    Additional materials or work may result in
+                                    additional charges where applicable.
+                                </p>
+
+                            </div>
+
+
+                            <div>
+
+                                <h3 class="text-xl font-bold text-gray-100 mb-3">
+                                    User Responsibilities
+                                </h3>
+
+                                <p>
+                                    Users are responsible for maintaining the security
+                                    of their account credentials and for activity
+                                    performed through their account.
+                                </p>
+
+                            </div>
+
+
+                            <div>
+
+                                <h3 class="text-xl font-bold text-gray-100 mb-3">
+                                    Platform Availability
+                                </h3>
+
+                                <p>
+                                    We aim to keep ServiceHub reliable and available,
+                                    but uninterrupted access cannot be guaranteed at
+                                    all times. Maintenance, technical issues, or
+                                    circumstances outside our control may temporarily
+                                    affect the platform.
+                                </p>
+
+                            </div>
+
+
+                            <div>
+
+                                <h3 class="text-xl font-bold text-gray-100 mb-3">
+                                    Changes to These Terms
+                                </h3>
+
+                                <p>
+                                    ServiceHub may update these Terms & Conditions
+                                    when necessary. Updated terms will be published
+                                    on this page.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <a href="#"
+                            class="inline-block mt-6 text-sm text-gray-500 hover:text-violet-400 transition">
+                            ↑ Back to contents
+                        </a>
+
+                    </section>
+
+                </article>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="/bookService/Frontend/JS/indexJs.js"></script>
+
+    <script src="https://kit.fontawesome.com/330033b57f.js"
+        crossorigin="anonymous"></script>
+
+</body>
+
+</html>

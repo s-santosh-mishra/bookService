@@ -1,7 +1,4 @@
-/* =================================
-   ServiceHub Admin Login
-================================= */
-
+// ServiceHub Admin Login
 const adminLoginForm =
     document.getElementById("adminLoginForm");
 
@@ -26,11 +23,7 @@ const adminMessage =
 const adminLoginButton =
     document.getElementById("adminLoginButton");
 
-
-
-/* =================================
-   Password Visibility
-================================= */
+// Password Visibility
 
 togglePassword.addEventListener("click", () => {
 
@@ -49,11 +42,7 @@ togglePassword.addEventListener("click", () => {
 
 });
 
-
-
-/* =================================
-   Admin Login
-================================= */
+// Admin Login
 
 adminLoginForm.addEventListener(
     "submit",
@@ -81,7 +70,7 @@ adminLoginForm.addEventListener(
             showError(
                 adminId,
                 adminIdError,
-                "Please enter your admin ID."
+                "Please enter your email."
             );
 
             isValid = false;
@@ -106,42 +95,7 @@ adminLoginForm.addEventListener(
             return;
         }
 
-
-
-        /*
-        =================================
-        BACKEND CONNECTION - LATER
-        =================================
-
-        const response = await fetch(
-            "http://localhost:5000/api/admin/login",
-            {
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify({
-                    adminId: idValue,
-                    password: passwordValue
-                })
-            }
-        );
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            showMessage(result.message, "error");
-            return;
-        }
-
-        window.location.href = "admin-dashboard.html";
-
-        */
-
-
-        /* Temporary frontend simulation */
+        // Backend Connection
 
         adminLoginButton.disabled = true;
 
@@ -151,13 +105,85 @@ adminLoginForm.addEventListener(
         `;
 
 
-        setTimeout(() => {
+        try {
+
+            const response = await fetch(
+                "http://localhost:8080/api/auth/login",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        email: idValue,
+                        password: passwordValue
+                    })
+                }
+            );
+
+
+            const result = await response.json();
+
+            // Backend Error
+
+            if (!response.ok) {
+
+                showMessage(
+                    result.message || "Login failed.",
+                    "error"
+                );
+
+                return;
+            }
+            // Check Admin Role
+
+            if (result.role !== "ADMIN") {
+
+                showMessage(
+                    "Access denied. This account is not an administrator.",
+                    "error"
+                );
+
+                return;
+            }
+
+            // Successful Admin Login
 
             showMessage(
-                "Admin login is ready. Backend authentication will be connected next.",
+                "Admin login successful!",
                 "success"
             );
 
+
+            adminLoginForm.reset();
+
+
+            /*
+             * Dashboard will be connected later.
+             *
+             * For now, we just confirm
+             * that admin authentication works.
+             */
+
+            // window.location.href =
+            //     "/bookService/Frontend/Admin/admin.html";
+
+
+        } catch (error) {
+
+            console.error(
+                "Admin login error:",
+                error
+            );
+
+            showMessage(
+                "Unable to connect to the server. Please try again.",
+                "error"
+            );
+
+        } finally {
 
             adminLoginButton.disabled = false;
 
@@ -166,16 +192,12 @@ adminLoginForm.addEventListener(
                 <span>Admin Login</span>
             `;
 
-        }, 800);
+        }
 
     }
 );
 
-
-
-/* =================================
-   Helpers
-================================= */
+    // Helpers
 
 function showError(
     input,

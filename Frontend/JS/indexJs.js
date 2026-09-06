@@ -1,7 +1,4 @@
-
-/* =====================================================
-   MOBILE MENU
-===================================================== */
+//MOBILE MENU
 
 const mobileMenuButton =
     document.getElementById("mobileMenuButton");
@@ -9,19 +6,11 @@ const mobileMenuButton =
 const mobileMenu =
     document.getElementById("mobileMenu");
 
-
 mobileMenuButton.addEventListener("click", () => {
-
-    mobileMenu.classList.toggle("hidden");
-
+    mobileMenu.classList.toggle("menu-open");
 });
 
-
-
-/* =====================================================
-   SERVICE IMAGE SLIDER
-===================================================== */
-
+//SERVICE IMAGE SLIDER
 
 const serviceImages = {
 
@@ -63,23 +52,15 @@ const serviceImages = {
 
 };
 
-
-
-/* =====================================================
-   CHANGE IMAGES EVERY 3 SECONDS
-===================================================== */
+//CHANGE IMAGES EVERY 3 SECONDS
 
 const imageIndexes = {};
-
 
 // Initialize indexes
 
 Object.keys(serviceImages).forEach(service => {
-
     imageIndexes[service] = 0;
-
 });
-
 
 // Change image
 
@@ -87,7 +68,6 @@ function changeServiceImages() {
 
     const images =
         document.querySelectorAll(".service-image");
-
 
     images.forEach(image => {
 
@@ -97,48 +77,30 @@ function changeServiceImages() {
         const serviceImageList =
             serviceImages[service];
 
-
         if (!serviceImageList) {
             return;
         }
 
-
         // Fade out
-
         image.style.opacity = "0";
 
-
         setTimeout(() => {
-
             imageIndexes[service]++;
-
             if (
                 imageIndexes[service] >=
                 serviceImageList.length
             ) {
-
                 imageIndexes[service] = 0;
-
             }
-
-
             image.src =
                 serviceImageList[
                     imageIndexes[service]
                 ];
-
-
             // Fade in
-
             image.style.opacity = "1";
-
         }, 300);
-
     });
-
 }
 
-
 // Change images every 3 seconds
-
 setInterval(changeServiceImages, 3000);

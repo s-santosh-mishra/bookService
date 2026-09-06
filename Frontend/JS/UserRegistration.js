@@ -1,6 +1,4 @@
-/* =================================
-   ServiceHub Customer Registration
-================================= */
+//ServiceHub Customer Registration
 
 const registerForm = document.getElementById("registerForm");
 
@@ -30,11 +28,7 @@ const registerButton =
 const registerMessage =
     document.getElementById("registerMessage");
 
-
-
-/* =================================
-   Password Visibility
-================================= */
+//Password Visibility
 
 togglePassword.addEventListener("click", () => {
 
@@ -45,7 +39,6 @@ togglePassword.addEventListener("click", () => {
 
 });
 
-
 toggleConfirmPassword.addEventListener("click", () => {
 
     togglePasswordVisibility(
@@ -54,7 +47,6 @@ toggleConfirmPassword.addEventListener("click", () => {
     );
 
 });
-
 
 function togglePasswordVisibility(input, button) {
 
@@ -71,11 +63,7 @@ function togglePasswordVisibility(input, button) {
 
 }
 
-
-
-/* =================================
-   Phone / PIN Input
-================================= */
+// Phone / PIN Input
 
 phone.addEventListener("input", () => {
 
@@ -101,11 +89,7 @@ age.addEventListener("input", () => {
 
 });
 
-
-
-/* =================================
-   Registration
-================================= */
+// Registration
 
 registerForm.addEventListener("submit", async (event) => {
 
@@ -156,12 +140,7 @@ registerForm.addEventListener("submit", async (event) => {
     };
 
 
-    /*
-        =================================
-        BACKEND CONNECTION
-        =================================
-
-    */
+    // BACKEND CONNECTION
 
     registerButton.disabled = true;
 
@@ -382,15 +361,11 @@ registerForm.addEventListener("submit", async (event) => {
 });
 
 
-
-/* =================================
-   Validation
-================================= */
+//Validation
 
 function validateForm() {
 
     let valid = true;
-
 
     // Full Name
 
@@ -404,7 +379,6 @@ function validateForm() {
 
         valid = false;
     }
-
 
     // Age
 
@@ -431,7 +405,6 @@ function validateForm() {
         valid = false;
     }
 
-
     // Gender
 
     if (!gender.value) {
@@ -444,7 +417,6 @@ function validateForm() {
 
         valid = false;
     }
-
 
     // Email - optional
 
@@ -461,7 +433,6 @@ function validateForm() {
 
         valid = false;
     }
-
 
     // Phone
 
@@ -486,7 +457,6 @@ function validateForm() {
         valid = false;
     }
 
-
     // Address Line 1
 
     if (!addressLine1.value.trim()) {
@@ -499,7 +469,6 @@ function validateForm() {
 
         valid = false;
     }
-
 
     // City
 
@@ -514,7 +483,6 @@ function validateForm() {
         valid = false;
     }
 
-
     // State
 
     if (!state.value) {
@@ -527,7 +495,6 @@ function validateForm() {
 
         valid = false;
     }
-
 
     // PIN
 
@@ -552,7 +519,6 @@ function validateForm() {
         valid = false;
     }
 
-
     // Password
 
     if (!password.value) {
@@ -575,7 +541,6 @@ function validateForm() {
 
         valid = false;
     }
-
 
     // Confirm password
 
@@ -602,7 +567,6 @@ function validateForm() {
         valid = false;
     }
 
-
     // Terms
 
     if (!terms.checked) {
@@ -618,16 +582,12 @@ function validateForm() {
         valid = false;
     }
 
-
     return valid;
 
 }
 
 
-
-/* =================================
-   Helper Functions
-================================= */
+// Helper Functions
 
 function showError(input, errorId, message) {
 
@@ -642,7 +602,6 @@ function showError(input, errorId, message) {
 
 }
 
-
 function clearErrors() {
 
     const inputs =
@@ -654,7 +613,6 @@ function clearErrors() {
         input.classList.remove("input-error");
     });
 
-
     const errors =
         registerForm.querySelectorAll(
             ".error-message"
@@ -665,11 +623,9 @@ function clearErrors() {
         error.textContent = "";
     });
 
-
     registerMessage.classList.add("hidden");
 
 }
-
 
 function isValidEmail(value) {
 
@@ -679,9 +635,7 @@ function isValidEmail(value) {
 
 
 function showMessage(message, type) {
-
     registerMessage.textContent = message;
-
     registerMessage.className =
         `mt-6 rounded-lg border px-4 py-3 text-sm ${type}`;
 

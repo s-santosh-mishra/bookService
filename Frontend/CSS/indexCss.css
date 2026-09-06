@@ -23,6 +23,19 @@
     color: #e5e7eb;
 }
 
+/* Mobile Menu Animation */
+
+#mobileMenu {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.25s ease;
+}
+
+#mobileMenu.menu-open {
+    max-height: 400px;
+    opacity: 1;
+}
 
 /* Service Cards */
 

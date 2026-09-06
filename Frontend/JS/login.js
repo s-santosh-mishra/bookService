@@ -23,11 +23,7 @@ const loginButton = document.getElementById("loginButton");
 // Current selected role
 let selectedRole = "customer";
 
-
-
-/* =================================
-   Role Selection
-================================= */
+// Role Selection
 
 customerRole.addEventListener("click", () => {
 
@@ -60,11 +56,7 @@ workerRole.addEventListener("click", () => {
 
 });
 
-
-
-/* =================================
-   Password Visibility
-================================= */
+//Password Visibility
 
 togglePassword.addEventListener("click", () => {
 
@@ -82,11 +74,7 @@ togglePassword.addEventListener("click", () => {
 
 });
 
-
-
-/* =================================
-   Login Form
-================================= */
+// Login Form
 
 loginForm.addEventListener("submit", async (event) => {
 
@@ -169,7 +157,6 @@ loginForm.addEventListener("submit", async (event) => {
             result = await response.text();
         }
 
-
         if (!response.ok) {
 
             const errorMessage =
@@ -191,9 +178,7 @@ loginForm.addEventListener("submit", async (event) => {
         loginForm.reset();
 
     } catch (error) {
-
         console.error("Login error:", error);
-
         showMessage(
             "Unable to connect to the server. Please make sure the backend is running.",
             "error"
@@ -205,18 +190,13 @@ loginForm.addEventListener("submit", async (event) => {
 
         loginButton.innerHTML = `
         <i class="fa-solid fa-right-to-bracket"></i>
-        <span>Login</span>
-    `;
-
+        <span>Login</span>`;
     }
 
 });
 
 
-
-/* =================================
-   Validation Functions
-================================= */
+//Validation Functions
 
 function showError(input, errorElement, message) {
 
@@ -228,7 +208,6 @@ function showError(input, errorElement, message) {
 
 }
 
-
 function clearValidation() {
 
     userId.classList.remove("input-error");
@@ -238,16 +217,10 @@ function clearValidation() {
     passwordError.classList.add("hidden");
 
     loginMessage.classList.add("hidden");
-
 }
 
-
-
 function showMessage(message, type) {
-
     loginMessage.textContent = message;
-
     loginMessage.className =
         `mb-5 rounded-lg border px-4 py-3 text-sm ${type}`;
-
 }
