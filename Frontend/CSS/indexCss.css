@@ -29,12 +29,19 @@
     max-height: 0;
     opacity: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease, opacity 0.25s ease;
+    margin-top: 0;
+    padding-bottom: 0;
+    transition: max-height 0.3s ease,
+                opacity 0.25s ease,
+                margin-top 0.3s ease,
+                padding-bottom 0.3s ease;
 }
 
 #mobileMenu.menu-open {
     max-height: 400px;
     opacity: 1;
+    margin-top: 1rem;
+    padding-bottom: 0.75rem;
 }
 
 /* Service Cards */
@@ -188,4 +195,10 @@ a {
     background: #7c3aed;
     color: white;
     transform: translateY(-3px);
+}
+
+@media (max-width: 1023px) {
+    .hero-image {
+        display: none;
+    }
 }
