@@ -18,6 +18,9 @@ public class Users {
     @JoinColumn(name = "user_id")
     private Credentials credentials;
 
+    @OneToOne(mappedBy = "user")
+    private Customer customer;
+
     @Column(name = "full_name", nullable = false, length = 150)
     private String fullName;
 
@@ -191,5 +194,13 @@ public class Users {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
     }
 }
