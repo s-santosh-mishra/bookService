@@ -12,6 +12,14 @@ const workerDetailsOverlay = document.getElementById("workerDetailsOverlay");
 const workerDetailsContent = document.getElementById("workerDetailsContent");
 const closeWorkerDetails = document.getElementById("closeWorkerDetails");
 
+const workerDetailsActions = document.getElementById("workerDetailsActions");
+const approveWorkerButton = document.getElementById("approveWorkerButton");
+const rejectWorkerButton = document.getElementById("rejectWorkerButton");
+const suspendWorkerButton = document.getElementById("suspendWorkerButton");
+const restoreWorkerButton = document.getElementById("restoreWorkerButton");
+
+let selectedWorkerId = null;
+
 const statusEndpoints = {
     Pending: "pending",
     Verified: "verified",
@@ -194,13 +202,16 @@ function renderWorkers(workers, status) {
             <td class="px-6 py-4 text-right">
 
                 <button
-                    class="view-worker-button px-3 py-2 rounded-lg
-                           text-sm text-violet-400
-                           hover:bg-violet-600/10
+                      class="view-worker-button px-3 py-2
+                          text-sm text-gray-300
+                          bg-gray-800
+                          hover:bg-gray-700
+                          rounded-lg
                            transition-colors"
+                      title="View worker"
                     data-worker-id="${escapeHtml(worker.workerId)}">
 
-                    View
+                    <i class="fa-solid fa-eye"></i>
 
                 </button>
 
@@ -373,6 +384,10 @@ async function loadWorkerDetails(workerId) {
         }
 
         const worker = await response.json();
+
+        selectedWorkerId = worker.workerId;
+
+        updateWorkerActions(worker.verificationStatus);
 
         renderWorkerDetails(worker);
 
@@ -599,9 +614,8 @@ function renderWorkerDetails(worker) {
 
                 <div class="flex flex-wrap gap-2">
 
-                    ${
-                        worker.services && worker.services.length
-                        ? worker.services.map(service => `
+                    ${worker.services && worker.services.length
+            ? worker.services.map(service => `
                             <span class="px-3 py-1.5 rounded-lg
                                          bg-violet-600/10
                                          text-violet-400 text-sm">
@@ -610,12 +624,12 @@ function renderWorkerDetails(worker) {
 
                             </span>
                         `).join("")
-                        : `
+            : `
                             <span class="text-gray-500 text-sm">
                                 No services assigned.
                             </span>
                         `
-                    }
+        }
 
                 </div>
 
@@ -672,6 +686,142 @@ closeWorkerDetails.addEventListener(
 workerDetailsOverlay.addEventListener(
     "click",
     closeWorkerDetailsModal
+);
+
+function updateWorkerActions(status) {
+
+    workerDetailsActions.classList.add("hidden");
+
+    approveWorkerButton.classList.add("hidden");
+    rejectWorkerButton.classList.add("hidden");
+    suspendWorkerButton.classList.add("hidden");
+    restoreWorkerButton.classList.add("hidden");
+
+    if (status === "PENDING") {
+
+        workerDetailsActions.classList.remove("hidden");
+
+        approveWorkerButton.classList.remove("hidden");
+        rejectWorkerButton.classList.remove("hidden");
+
+    } else if (status === "VERIFIED") {
+
+        workerDetailsActions.classList.remove("hidden");
+
+        suspendWorkerButton.classList.remove("hidden");
+
+    } else if (status === "SUSPENDED") {
+
+        workerDetailsActions.classList.remove("hidden");
+
+        restoreWorkerButton.classList.remove("hidden");
+    }
+}
+
+
+async function updateWorkerStatus(action) {
+
+    if (!selectedWorkerId) {
+        return;
+    }
+
+    const actionLabels = {
+        approve: "approve",
+        reject: "reject",
+        suspend: "suspend",
+        restore: "restore"
+    };
+
+    const completedActionLabels = {
+        approve: "approved",
+        reject: "rejected",
+        suspend: "suspended",
+        restore: "restored"
+    };
+
+    const actionLabel = actionLabels[action];
+
+    const confirmed = confirm(
+        `Are you sure you want to ${actionLabel} this worker?`
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    const token = sessionStorage.getItem(WORKER_ACCESS_TOKEN_KEY);
+
+    const buttonMap = {
+        approve: approveWorkerButton,
+        reject: rejectWorkerButton,
+        suspend: suspendWorkerButton,
+        restore: restoreWorkerButton
+    };
+
+    const button = buttonMap[action];
+
+    button.disabled = true;
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE_URL}/${selectedWorkerId}/${action}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            }
+        );
+
+        if (!response.ok) {
+
+            if (response.status === 401 || response.status === 403) {
+                window.location.href = "AdminLogin.html";
+                return;
+            }
+
+            throw new Error("Failed to update worker status.");
+        }
+
+        closeWorkerDetailsModal();
+
+        await loadWorkers(currentStatus);
+
+        alert(`Worker ${completedActionLabels[action]} successfully.`);
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Failed to update worker status.");
+
+    } finally {
+
+        button.disabled = false;
+
+    }
+}
+
+
+approveWorkerButton.addEventListener(
+    "click",
+    () => updateWorkerStatus("approve")
+);
+
+rejectWorkerButton.addEventListener(
+    "click",
+    () => updateWorkerStatus("reject")
+);
+
+suspendWorkerButton.addEventListener(
+    "click",
+    () => updateWorkerStatus("suspend")
+);
+
+restoreWorkerButton.addEventListener(
+    "click",
+    () => updateWorkerStatus("restore")
 );
 
 

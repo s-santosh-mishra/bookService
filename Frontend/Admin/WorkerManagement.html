@@ -223,15 +223,17 @@
                 <div class="relative flex min-h-screen items-center
                 justify-center p-4">
 
-                    <div class="w-full max-w-3xl max-h-[90vh]
-                    overflow-y-auto
+                    <div class="flex w-full max-w-3xl max-h-[90vh]
+                    flex-col overflow-hidden
                     rounded-2xl border border-white/10
                     bg-gray-900 shadow-2xl">
 
                         <div class="flex items-center justify-between
+                        shrink-0
                         border-b border-gray-800 px-6 py-5">
 
                             <div>
+
                                 <h2 class="text-xl font-semibold">
                                     Worker Details
                                 </h2>
@@ -239,6 +241,7 @@
                                 <p class="mt-1 text-sm text-gray-500">
                                     Complete worker information
                                 </p>
+
                             </div>
 
                             <button id="closeWorkerDetails" class="flex h-9 w-9 items-center justify-center
@@ -253,7 +256,7 @@
                         </div>
 
 
-                        <div id="workerDetailsContent" class="p-6">
+                        <div id="workerDetailsContent" class="min-h-0 flex-1 overflow-y-auto p-6">
 
                             <div class="flex flex-col items-center
                             justify-center py-12">
@@ -264,6 +267,62 @@
                                 <p class="text-gray-400">
                                     Select a worker to view details.
                                 </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div id="workerDetailsActions" class="hidden shrink-0 border-t border-gray-800 px-6 py-5">
+
+                            <div class="flex flex-wrap justify-end gap-3">
+
+                                <button id="rejectWorkerButton" class="hidden px-4 py-2.5 rounded-lg
+                                   bg-red-600/10 text-red-400
+                                   border border-red-500/20
+                                   hover:bg-red-600 hover:text-white
+                                   transition-colors">
+
+                                    <i class="fa-solid fa-xmark mr-2"></i>
+                                    Reject
+
+                                </button>
+
+
+                                <button id="approveWorkerButton" class="hidden px-4 py-2.5 rounded-lg
+                                   bg-green-600/10 text-green-400
+                                   border border-green-500/20
+                                   hover:bg-green-600 hover:text-white
+                                   transition-colors">
+
+                                    <i class="fa-solid fa-check mr-2"></i>
+                                    Approve
+
+                                </button>
+
+
+                                <button id="suspendWorkerButton" class="hidden px-4 py-2.5 rounded-lg
+                                   bg-yellow-600/10 text-yellow-400
+                                   border border-yellow-500/20
+                                   hover:bg-yellow-600 hover:text-white
+                                   transition-colors">
+
+                                    <i class="fa-solid fa-ban mr-2"></i>
+                                    Suspend
+
+                                </button>
+
+
+                                <button id="restoreWorkerButton" class="hidden px-4 py-2.5 rounded-lg
+                                   bg-violet-600/10 text-violet-400
+                                   border border-violet-500/20
+                                   hover:bg-violet-600 hover:text-white
+                                   transition-colors">
+
+                                    <i class="fa-solid fa-rotate-left mr-2"></i>
+                                    Restore
+
+                                </button>
 
                             </div>
 
