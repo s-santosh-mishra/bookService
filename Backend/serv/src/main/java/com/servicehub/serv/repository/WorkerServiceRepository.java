@@ -9,4 +9,5 @@ import java.util.UUID;
 public interface WorkerServiceRepository
         extends JpaRepository<WorkerService, WorkerServiceId> {
                 List<WorkerService> findByWorker_UserId(UUID workerId);
+                List<WorkerService> findByService_ServiceId(UUID serviceId);
 }

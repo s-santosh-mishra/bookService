@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Category Management | ServiceHub</title>
+
+    <link rel="stylesheet" href="../CSS/output.css">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="../Images/favicon-32x32.png?v=3">
+
+    <link rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="../Images/favicon-16x16.png?v=3">
+</head>
+
+
+<body class="min-h-screen bg-gray-950 text-white">
+
+    <div class="min-h-screen">
+
+        <div id="adminSidebar"></div>
+
+
+        <main class="min-h-screen lg:ml-64">
+
+            <div id="adminHeader"></div>
+
+
+            <section class="px-4 py-8 sm:px-6 lg:px-8">
+
+                <div class="max-w-7xl mx-auto">
+
+
+                    <!-- Page Header -->
+
+                    <div class="mb-8">
+
+                        <div class="flex items-center gap-2
+                                    text-sm text-gray-500 mb-2">
+
+                            <a href="AdminDashboard.html"
+                               class="hover:text-violet-400 transition-colors">
+
+                                Dashboard
+
+                            </a>
+
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
+
+                            <a href="SystemManagement.html"
+                               class="hover:text-violet-400 transition-colors">
+
+                                System Management
+
+                            </a>
+
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
+
+                            <span class="text-gray-400">
+                                Category Management
+                            </span>
+
+                        </div>
+
+
+                        <h1 class="text-2xl font-bold sm:text-3xl">
+                            Category Management
+                        </h1>
+
+
+                        <p class="mt-2 text-gray-400">
+                            Manage ServiceHub service categories.
+                        </p>
+
+                    </div>
+
+
+                    <!-- Category List -->
+
+                    <div class="bg-gray-900 border border-gray-800
+                                rounded-xl overflow-hidden">
+
+
+                        <!-- List Header -->
+
+                        <div class="px-6 py-5
+                                    border-b border-gray-800">
+
+                            <div class="flex flex-col
+                                        sm:flex-row
+                                        sm:items-center
+                                        sm:justify-between
+                                        gap-4">
+
+                                <div>
+
+                                    <h3 class="text-lg font-semibold">
+                                        Categories
+                                    </h3>
+
+                                    <p class="text-sm text-gray-500 mt-1">
+                                        View and manage service categories.
+                                    </p>
+
+                                </div>
+
+
+                                <div class="flex items-center gap-3">
+
+                                    <span id="categoryCount"
+                                          class="px-3 py-1 rounded-full
+                                                 bg-gray-800 text-gray-400
+                                                 text-sm">
+
+                                        0
+
+                                    </span>
+
+
+                                    <button
+                                        id="addCategoryButton"
+                                        class="px-4 py-2.5 rounded-lg
+                                               bg-violet-600
+                                               hover:bg-violet-700
+                                               text-white text-sm
+                                               font-medium
+                                               transition-colors">
+
+                                        <i class="fa-solid fa-plus mr-2"></i>
+
+                                        Add Category
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Category Table -->
+
+                        <div class="overflow-x-auto">
+
+                            <table class="w-full">
+
+                                <thead>
+
+                                    <tr class="text-left text-xs
+                                               uppercase tracking-wider
+                                               text-gray-500
+                                               border-b border-gray-800">
+
+                                        <th class="px-6 py-4">
+                                            Category
+                                        </th>
+
+                                        <th class="px-6 py-4">
+                                            Services
+                                        </th>
+
+                                        <th class="px-6 py-4">
+                                            Status
+                                        </th>
+
+                                        <th class="px-6 py-4 text-right">
+                                            Action
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+
+                                <tbody id="categoryTableBody">
+
+                                    <tr>
+
+                                        <td colspan="4"
+                                            class="px-6 py-16 text-center">
+
+                                            <div class="flex flex-col
+                                                        items-center">
+
+                                                <div class="w-12 h-12
+                                                            rounded-full
+                                                            bg-gray-800
+                                                            flex items-center
+                                                            justify-center
+                                                            mb-4">
+
+                                                    <i class="fa-solid fa-layer-group
+                                                              text-gray-600
+                                                              text-lg"></i>
+
+                                                </div>
+
+
+                                                <p class="text-gray-400">
+                                                    Loading categories...
+                                                </p>
+
+                                            </div>
+
+                                        </td>
+
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- Add Category Modal -->
+
+            <div id="addCategoryModal"
+                 class="fixed inset-0 z-50 hidden">
+
+                <div id="addCategoryOverlay"
+                     class="absolute inset-0
+                            bg-black/70 backdrop-blur-sm">
+                </div>
+
+
+                <div class="relative flex min-h-screen
+                            items-center justify-center p-4">
+
+                    <div class="w-full max-w-md
+                                overflow-hidden
+                                rounded-2xl
+                                border border-white/10
+                                bg-gray-900
+                                shadow-2xl">
+
+
+                        <!-- Modal Header -->
+
+                        <div class="flex items-center
+                                    justify-between
+                                    border-b border-gray-800
+                                    px-6 py-5">
+
+                            <div>
+
+                                <h2 class="text-xl font-semibold">
+                                    Add Category
+                                </h2>
+
+                                <p class="mt-1 text-sm text-gray-500">
+                                    Create a new service category.
+                                </p>
+
+                            </div>
+
+
+                            <button
+                                id="closeAddCategory"
+                                class="flex h-9 w-9
+                                       items-center justify-center
+                                       rounded-lg
+                                       text-gray-400
+                                       hover:bg-gray-800
+                                       hover:text-white
+                                       transition-colors">
+
+                                <i class="fa-solid fa-xmark"></i>
+
+                            </button>
+
+                        </div>
+
+
+                        <!-- Modal Content -->
+
+                        <form id="addCategoryForm"
+                              class="px-6 py-6">
+
+
+                            <label for="categoryName"
+                                   class="block text-sm
+                                          font-medium
+                                          text-gray-300 mb-2">
+
+                                Category Name
+
+                            </label>
+
+
+                            <input
+                                type="text"
+                                id="categoryName"
+                                name="categoryName"
+                                maxlength="100"
+                                required
+                                autocomplete="off"
+                                placeholder="Enter category name"
+                                class="w-full
+                                       rounded-lg
+                                       border border-gray-800
+                                       bg-gray-950
+                                       px-4 py-3
+                                       text-white
+                                       placeholder-gray-600
+                                       focus:outline-none
+                                       focus:border-violet-500
+                                       transition-colors">
+
+
+                            <!-- Modal Actions -->
+
+                            <div class="flex justify-end
+                                        gap-3 mt-6">
+
+                                <button
+                                    type="button"
+                                    id="cancelAddCategory"
+                                    class="px-4 py-2.5
+                                           rounded-lg
+                                           bg-gray-800
+                                           text-gray-300
+                                           hover:bg-gray-700
+                                           hover:text-white
+                                           transition-colors">
+
+                                    Cancel
+
+                                </button>
+
+
+                                <button
+                                    type="submit"
+                                    class="px-4 py-2.5
+                                           rounded-lg
+                                           bg-violet-600
+                                           text-white
+                                           hover:bg-violet-700
+                                           transition-colors">
+
+                                    <i class="fa-solid fa-plus mr-2"></i>
+
+                                    Add Category
+
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <script src="components/AdminLayout.js"></script>
+
+    <script src="CategoryManagement.js"></script>
+
+</body>
+
+</html>

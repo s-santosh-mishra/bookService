@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>System Management - ServiceHub</title>
+
+    <link rel="stylesheet" href="../CSS/output.css">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="../Images/favicon-32x32.png?v=3">
+
+    <link rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="../Images/favicon-16x16.png?v=3">
+
+</head>
+
+<body class="min-h-screen bg-gray-950 text-white">
+
+    <div class="min-h-screen">
+
+        <!-- Sidebar -->
+        <div id="adminSidebar"></div>
+
+        <!-- Main Content -->
+        <main class="min-h-screen lg:ml-64">
+
+            <!-- Header -->
+            <div id="adminHeader"></div>
+
+            <section class="px-4 py-8 sm:px-6 lg:px-8">
+
+                <!-- Breadcrumb -->
+                <div class="flex items-center gap-2 text-sm text-gray-500 mb-6">
+
+                    <a href="AdminDashboard.html"
+                       class="hover:text-white transition-colors">
+                        Dashboard
+                    </a>
+
+                    <i class="fa-solid fa-chevron-right text-xs"></i>
+
+                    <span class="text-gray-300">
+                        System Management
+                    </span>
+
+                </div>
+
+                <!-- Page Heading -->
+                <div class="mb-8">
+
+                    <h1 class="text-2xl font-bold sm:text-3xl">
+                        System Management
+                    </h1>
+
+                    <p class="text-gray-500 mt-2">
+                        Manage service categories and services available on ServiceHub.
+                    </p>
+
+                </div>
+
+                <!-- Management Options -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
+
+                    <!-- Category Management -->
+                    <a href="CategoryManagement.html"
+                       class="group bg-gray-900 border border-gray-800
+                              rounded-xl p-6
+                              hover:border-violet-500/50
+                              hover:bg-gray-900/80
+                              transition-all">
+
+                        <div class="flex items-start justify-between">
+
+                            <div class="w-12 h-12 rounded-xl
+                                        bg-violet-600/15
+                                        flex items-center justify-center
+                                        text-violet-400
+                                        group-hover:bg-violet-600/20
+                                        transition-colors">
+
+                                <i class="fa-solid fa-layer-group text-xl"></i>
+
+                            </div>
+
+                            <i class="fa-solid fa-arrow-right
+                                      text-gray-600
+                                      group-hover:text-violet-400
+                                      group-hover:translate-x-1
+                                      transition-all"></i>
+
+                        </div>
+
+                        <h2 class="text-lg font-semibold mt-5">
+                            Category Management
+                        </h2>
+
+                        <p class="text-sm text-gray-500 mt-2 leading-relaxed">
+                            Add, activate, and deactivate service categories.
+                        </p>
+
+                    </a>
+
+
+                    <!-- Service Management -->
+                    <a href="ServiceManagement.html"
+                       class="group bg-gray-900 border border-gray-800
+                              rounded-xl p-6
+                              hover:border-violet-500/50
+                              hover:bg-gray-900/80
+                              transition-all">
+
+                        <div class="flex items-start justify-between">
+
+                            <div class="w-12 h-12 rounded-xl
+                                        bg-violet-600/15
+                                        flex items-center justify-center
+                                        text-violet-400
+                                        group-hover:bg-violet-600/20
+                                        transition-colors">
+
+                                <i class="fa-solid fa-screwdriver-wrench text-xl"></i>
+
+                            </div>
+
+                            <i class="fa-solid fa-arrow-right
+                                      text-gray-600
+                                      group-hover:text-violet-400
+                                      group-hover:translate-x-1
+                                      transition-all"></i>
+
+                        </div>
+
+                        <h2 class="text-lg font-semibold mt-5">
+                            Service Management
+                        </h2>
+
+                        <p class="text-sm text-gray-500 mt-2 leading-relaxed">
+                            Manage services, categories, availability, and worker assignments.
+                        </p>
+
+                    </a>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <script src="components/AdminLayout.js"></script>
+
+</body>
+
+</html>
