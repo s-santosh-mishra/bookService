@@ -15,129 +15,108 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+        private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(
-            JwtAuthenticationFilter jwtAuthenticationFilter
-    ) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-    }
+        public SecurityConfig(
+                        JwtAuthenticationFilter jwtAuthenticationFilter) {
+                this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        }
 
+        // BCrypt password hashing
+        @Bean
+        public PasswordEncoder passwordEncoder() {
 
-    // BCrypt password hashing
-    @Bean
-    public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 
-        return new BCryptPasswordEncoder();
-    }
+        // CORS configuration
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
 
+                CorsConfiguration configuration = new CorsConfiguration();
 
-    // CORS configuration
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+                configuration.setAllowedOrigins(
+                                List.of(
+                                                "http://127.0.0.1:5500"));
 
-        CorsConfiguration configuration =
-                new CorsConfiguration();
+                configuration.setAllowedMethods(
+                                List.of(
+                                                "GET",
+                                                "POST",
+                                                "PUT",
+                                                "DELETE",
+                                                "OPTIONS"));
 
-        configuration.setAllowedOrigins(
-                List.of(
-                        "http://127.0.0.1:5500"
-                )
-        );
+                configuration.setAllowedHeaders(
+                                List.of("*"));
 
-        configuration.setAllowedMethods(
-                List.of(
-                        "GET",
-                        "POST",
-                        "PUT",
-                        "DELETE",
-                        "OPTIONS"
-                )
-        );
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
-        configuration.setAllowedHeaders(
-                List.of("*")
-        );
+                source.registerCorsConfiguration(
+                                "/**",
+                                configuration);
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
+                return source;
+        }
 
-        source.registerCorsConfiguration(
-                "/**",
-                configuration
-        );
+        // Spring Security configuration
+        @Bean
+        public SecurityFilterChain securityFilterChain(
+                        HttpSecurity http) throws Exception {
 
-        return source;
-    }
+                http
 
+                                // CORS
+                                .cors(cors -> cors.configurationSource(
+                                                corsConfigurationSource()))
 
-    // Spring Security configuration
-    @Bean
-    public SecurityFilterChain securityFilterChain(
-            HttpSecurity http
-    ) throws Exception {
+                                // CSRF is disabled because
+                                // authentication is stateless and
+                                // handled using JWT
+                                .csrf(csrf -> csrf.disable())
 
-        http
+                                // JWT authentication does not use
+                                // server-side HTTP sessions
+                                .sessionManagement(session -> session.sessionCreationPolicy(
+                                                SessionCreationPolicy.STATELESS))
 
-                // CORS
-                .cors(cors ->
-                        cors.configurationSource(
-                                corsConfigurationSource()
-                        )
-                )
+                                // Endpoint authorization
+                                .authorizeHttpRequests(auth -> auth
 
-                // CSRF is disabled because
-                // authentication is stateless and
-                // handled using JWT
-                .csrf(csrf ->
-                        csrf.disable()
-                )
+                                                // Authentication endpoints
+                                                .requestMatchers("/api/auth/**")
+                                                .permitAll()
 
-                // JWT authentication does not use
-                // server-side HTTP sessions
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(
-                                SessionCreationPolicy.STATELESS
-                        )
-                )
+                                                // Customer registration
+                                                .requestMatchers("/api/user/register")
+                                                .permitAll()
 
-                // Endpoint authorization
-                .authorizeHttpRequests(auth -> auth
+                                                // Worker registration
+                                                .requestMatchers("/api/worker/register")
+                                                .permitAll()
 
-                        // Authentication endpoints
-                        .requestMatchers(
-                                "/api/auth/**"
-                        ).permitAll()
+                                                // Public categories
+                                                .requestMatchers(HttpMethod.GET, "/api/categories")
+                                                .permitAll()
 
-                        // Customer registration
-                        .requestMatchers(
-                                "/api/user/register"
-                        ).permitAll()
+                                                // Admin APIs require JWT + ADMIN role
+                                                .requestMatchers("/api/admin/**")
+                                                .hasRole("ADMIN")
 
-                        // Worker registration
-                        .requestMatchers(
-                                "/api/worker/register"
-                        ).permitAll()
+                                                // Everything else requires authentication
+                                                .anyRequest()
+                                                .authenticated())
 
-                        // Admin APIs
-                        .requestMatchers(
-                                "/api/admin/**"
-                        ).hasRole("ADMIN")
+                                // JWT filter
+                                .addFilterBefore(
+                                                jwtAuthenticationFilter,
+                                                UsernamePasswordAuthenticationFilter.class);
 
-                        // Everything else
-                        .anyRequest().authenticated()
-                )
-
-                // JWT filter
-                .addFilterBefore(
-                        jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class
-                );
-
-        return http.build();
-    }
+                return http.build();
+        }
 }
