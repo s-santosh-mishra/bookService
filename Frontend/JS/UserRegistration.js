@@ -1,4 +1,6 @@
-//ServiceHub Customer Registration
+// ================================================
+// ServiceHub Customer Registration
+// ================================================
 
 const registerForm = document.getElementById("registerForm");
 
@@ -9,6 +11,8 @@ const email = document.getElementById("email");
 const phone = document.getElementById("phone");
 
 const addressLine1 = document.getElementById("addressLine1");
+const addressLine2 = document.getElementById("addressLine2");
+const landmark = document.getElementById("landmark");
 const city = document.getElementById("city");
 const state = document.getElementById("state");
 const pincode = document.getElementById("pincode");
@@ -18,7 +22,9 @@ const confirmPassword = document.getElementById("confirmPassword");
 
 const terms = document.getElementById("terms");
 
-const togglePassword = document.getElementById("togglePassword");
+const togglePassword =
+    document.getElementById("togglePassword");
+
 const toggleConfirmPassword =
     document.getElementById("toggleConfirmPassword");
 
@@ -28,7 +34,10 @@ const registerButton =
 const registerMessage =
     document.getElementById("registerMessage");
 
-//Password Visibility
+
+// ================================================
+// Password Visibility
+// ================================================
 
 togglePassword.addEventListener("click", () => {
 
@@ -39,6 +48,7 @@ togglePassword.addEventListener("click", () => {
 
 });
 
+
 toggleConfirmPassword.addEventListener("click", () => {
 
     togglePasswordVisibility(
@@ -47,6 +57,7 @@ toggleConfirmPassword.addEventListener("click", () => {
     );
 
 });
+
 
 function togglePasswordVisibility(input, button) {
 
@@ -63,7 +74,10 @@ function togglePasswordVisibility(input, button) {
 
 }
 
-// Phone / PIN Input
+
+// ================================================
+// Input Restrictions
+// ================================================
 
 phone.addEventListener("input", () => {
 
@@ -83,13 +97,15 @@ pincode.addEventListener("input", () => {
 
 age.addEventListener("input", () => {
 
-    if (age.value.length > 3) {
-        age.value = age.value.slice(0, 3);
-    }
+    age.value =
+        age.value.replace(/\D/g, "").slice(0, 3);
 
 });
 
-// Registration
+
+// ================================================
+// Form Submission
+// ================================================
 
 registerForm.addEventListener("submit", async (event) => {
 
@@ -97,61 +113,68 @@ registerForm.addEventListener("submit", async (event) => {
 
     clearErrors();
 
-    const isValid = validateForm();
-
-    if (!isValid) {
+    if (!validateForm()) {
         return;
     }
 
 
     const formData = {
 
-        fullName: fullName.value.trim(),
+        fullName:
+            fullName.value.trim(),
 
-        age: Number(age.value),
+        age:
+            Number(age.value),
 
-        gender: gender.value.toUpperCase(),
+        gender:
+            gender.value.toUpperCase(),
 
-        email: email.value.trim(),
+        email:
+            email.value.trim(),
 
-        phone: phone.value.trim(),
+        phone:
+            phone.value.trim(),
 
-        addressLine1: addressLine1.value.trim(),
+        addressLine1:
+            addressLine1.value.trim(),
 
         addressLine2:
-            document.getElementById("addressLine2")
-                .value.trim() || null,
+            addressLine2.value.trim() || null,
 
         landmark:
-            document.getElementById("landmark")
-                .value.trim() || null,
+            landmark.value.trim() || null,
 
-        city: city.value.trim(),
+        city:
+            city.value.trim(),
 
-        state: state.value,
+        state:
+            state.value,
 
-        pinCode: pincode.value.trim(),
+        pinCode:
+            pincode.value.trim(),
 
-        password: password.value,
+        password:
+            password.value,
 
-        confirmPassword: confirmPassword.value,
+        confirmPassword:
+            confirmPassword.value,
 
-        termsAccepted: terms.checked
+        termsAccepted:
+            terms.checked
     };
 
 
-    // BACKEND CONNECTION
+    // ============================================
+    // Loading State
+    // ============================================
 
-    registerButton.disabled = true;
+    setLoading(true);
 
-    registerButton.innerHTML = `
-    <i class="fa-solid fa-spinner fa-spin"></i>
-    <span>Creating account...</span>`;
 
     try {
 
         const response = await fetch(
-            "http://localhost:8080/api/auth/register",
+            "http://localhost:8080/api/user/register",
             {
                 method: "POST",
 
@@ -164,86 +187,36 @@ registerForm.addEventListener("submit", async (event) => {
         );
 
 
-        let result;
+        const result =
+            await readResponse(response);
 
-        const contentType = response.headers.get("content-type");
-
-        if (contentType && contentType.includes("application/json")) {
-            result = await response.json();
-        } else {
-            result = await response.text();
-        }
 
         if (!response.ok) {
 
-            const errorMessage =
-                typeof result === "object" && result !== null
-                    ? result.error || result.message || "Registration failed. Please try again."
-                    : result;
-
             showMessage(
-                errorMessage,
+                getBackendError(result),
                 "error"
             );
 
             return;
         }
 
+
+        // ========================================
+        // Success
+        // ========================================
+
         registerForm.reset();
 
-        let countdown = 7;
-
-        registerMessage.className =
-            "mt-6 rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-400";
-
-        registerMessage.innerHTML = `
-    <div class="text-center">
-        <p class="font-medium">
-            Registration successful!
-        </p>
-
-        <p class="mt-1">
-            You can now
-            <a
-                href="/bookService/Frontend/HTML/login.html"
-                class="text-purple-400 hover:text-purple-300 font-medium"
-            >
-                Login
-            </a>
-            to your account.
-        </p>
-
-        <p class="mt-2 text-gray-400">
-            Redirecting to login in
-            <span id="countdown">${countdown}</span>
-            seconds...
-        </p>
-    </div>
-`;
-
-        const countdownElement =
-            document.getElementById("countdown");
-
-        const countdownTimer = setInterval(() => {
-
-            countdown--;
-
-            countdownElement.textContent = countdown;
-
-            if (countdown <= 0) {
-
-                clearInterval(countdownTimer);
-
-                window.location.href =
-                    "/bookService/Frontend/HTML/login.html";
-            }
-
-        }, 1000);
+        showSuccess();
 
 
     } catch (error) {
 
-        console.error("Registration error:", error);
+        console.error(
+            "Registration error:",
+            error
+        );
 
         showMessage(
             "Unable to connect to the server. Please make sure the backend is running.",
@@ -252,120 +225,21 @@ registerForm.addEventListener("submit", async (event) => {
 
     } finally {
 
-        registerButton.disabled = false;
-
-        registerButton.innerHTML = `
-        <i class="fa-solid fa-user-plus"></i>
-        <span>Create Account</span>`;
+        setLoading(false);
 
     }
-
-    registerForm.addEventListener("submit", async (event) => {
-
-        event.preventDefault();
-
-        clearErrors();
-
-        const isValid = validateForm();
-
-        if (!isValid) {
-            return;
-        }
-
-        const formData = {
-
-            fullName: fullName.value.trim(),
-            age: Number(age.value),
-            gender: gender.value.toUpperCase(),
-            email: email.value.trim(),
-            phone: phone.value.trim(),
-
-            addressLine1: addressLine1.value.trim(),
-
-            addressLine2:
-                document.getElementById("addressLine2")
-                    .value.trim() || null,
-
-            landmark:
-                document.getElementById("landmark")
-                    .value.trim() || null,
-
-            city: city.value.trim(),
-            state: state.value,
-            pinCode: pincode.value.trim(),
-
-            password: password.value,
-            confirmPassword: confirmPassword.value,
-            termsAccepted: terms.checked
-        };
-
-        registerButton.disabled = true;
-
-        registerButton.innerHTML = `
-        <i class="fa-solid fa-spinner fa-spin"></i>
-        <span>Creating account...</span>
-    `;
-
-        try {
-
-            const response = await fetch(
-                "http://localhost:8080/api/user/register",
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-
-                    body: JSON.stringify(formData)
-                }
-            );
-
-            const result = await response.text();
-
-            if (!response.ok) {
-
-                showMessage(
-                    result || "Registration failed. Please try again.",
-                    "error"
-                );
-
-                return;
-            }
-
-            alert("Registration successful!");
-
-            registerForm.reset();
-
-        } catch (error) {
-
-            console.error("Registration error:", error);
-
-            showMessage(
-                "Unable to connect to the server. Please make sure the backend is running.",
-                "error"
-            );
-
-        } finally {
-
-            registerButton.disabled = false;
-
-            registerButton.innerHTML = `
-            <i class="fa-solid fa-user-plus"></i>
-            <span>Create Account</span>
-        `;
-        }
-
-    });
 
 });
 
 
-//Validation
+// ================================================
+// Validation
+// ================================================
 
 function validateForm() {
 
     let valid = true;
+
 
     // Full Name
 
@@ -378,11 +252,14 @@ function validateForm() {
         );
 
         valid = false;
+
     }
+
 
     // Age
 
-    const ageValue = Number(age.value);
+    const ageValue =
+        Number(age.value);
 
     if (!age.value) {
 
@@ -394,7 +271,10 @@ function validateForm() {
 
         valid = false;
 
-    } else if (ageValue < 18 || ageValue > 100) {
+    } else if (
+        ageValue < 18 ||
+        ageValue > 100
+    ) {
 
         showError(
             age,
@@ -403,7 +283,9 @@ function validateForm() {
         );
 
         valid = false;
+
     }
+
 
     // Gender
 
@@ -416,12 +298,23 @@ function validateForm() {
         );
 
         valid = false;
+
     }
 
-    // Email - optional
 
-    if (
-        email.value.trim() &&
+    // Email
+
+    if (!email.value.trim()) {
+
+        showError(
+            email,
+            "emailError",
+            "Please enter your email address."
+        );
+
+        valid = false;
+
+    } else if (
         !isValidEmail(email.value.trim())
     ) {
 
@@ -432,7 +325,9 @@ function validateForm() {
         );
 
         valid = false;
+
     }
+
 
     // Phone
 
@@ -446,7 +341,11 @@ function validateForm() {
 
         valid = false;
 
-    } else if (!/^[6-9]\d{9}$/.test(phone.value.trim())) {
+    } else if (
+        !/^[6-9]\d{9}$/.test(
+            phone.value.trim()
+        )
+    ) {
 
         showError(
             phone,
@@ -455,9 +354,11 @@ function validateForm() {
         );
 
         valid = false;
+
     }
 
-    // Address Line 1
+
+    // Address
 
     if (!addressLine1.value.trim()) {
 
@@ -468,7 +369,9 @@ function validateForm() {
         );
 
         valid = false;
+
     }
+
 
     // City
 
@@ -481,7 +384,9 @@ function validateForm() {
         );
 
         valid = false;
+
     }
+
 
     // State
 
@@ -494,7 +399,9 @@ function validateForm() {
         );
 
         valid = false;
+
     }
+
 
     // PIN
 
@@ -508,7 +415,11 @@ function validateForm() {
 
         valid = false;
 
-    } else if (!/^\d{6}$/.test(pincode.value.trim())) {
+    } else if (
+        !/^\d{6}$/.test(
+            pincode.value.trim()
+        )
+    ) {
 
         showError(
             pincode,
@@ -517,7 +428,9 @@ function validateForm() {
         );
 
         valid = false;
+
     }
+
 
     // Password
 
@@ -531,7 +444,9 @@ function validateForm() {
 
         valid = false;
 
-    } else if (password.value.length < 8) {
+    } else if (
+        password.value.length < 8
+    ) {
 
         showError(
             password,
@@ -540,9 +455,11 @@ function validateForm() {
         );
 
         valid = false;
+
     }
 
-    // Confirm password
+
+    // Confirm Password
 
     if (!confirmPassword.value) {
 
@@ -555,7 +472,8 @@ function validateForm() {
         valid = false;
 
     } else if (
-        password.value !== confirmPassword.value
+        password.value !==
+        confirmPassword.value
     ) {
 
         showError(
@@ -565,78 +483,253 @@ function validateForm() {
         );
 
         valid = false;
+
     }
+
 
     // Terms
 
     if (!terms.checked) {
 
-        const termsError =
+        const error =
             document.getElementById("termsError");
 
-        termsError.textContent =
+        error.textContent =
             "Please accept the Terms & Conditions to continue.";
 
-        termsError.classList.remove("hidden");
+        error.classList.remove("hidden");
 
         valid = false;
+
     }
+
 
     return valid;
 
 }
 
 
-// Helper Functions
+// ================================================
+// Loading
+// ================================================
 
-function showError(input, errorId, message) {
+function setLoading(loading) {
+
+    registerButton.disabled = loading;
+
+
+    if (loading) {
+
+        registerButton.innerHTML = `
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span>Creating account...</span>
+        `;
+
+    } else {
+
+        registerButton.innerHTML = `
+            <i class="fa-solid fa-user-plus"></i>
+            <span>Create Account</span>
+        `;
+
+    }
+
+}
+
+
+// ================================================
+// Success Message
+// ================================================
+
+function showSuccess() {
+
+    let countdown = 7;
+
+
+    registerMessage.className =
+        "mt-6 rounded-lg border border-green-500/30 " +
+        "bg-green-500/10 px-4 py-3 text-sm text-green-400";
+
+
+    registerMessage.innerHTML = `
+        <div class="text-center">
+
+            <p class="font-medium">
+                Registration successful!
+            </p>
+
+            <p class="mt-1">
+                You can now
+                <a
+                    href="/bookService/Frontend/HTML/login.html"
+                    class="text-purple-400 hover:text-purple-300 font-medium"
+                >
+                    Login
+                </a>
+                to your account.
+            </p>
+
+            <p class="mt-2 text-gray-400">
+
+                Redirecting to login in
+                <span id="countdown">
+                    ${countdown}
+                </span>
+                seconds...
+
+            </p>
+
+        </div>
+    `;
+
+
+    const countdownElement =
+        document.getElementById("countdown");
+
+
+    const countdownTimer =
+        setInterval(() => {
+
+            countdown--;
+
+            countdownElement.textContent =
+                countdown;
+
+
+            if (countdown <= 0) {
+
+                clearInterval(countdownTimer);
+
+                window.location.href =
+                    "/bookService/Frontend/HTML/login.html";
+
+            }
+
+        }, 1000);
+
+}
+
+
+// ================================================
+// Error / Message Helpers
+// ================================================
+
+function showError(
+    input,
+    errorId,
+    message
+) {
 
     input.classList.add("input-error");
 
     const error =
         document.getElementById(errorId);
 
-    error.textContent = message;
+    error.textContent =
+        message;
 
     error.classList.remove("hidden");
 
 }
 
+
 function clearErrors() {
 
-    const inputs =
-        registerForm.querySelectorAll(
-            ".form-input"
-        );
+    registerForm
+        .querySelectorAll(".form-input")
+        .forEach(input => {
 
-    inputs.forEach(input => {
-        input.classList.remove("input-error");
-    });
+            input.classList.remove(
+                "input-error"
+            );
 
-    const errors =
-        registerForm.querySelectorAll(
-            ".error-message"
-        );
+        });
 
-    errors.forEach(error => {
-        error.classList.add("hidden");
-        error.textContent = "";
-    });
+
+    registerForm
+        .querySelectorAll(".error-message")
+        .forEach(error => {
+
+            error.classList.add("hidden");
+
+            error.textContent = "";
+
+        });
+
 
     registerMessage.classList.add("hidden");
 
+    registerMessage.textContent = "";
+
 }
+
+
+function showMessage(
+    message,
+    type
+) {
+
+    if (type === "error") {
+
+        registerMessage.className =
+            "mt-6 rounded-lg border border-red-500/30 " +
+            "bg-red-500/10 px-4 py-3 text-sm text-red-400";
+
+    }
+
+    registerMessage.textContent =
+        message;
+
+}
+
+
+async function readResponse(response) {
+
+    const contentType =
+        response.headers.get("content-type");
+
+
+    if (
+        contentType &&
+        contentType.includes("application/json")
+    ) {
+
+        return await response.json();
+
+    }
+
+
+    return await response.text();
+
+}
+
+
+function getBackendError(result) {
+
+    if (
+        typeof result === "object" &&
+        result !== null
+    ) {
+
+        return (
+            result.error ||
+            result.message ||
+            "Registration failed. Please try again."
+        );
+
+    }
+
+
+    return (
+        result ||
+        "Registration failed. Please try again."
+    );
+
+}
+
 
 function isValidEmail(value) {
 
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-
-}
-
-
-function showMessage(message, type) {
-    registerMessage.textContent = message;
-    registerMessage.className =
-        `mt-6 rounded-lg border px-4 py-3 text-sm ${type}`;
 
 }

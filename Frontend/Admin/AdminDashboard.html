@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard | ServiceHub</title>
+
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" href="../CSS/output.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="../Images/favicon-32x32.png?v=3">
+    <link rel="icon" type="image/png" sizes="16x16" href="../Images/favicon-16x16.png?v=3">
+
+</head>
+
+<body class="min-h-screen bg-gray-950 text-white">
+
+    <div class="flex min-h-screen">
+
+    <div id="adminSidebar"></div>
+
+    <main class="min-h-screen min-w-0 flex-1 lg:ml-64">
+
+        <div id="adminHeader"></div>
+
+        <section class="px-4 py-8 sm:px-6 lg:px-8">
+
+
+            <div class="mb-8">
+
+                <h1 class="text-2xl font-bold sm:text-3xl">
+                    Dashboard Overview
+                </h1>
+
+                <p class="mt-2 text-gray-400">
+                    Monitor the current state of the ServiceHub platform.
+                </p>
+
+            </div>
+
+            <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+
+
+                <!-- Total Customers -->
+                <div class="rounded-2xl border border-white/10
+                           bg-[#111827]/90 p-6 shadow-2xl">
+
+                    <div class="flex items-start justify-between">
+
+                        <div>
+
+                            <p class="text-sm text-gray-400">
+                                Total Customers
+                            </p>
+
+                            <h3 class="mt-2 text-3xl font-bold">
+                                0
+                            </h3>
+
+                        </div>
+
+                        <div class="flex h-11 w-11 items-center justify-center
+                                   rounded-xl bg-purple-600/15
+                                   text-purple-400">
+
+                            <i class="fa-solid fa-users"></i>
+
+                        </div>
+
+                    </div>
+
+                    <p class="mt-4 text-xs text-gray-500">
+                        Registered customers
+                    </p>
+
+                </div>
+
+
+                <!-- Total Workers -->
+                <div class="rounded-2xl border border-white/10
+                           bg-[#111827]/90 p-6 shadow-2xl">
+
+                    <div class="flex items-start justify-between">
+
+                        <div>
+
+                            <p class="text-sm text-gray-400">
+                                Total Workers
+                            </p>
+
+                            <h3 class="mt-2 text-3xl font-bold">
+                                0
+                            </h3>
+
+                        </div>
+
+                        <div class="flex h-11 w-11 items-center justify-center
+                                   rounded-xl bg-purple-600/15
+                                   text-purple-400">
+
+                            <i class="fa-solid fa-user-gear"></i>
+
+                        </div>
+
+                    </div>
+
+                    <p class="mt-4 text-xs text-gray-500">
+                        Registered workers
+                    </p>
+
+                </div>
+
+
+                <!-- Pending Workers -->
+                <div class="rounded-2xl border border-white/10
+                           bg-[#111827]/90 p-6 shadow-2xl">
+
+                    <div class="flex items-start justify-between">
+
+                        <div>
+
+                            <p class="text-sm text-gray-400">
+                                Pending Workers
+                            </p>
+
+                            <h3 class="mt-2 text-3xl font-bold">
+                                0
+                            </h3>
+
+                        </div>
+
+                        <div class="flex h-11 w-11 items-center justify-center
+                                   rounded-xl bg-yellow-500/10
+                                   text-yellow-400">
+
+                            <i class="fa-solid fa-user-clock"></i>
+
+                        </div>
+
+                    </div>
+
+                    <p class="mt-4 text-xs text-gray-500">
+                        Awaiting verification
+                    </p>
+
+                </div>
+
+
+                <!-- Active Workers -->
+                <div class="rounded-2xl border border-white/10
+                           bg-[#111827]/90 p-6 shadow-2xl">
+
+                    <div class="flex items-start justify-between">
+
+                        <div>
+
+                            <p class="text-sm text-gray-400">
+                                Verified Workers
+                            </p>
+
+                            <h3 class="mt-2 text-3xl font-bold">
+                                0
+                            </h3>
+
+                        </div>
+
+                        <div class="flex h-11 w-11 items-center justify-center
+                                   rounded-xl bg-green-500/10
+                                   text-green-400">
+
+                            <i class="fa-solid fa-user-check"></i>
+
+                        </div>
+
+                    </div>
+
+                    <p class="mt-4 text-xs text-gray-500">
+                        Verified workers
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="mt-8 grid gap-6 xl:grid-cols-3">
+
+
+                <!-- Quick Actions -->
+                <div class="rounded-2xl border border-white/10
+                           bg-[#111827]/90 p-6 shadow-2xl xl:col-span-2">
+
+                    <div class="mb-6">
+
+                        <h2 class="text-lg font-semibold">
+                            Quick Actions
+                        </h2>
+
+                        <p class="mt-1 text-sm text-gray-500">
+                            Frequently used administration actions.
+                        </p>
+
+                    </div>
+
+
+                    <div class="grid gap-4 sm:grid-cols-2">
+
+
+                                <a href="#" class="group flex items-center gap-4
+                                   rounded-xl border border-white/10
+                                   bg-gray-900/60 p-4
+                                   hover:border-purple-500/30
+                                   hover:bg-purple-600/5
+                                   transition duration-200">
+
+                            <div class="flex h-11 w-11 shrink-0
+                                       items-center justify-center
+                                       rounded-xl bg-purple-600/15
+                                       text-purple-400">
+
+                                <i class="fa-solid fa-user-check"></i>
+
+                            </div>
+
+                            <div>
+
+                                <h3 class="font-medium
+                                           group-hover:text-purple-400
+                                           transition">
+
+                                    Review Workers
+
+                                </h3>
+
+                                <p class="mt-1 text-xs text-gray-500">
+                                    Review pending worker registrations
+                                </p>
+
+                            </div>
+
+                        </a>
+
+
+                        <a href="#" class="group flex items-center gap-4
+                                   rounded-xl border border-white/10
+                                   bg-gray-900/60 p-4
+                                   hover:border-purple-500/30
+                                   hover:bg-purple-600/5
+                                   transition duration-200">
+
+                            <div class="flex h-11 w-11 shrink-0
+                                       items-center justify-center
+                                       rounded-xl bg-purple-600/15
+                                       text-purple-400">
+
+                                <i class="fa-solid fa-users"></i>
+
+                            </div>
+
+                            <div>
+
+                                <h3 class="font-medium
+                                           group-hover:text-purple-400
+                                           transition">
+
+                                    Manage Customers
+
+                                </h3>
+
+                                <p class="mt-1 text-xs text-gray-500">
+                                    View and manage customer accounts
+                                </p>
+
+                            </div>
+
+                        </a>
+
+
+                    </div>
+
+                </div>
+
+
+                <!-- System Status -->
+                <div class="rounded-2xl border border-white/10
+                           bg-[#111827]/90 p-6 shadow-2xl">
+
+                    <div class="mb-6">
+
+                        <h2 class="text-lg font-semibold">
+                            System Status
+                        </h2>
+
+                        <p class="mt-1 text-sm text-gray-500">
+                            Current platform status
+                        </p>
+
+                    </div>
+
+
+                    <div class="space-y-5">
+
+
+                        <div class="flex items-center justify-between">
+
+                            <div class="flex items-center gap-3">
+
+                                <span class="h-2.5 w-2.5 rounded-full
+                                           bg-green-400">
+                                </span>
+
+                                <span class="text-sm text-gray-300">
+                                    Backend API
+                                </span>
+
+                            </div>
+
+                            <span class="text-xs text-green-400">
+                                Online
+                            </span>
+
+                        </div>
+
+
+                        <div class="flex items-center justify-between">
+
+                            <div class="flex items-center gap-3">
+
+                                <span class="h-2.5 w-2.5 rounded-full
+                                           bg-green-400">
+                                </span>
+
+                                <span class="text-sm text-gray-300">
+                                    Database
+                                </span>
+
+                            </div>
+
+                            <span class="text-xs text-green-400">
+                                Connected
+                            </span>
+
+                        </div>
+
+
+                        <div class="flex items-center justify-between">
+
+                            <div class="flex items-center gap-3">
+
+                                <span class="h-2.5 w-2.5 rounded-full
+                                           bg-green-400">
+                                </span>
+
+                                <span class="text-sm text-gray-300">
+                                    Authentication
+                                </span>
+
+                            </div>
+
+                            <span class="text-xs text-green-400">
+                                Active
+                            </span>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+    <script src="components/AdminLayout.js"></script>
+
+</body>
+
+</html>

@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Create Account | ServiceHub</title>
+    <title>Worker Registration | ServiceHub</title>
 
     <link rel="stylesheet" href="/bookService/Frontend/CSS/output.css">
 
@@ -39,7 +39,6 @@
 
 <body class="min-h-screen bg-[#0b0f19] text-white">
 
-
 <main class="min-h-screen flex items-center justify-center px-5 py-10">
 
     <div class="w-full max-w-4xl">
@@ -66,16 +65,15 @@
 
 
             <h1 class="text-3xl md:text-4xl font-bold mt-6">
-                Create your account
+                Join as a Service Professional
             </h1>
 
 
             <p class="text-gray-400 mt-2">
-                Join ServiceHub and get reliable services at your doorstep.
+                Offer your skills to customers through ServiceHub.
             </p>
 
         </div>
-
 
 
         <!-- Registration Card -->
@@ -86,7 +84,7 @@
                    p-6 md:p-10 shadow-2xl"
         >
 
-            <form id="registerForm" novalidate>
+            <form id="workerRegisterForm" novalidate>
 
 
                 <!-- =================================
@@ -116,7 +114,6 @@
 
                 <div class="grid md:grid-cols-[1fr_140px] gap-5 mb-5">
 
-
                     <!-- Full Name -->
 
                     <div>
@@ -140,7 +137,8 @@
 
                         </div>
 
-                        <p id="fullNameError" class="error-message hidden"></p>
+                        <p id="fullNameError"
+                           class="error-message hidden"></p>
 
                     </div>
 
@@ -169,7 +167,8 @@
 
                         </div>
 
-                        <p id="ageError" class="error-message hidden"></p>
+                        <p id="ageError"
+                           class="error-message hidden"></p>
 
                     </div>
 
@@ -218,7 +217,8 @@
 
                     </div>
 
-                    <p id="genderError" class="error-message hidden"></p>
+                    <p id="genderError"
+                       class="error-message hidden"></p>
 
                 </div>
 
@@ -246,7 +246,8 @@
 
                     </div>
 
-                    <p id="emailError" class="error-message hidden"></p>
+                    <p id="emailError"
+                       class="error-message hidden"></p>
 
                 </div>
 
@@ -277,14 +278,13 @@
 
                     </div>
 
-                    <p id="phoneError" class="error-message hidden"></p>
+                    <p id="phoneError"
+                       class="error-message hidden"></p>
 
                 </div>
 
 
-
                 <div class="section-divider"></div>
-
 
 
                 <!-- =================================
@@ -304,7 +304,7 @@
                         </h2>
 
                         <p class="text-sm text-gray-500 mt-1">
-                            This helps us provide services in your area.
+                            Tell us where you provide your services.
                         </p>
 
                     </div>
@@ -335,7 +335,8 @@
 
                     </div>
 
-                    <p id="addressLine1Error" class="error-message hidden"></p>
+                    <p id="addressLine1Error"
+                       class="error-message hidden"></p>
 
                 </div>
 
@@ -397,7 +398,6 @@
 
                 <div class="grid md:grid-cols-2 gap-5 mb-5">
 
-
                     <!-- City -->
 
                     <div>
@@ -421,7 +421,8 @@
 
                         </div>
 
-                        <p id="cityError" class="error-message hidden"></p>
+                        <p id="cityError"
+                           class="error-message hidden"></p>
 
                     </div>
 
@@ -490,7 +491,8 @@
 
                         </div>
 
-                        <p id="stateError" class="error-message hidden"></p>
+                        <p id="stateError"
+                           class="error-message hidden"></p>
 
                     </div>
 
@@ -521,14 +523,190 @@
 
                     </div>
 
-                    <p id="pincodeError" class="error-message hidden"></p>
+                    <p id="pincodeError"
+                       class="error-message hidden"></p>
 
                 </div>
 
 
+                <div class="section-divider"></div>
+
+
+                <!-- =================================
+                     Professional Information
+                ================================== -->
+
+                <div class="section-header">
+
+                    <div class="section-icon">
+                        <i class="fa-solid fa-briefcase"></i>
+                    </div>
+
+                    <div>
+
+                        <h2 class="text-xl font-semibold">
+                            Professional Information
+                        </h2>
+
+                        <p class="text-sm text-gray-500 mt-1">
+                            Tell customers about your experience and skills.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Experience -->
+
+                <div class="mb-5">
+
+                    <label
+                        for="experienceYears"
+                        class="input-label"
+                    >
+                        Years of Experience <span>*</span>
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i class="fa-solid fa-clock"></i>
+
+                        <input
+                            type="number"
+                            id="experienceYears"
+                            name="experienceYears"
+                            min="0"
+                            max="80"
+                            placeholder="e.g. 5"
+                            class="form-input"
+                        >
+
+                    </div>
+
+                    <p
+                        id="experienceYearsError"
+                        class="error-message hidden"
+                    ></p>
+
+                </div>
+
+
+                <!-- Qualification -->
+
+                <div class="mb-5">
+
+                    <label
+                        for="qualification"
+                        class="input-label"
+                    >
+                        Qualification <span>*</span>
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i class="fa-solid fa-certificate"></i>
+
+                        <input
+                            type="text"
+                            id="qualification"
+                            name="qualification"
+                            placeholder="e.g. ITI, Diploma, Certification"
+                            class="form-input"
+                        >
+
+                    </div>
+
+                    <p
+                        id="qualificationError"
+                        class="error-message hidden"
+                    ></p>
+
+                </div>
+
+
+                <!-- Bio -->
+
+                <div class="mb-8">
+
+                    <label for="bio" class="input-label">
+                        Professional Bio
+                        <span class="optional">(Optional)</span>
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i class="fa-solid fa-align-left"></i>
+
+                        <textarea
+                            id="bio"
+                            name="bio"
+                            rows="4"
+                            placeholder="Tell customers about your skills and experience"
+                            class="form-input resize-none"
+                        ></textarea>
+
+                    </div>
+
+                </div>
+
 
                 <div class="section-divider"></div>
 
+
+                <!-- =================================
+                     Services
+                ================================== -->
+
+                <div class="section-header">
+
+                    <div class="section-icon">
+                        <i class="fa-solid fa-screwdriver-wrench"></i>
+                    </div>
+
+                    <div>
+
+                        <h2 class="text-xl font-semibold">
+                            Services You Provide
+                        </h2>
+
+                        <p class="text-sm text-gray-500 mt-1">
+                            Select the services you are comfortable providing.
+                            You can choose services from a maximum of 3 categories.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <p
+                    id="categoryLimitMessage"
+                    class="hidden mt-4 text-sm text-yellow-400"
+                >
+                    Maximum 3 categories can be chosen.
+                </p>
+
+
+                <div
+                    id="categoriesContainer"
+                    class="mt-6 space-y-4"
+                >
+
+                    <p class="text-sm text-gray-500">
+                        Loading services...
+                    </p>
+
+                </div>
+
+
+                <p
+                    id="servicesError"
+                    class="error-message hidden mt-3"
+                ></p>
+
+
+                <div class="section-divider mt-8"></div>
 
 
                 <!-- =================================
@@ -548,7 +726,7 @@
                         </h2>
 
                         <p class="text-sm text-gray-500 mt-1">
-                            Keep your ServiceHub account secure.
+                            Create your ServiceHub login credentials.
                         </p>
 
                     </div>
@@ -591,7 +769,10 @@
                         Use at least 8 characters.
                     </p>
 
-                    <p id="passwordError" class="error-message hidden"></p>
+                    <p
+                        id="passwordError"
+                        class="error-message hidden"
+                    ></p>
 
                 </div>
 
@@ -600,7 +781,10 @@
 
                 <div class="mb-6">
 
-                    <label for="confirmPassword" class="input-label">
+                    <label
+                        for="confirmPassword"
+                        class="input-label"
+                    >
                         Confirm Password <span>*</span>
                     </label>
 
@@ -627,7 +811,10 @@
 
                     </div>
 
-                    <p id="confirmPasswordError" class="error-message hidden"></p>
+                    <p
+                        id="confirmPasswordError"
+                        class="error-message hidden"
+                    ></p>
 
                 </div>
 
@@ -655,7 +842,11 @@
 
                 </label>
 
-                <p id="termsError" class="error-message hidden"></p>
+
+                <p
+                    id="termsError"
+                    class="error-message hidden"
+                ></p>
 
 
                 <!-- Message -->
@@ -666,7 +857,7 @@
                 ></div>
 
 
-                <!-- Button -->
+                <!-- Submit -->
 
                 <button
                     type="submit"
@@ -676,7 +867,9 @@
 
                     <i class="fa-solid fa-user-plus"></i>
 
-                    <span>Create Account</span>
+                    <span>
+                        Submit Registration
+                    </span>
 
                 </button>
 
@@ -711,7 +904,7 @@
 </main>
 
 
-<script src="/bookService/Frontend/JS/UserRegistration.js"></script>
+<script src="/bookService/Frontend/JS/WorkerRegister.js"></script>
 
 </body>
 

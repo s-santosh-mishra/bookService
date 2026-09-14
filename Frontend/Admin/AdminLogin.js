@@ -1,4 +1,5 @@
 // ServiceHub Admin Login
+
 const adminLoginForm =
     document.getElementById("adminLoginForm");
 
@@ -23,17 +24,18 @@ const adminMessage =
 const adminLoginButton =
     document.getElementById("adminLoginButton");
 
+
+// ================================
 // Password Visibility
+// ================================
 
 togglePassword.addEventListener("click", () => {
 
     const isPassword =
         adminPassword.type === "password";
 
-
     adminPassword.type =
         isPassword ? "text" : "password";
-
 
     togglePassword.innerHTML =
         isPassword
@@ -42,7 +44,10 @@ togglePassword.addEventListener("click", () => {
 
 });
 
+
+// ================================
 // Admin Login
+// ================================
 
 adminLoginForm.addEventListener(
     "submit",
@@ -63,7 +68,7 @@ adminLoginForm.addEventListener(
         let isValid = true;
 
 
-        /* Admin ID */
+        // Admin ID / Email
 
         if (!idValue) {
 
@@ -77,7 +82,7 @@ adminLoginForm.addEventListener(
         }
 
 
-        /* Password */
+        // Password
 
         if (!passwordValue) {
 
@@ -95,7 +100,10 @@ adminLoginForm.addEventListener(
             return;
         }
 
-        // Backend Connection
+
+        // ================================
+        // Loading State
+        // ================================
 
         adminLoginButton.disabled = true;
 
@@ -126,7 +134,10 @@ adminLoginForm.addEventListener(
 
             const result = await response.json();
 
+
+            // ================================
             // Backend Error
+            // ================================
 
             if (!response.ok) {
 
@@ -137,7 +148,11 @@ adminLoginForm.addEventListener(
 
                 return;
             }
-            // Check Admin Role
+
+
+            // ================================
+            // Admin Role Check
+            // ================================
 
             if (result.role !== "ADMIN") {
 
@@ -149,7 +164,56 @@ adminLoginForm.addEventListener(
                 return;
             }
 
+
+            // ================================
+            // JWT Check
+            // ================================
+
+            if (!result.token) {
+
+                console.error(
+                    "Login response does not contain a JWT."
+                );
+
+                showMessage(
+                    "Login failed. Authentication token was not received.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            // ================================
+            // Store Authentication Token
+            // ================================
+
+            sessionStorage.setItem(
+                "servicehub_access_token",
+                result.token
+            );
+
+
+            // Store basic authenticated user information
+            sessionStorage.setItem(
+                "servicehub_user_id",
+                result.userId
+            );
+
+            sessionStorage.setItem(
+                "servicehub_user_email",
+                result.email
+            );
+
+            sessionStorage.setItem(
+                "servicehub_user_role",
+                result.role
+            );
+
+
+            // ================================
             // Successful Admin Login
+            // ================================
 
             showMessage(
                 "Admin login successful!",
@@ -160,15 +224,14 @@ adminLoginForm.addEventListener(
             adminLoginForm.reset();
 
 
-            /*
-             * Dashboard will be connected later.
-             *
-             * For now, we just confirm
-             * that admin authentication works.
-             */
+            // Redirect to Admin Dashboard
 
-            // window.location.href =
-            //     "/bookService/Frontend/Admin/admin.html";
+            setTimeout(() => {
+
+                window.location.href =
+                    "AdminDashboard.html";
+
+            }, 500);
 
 
         } catch (error) {
@@ -197,7 +260,10 @@ adminLoginForm.addEventListener(
     }
 );
 
-    // Helpers
+
+// ================================
+// Helper Functions
+// ================================
 
 function showError(
     input,

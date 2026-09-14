@@ -5,6 +5,7 @@ import com.servicehub.serv.dto.LoginResDto;
 import com.servicehub.serv.entity.Credentials;
 import com.servicehub.serv.exception.InvalidCredentialsException;
 import com.servicehub.serv.repository.CredentialsRepository;
+import com.servicehub.serv.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,13 +14,16 @@ public class UserLoginService {
 
     private final CredentialsRepository credentialsRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     public UserLoginService(
             CredentialsRepository credentialsRepository,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService
     ) {
         this.credentialsRepository = credentialsRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public LoginResDto login(LoginReqDto request) {
@@ -41,10 +45,14 @@ public class UserLoginService {
             );
         }
 
+        // Generate JWT after successful authentication
+        String token = jwtService.generateToken(credentials);
+
         return new LoginResDto(
                 credentials.getUserId(),
                 credentials.getEmail(),
-                credentials.getRole()
+                credentials.getRole(),
+                token
         );
     }
 }
