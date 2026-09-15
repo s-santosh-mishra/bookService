@@ -38,6 +38,19 @@ public class GlobalExceptionHandler {
                                 .body(response);
         }
 
+        @ExceptionHandler(AccountStatusException.class)
+        public ResponseEntity<Map<String, String>> handleAccountStatus(
+                        AccountStatusException exception) {
+
+                Map<String, String> response = new HashMap<>();
+
+                response.put("error", exception.getMessage());
+
+                return ResponseEntity
+                                .status(HttpStatus.FORBIDDEN)
+                                .body(response);
+        }
+
         @ExceptionHandler(MethodArgumentNotValidException.class)
         public ResponseEntity<Map<String, Object>> handleValidationErrors(
                         MethodArgumentNotValidException exception) {
@@ -63,6 +76,7 @@ public class GlobalExceptionHandler {
         @ExceptionHandler(IllegalArgumentException.class)
         public ResponseEntity<Map<String, String>> handleIllegalArgument(
                         IllegalArgumentException exception) {
+
                 Map<String, String> response = new HashMap<>();
 
                 response.put("error", exception.getMessage());

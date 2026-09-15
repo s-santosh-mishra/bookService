@@ -2,34 +2,48 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Admin Dashboard | ServiceHub</title>
 
-    <!-- Tailwind CSS -->
     <link rel="stylesheet" href="../CSS/output.css">
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-    <link rel="icon" type="image/png" sizes="32x32" href="../Images/favicon-32x32.png?v=3">
-    <link rel="icon" type="image/png" sizes="16x16" href="../Images/favicon-16x16.png?v=3">
+    <link rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="../Images/favicon-32x32.png?v=3">
+
+    <link rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="../Images/favicon-16x16.png?v=3">
 
 </head>
 
+
 <body class="min-h-screen bg-gray-950 text-white">
 
-    <div class="flex min-h-screen">
+<div class="flex min-h-screen">
 
+    <!-- Admin Sidebar -->
     <div id="adminSidebar"></div>
+
 
     <main class="min-h-screen min-w-0 flex-1 lg:ml-64">
 
+        <!-- Admin Header -->
         <div id="adminHeader"></div>
+
 
         <section class="px-4 py-8 sm:px-6 lg:px-8">
 
+
+            <!-- Dashboard Introduction -->
 
             <div class="mb-8">
 
@@ -43,12 +57,18 @@
 
             </div>
 
-            <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+
+            <!-- ================================ -->
+            <!-- Overview Counts -->
+            <!-- ================================ -->
+
+            <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
 
 
                 <!-- Total Customers -->
+
                 <div class="rounded-2xl border border-white/10
-                           bg-[#111827]/90 p-6 shadow-2xl">
+                            bg-[#111827]/90 p-6 shadow-2xl">
 
                     <div class="flex items-start justify-between">
 
@@ -58,21 +78,26 @@
                                 Total Customers
                             </p>
 
-                            <h3 class="mt-2 text-3xl font-bold">
+                            <h3 id="totalCustomers"
+                                class="mt-2 text-3xl font-bold">
+
                                 0
+
                             </h3>
 
                         </div>
 
+
                         <div class="flex h-11 w-11 items-center justify-center
-                                   rounded-xl bg-purple-600/15
-                                   text-purple-400">
+                                    rounded-xl bg-purple-600/15
+                                    text-purple-400">
 
                             <i class="fa-solid fa-users"></i>
 
                         </div>
 
                     </div>
+
 
                     <p class="mt-4 text-xs text-gray-500">
                         Registered customers
@@ -82,8 +107,9 @@
 
 
                 <!-- Total Workers -->
+
                 <div class="rounded-2xl border border-white/10
-                           bg-[#111827]/90 p-6 shadow-2xl">
+                            bg-[#111827]/90 p-6 shadow-2xl">
 
                     <div class="flex items-start justify-between">
 
@@ -93,21 +119,26 @@
                                 Total Workers
                             </p>
 
-                            <h3 class="mt-2 text-3xl font-bold">
+                            <h3 id="totalWorkers"
+                                class="mt-2 text-3xl font-bold">
+
                                 0
+
                             </h3>
 
                         </div>
 
+
                         <div class="flex h-11 w-11 items-center justify-center
-                                   rounded-xl bg-purple-600/15
-                                   text-purple-400">
+                                    rounded-xl bg-purple-600/15
+                                    text-purple-400">
 
                             <i class="fa-solid fa-user-gear"></i>
 
                         </div>
 
                     </div>
+
 
                     <p class="mt-4 text-xs text-gray-500">
                         Registered workers
@@ -117,8 +148,9 @@
 
 
                 <!-- Pending Workers -->
+
                 <div class="rounded-2xl border border-white/10
-                           bg-[#111827]/90 p-6 shadow-2xl">
+                            bg-[#111827]/90 p-6 shadow-2xl">
 
                     <div class="flex items-start justify-between">
 
@@ -128,21 +160,26 @@
                                 Pending Workers
                             </p>
 
-                            <h3 class="mt-2 text-3xl font-bold">
+                            <h3 id="pendingWorkers"
+                                class="mt-2 text-3xl font-bold">
+
                                 0
+
                             </h3>
 
                         </div>
 
+
                         <div class="flex h-11 w-11 items-center justify-center
-                                   rounded-xl bg-yellow-500/10
-                                   text-yellow-400">
+                                    rounded-xl bg-yellow-500/10
+                                    text-yellow-400">
 
                             <i class="fa-solid fa-user-clock"></i>
 
                         </div>
 
                     </div>
+
 
                     <p class="mt-4 text-xs text-gray-500">
                         Awaiting verification
@@ -151,9 +188,10 @@
                 </div>
 
 
-                <!-- Active Workers -->
+                <!-- Verified Workers -->
+
                 <div class="rounded-2xl border border-white/10
-                           bg-[#111827]/90 p-6 shadow-2xl">
+                            bg-[#111827]/90 p-6 shadow-2xl">
 
                     <div class="flex items-start justify-between">
 
@@ -163,15 +201,19 @@
                                 Verified Workers
                             </p>
 
-                            <h3 class="mt-2 text-3xl font-bold">
+                            <h3 id="verifiedWorkers"
+                                class="mt-2 text-3xl font-bold">
+
                                 0
+
                             </h3>
 
                         </div>
 
+
                         <div class="flex h-11 w-11 items-center justify-center
-                                   rounded-xl bg-green-500/10
-                                   text-green-400">
+                                    rounded-xl bg-green-500/10
+                                    text-green-400">
 
                             <i class="fa-solid fa-user-check"></i>
 
@@ -179,138 +221,132 @@
 
                     </div>
 
+
                     <p class="mt-4 text-xs text-gray-500">
                         Verified workers
                     </p>
 
                 </div>
 
-            </div>
 
-            <div class="mt-8 grid gap-6 xl:grid-cols-3">
+                <!-- Total Categories -->
 
-
-                <!-- Quick Actions -->
                 <div class="rounded-2xl border border-white/10
-                           bg-[#111827]/90 p-6 shadow-2xl xl:col-span-2">
+                            bg-[#111827]/90 p-6 shadow-2xl">
 
-                    <div class="mb-6">
+                    <div class="flex items-start justify-between">
 
-                        <h2 class="text-lg font-semibold">
-                            Quick Actions
-                        </h2>
+                        <div>
 
-                        <p class="mt-1 text-sm text-gray-500">
-                            Frequently used administration actions.
-                        </p>
+                            <p class="text-sm text-gray-400">
+                                Total Categories
+                            </p>
 
-                    </div>
+                            <h3 id="totalCategories"
+                                class="mt-2 text-3xl font-bold">
 
+                                0
 
-                    <div class="grid gap-4 sm:grid-cols-2">
+                            </h3>
 
-
-                                <a href="#" class="group flex items-center gap-4
-                                   rounded-xl border border-white/10
-                                   bg-gray-900/60 p-4
-                                   hover:border-purple-500/30
-                                   hover:bg-purple-600/5
-                                   transition duration-200">
-
-                            <div class="flex h-11 w-11 shrink-0
-                                       items-center justify-center
-                                       rounded-xl bg-purple-600/15
-                                       text-purple-400">
-
-                                <i class="fa-solid fa-user-check"></i>
-
-                            </div>
-
-                            <div>
-
-                                <h3 class="font-medium
-                                           group-hover:text-purple-400
-                                           transition">
-
-                                    Review Workers
-
-                                </h3>
-
-                                <p class="mt-1 text-xs text-gray-500">
-                                    Review pending worker registrations
-                                </p>
-
-                            </div>
-
-                        </a>
+                        </div>
 
 
-                        <a href="#" class="group flex items-center gap-4
-                                   rounded-xl border border-white/10
-                                   bg-gray-900/60 p-4
-                                   hover:border-purple-500/30
-                                   hover:bg-purple-600/5
-                                   transition duration-200">
+                        <div class="flex h-11 w-11 items-center justify-center
+                                    rounded-xl bg-purple-600/15
+                                    text-purple-400">
 
-                            <div class="flex h-11 w-11 shrink-0
-                                       items-center justify-center
-                                       rounded-xl bg-purple-600/15
-                                       text-purple-400">
+                            <i class="fa-solid fa-layer-group"></i>
 
-                                <i class="fa-solid fa-users"></i>
-
-                            </div>
-
-                            <div>
-
-                                <h3 class="font-medium
-                                           group-hover:text-purple-400
-                                           transition">
-
-                                    Manage Customers
-
-                                </h3>
-
-                                <p class="mt-1 text-xs text-gray-500">
-                                    View and manage customer accounts
-                                </p>
-
-                            </div>
-
-                        </a>
-
+                        </div>
 
                     </div>
+
+
+                    <p class="mt-4 text-xs text-gray-500">
+                        Service categories
+                    </p>
 
                 </div>
 
 
-                <!-- System Status -->
+                <!-- Total Services -->
+
                 <div class="rounded-2xl border border-white/10
-                           bg-[#111827]/90 p-6 shadow-2xl">
+                            bg-[#111827]/90 p-6 shadow-2xl">
 
-                    <div class="mb-6">
+                    <div class="flex items-start justify-between">
 
-                        <h2 class="text-lg font-semibold">
-                            System Status
-                        </h2>
+                        <div>
 
-                        <p class="mt-1 text-sm text-gray-500">
-                            Current platform status
-                        </p>
+                            <p class="text-sm text-gray-400">
+                                Total Services
+                            </p>
+
+                            <h3 id="totalServices"
+                                class="mt-2 text-3xl font-bold">
+
+                                0
+
+                            </h3>
+
+                        </div>
+
+
+                        <div class="flex h-11 w-11 items-center justify-center
+                                    rounded-xl bg-purple-600/15
+                                    text-purple-400">
+
+                            <i class="fa-solid fa-screwdriver-wrench"></i>
+
+                        </div>
 
                     </div>
 
 
-                    <div class="space-y-5">
+                    <p class="mt-4 text-xs text-gray-500">
+                        Available services
+                    </p>
 
+                </div>
+
+            </div>
+
+
+            <!-- ================================ -->
+            <!-- System Status -->
+            <!-- ================================ -->
+
+            <div class="mt-8 rounded-2xl border border-white/10
+                        bg-[#111827]/90 p-6 shadow-2xl">
+
+                <div class="mb-6">
+
+                    <h2 class="text-lg font-semibold">
+                        System Status
+                    </h2>
+
+                    <p class="mt-1 text-sm text-gray-500">
+                        Current platform status
+                    </p>
+
+                </div>
+
+
+                <div class="grid gap-5 md:grid-cols-3">
+
+
+                    <!-- Backend -->
+
+                    <div class="rounded-xl border border-white/10
+                                bg-gray-900/60 p-5">
 
                         <div class="flex items-center justify-between">
 
                             <div class="flex items-center gap-3">
 
-                                <span class="h-2.5 w-2.5 rounded-full
-                                           bg-green-400">
+                                <span id="backendStatusDot"
+                                      class="h-2.5 w-2.5 rounded-full bg-gray-500">
                                 </span>
 
                                 <span class="text-sm text-gray-300">
@@ -319,19 +355,30 @@
 
                             </div>
 
-                            <span class="text-xs text-green-400">
-                                Online
+
+                            <span id="backendStatus"
+                                  class="text-xs text-gray-400">
+
+                                Checking...
+
                             </span>
 
                         </div>
 
+                    </div>
+
+
+                    <!-- Database -->
+
+                    <div class="rounded-xl border border-white/10
+                                bg-gray-900/60 p-5">
 
                         <div class="flex items-center justify-between">
 
                             <div class="flex items-center gap-3">
 
-                                <span class="h-2.5 w-2.5 rounded-full
-                                           bg-green-400">
+                                <span id="databaseStatusDot"
+                                      class="h-2.5 w-2.5 rounded-full bg-gray-500">
                                 </span>
 
                                 <span class="text-sm text-gray-300">
@@ -340,19 +387,30 @@
 
                             </div>
 
-                            <span class="text-xs text-green-400">
-                                Connected
+
+                            <span id="databaseStatus"
+                                  class="text-xs text-gray-400">
+
+                                Checking...
+
                             </span>
 
                         </div>
 
+                    </div>
+
+
+                    <!-- Authentication -->
+
+                    <div class="rounded-xl border border-white/10
+                                bg-gray-900/60 p-5">
 
                         <div class="flex items-center justify-between">
 
                             <div class="flex items-center gap-3">
 
-                                <span class="h-2.5 w-2.5 rounded-full
-                                           bg-green-400">
+                                <span id="authenticationStatusDot"
+                                      class="h-2.5 w-2.5 rounded-full bg-gray-500">
                                 </span>
 
                                 <span class="text-sm text-gray-300">
@@ -361,18 +419,23 @@
 
                             </div>
 
-                            <span class="text-xs text-green-400">
-                                Active
+
+                            <span id="authenticationStatus"
+                                  class="text-xs text-gray-400">
+
+                                Checking...
+
                             </span>
 
                         </div>
 
-
                     </div>
+
 
                 </div>
 
             </div>
+
 
         </section>
 
@@ -380,7 +443,9 @@
 
 </div>
 
-    <script src="components/AdminLayout.js"></script>
+
+<script src="components/AdminLayout.js"></script>
+<script src="AdminDashboardjs.js"></script>
 
 </body>
 

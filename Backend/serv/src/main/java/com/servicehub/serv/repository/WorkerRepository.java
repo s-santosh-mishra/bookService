@@ -13,4 +13,8 @@ public interface WorkerRepository extends JpaRepository<Worker, UUID> {
     List<Worker> findByVerificationStatus(
             VerificationStatus verificationStatus
     );
+
+    long countByVerificationStatus(
+            VerificationStatus verificationStatus
+    );
 }

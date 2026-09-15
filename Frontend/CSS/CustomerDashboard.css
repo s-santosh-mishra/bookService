@@ -1,0 +1,178 @@
+/*   Customer Navigation*/
+
+.nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0.55rem 1rem;
+
+    border: 1px solid #374151;
+    border-radius: 9999px;
+
+    color: #e5e7eb;
+    font-size: 0.875rem;
+    font-weight: 500;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.nav-btn:hover {
+    background-color: rgba(76, 29, 149, 0.4);
+}
+
+
+#logoutButton:hover,
+#mobileLogoutButton:hover {
+    color: #ef4444;
+}
+
+
+/* Active Page */
+
+.nav-btn.active {
+    background-color: rgb(124, 58, 237);
+    border-color: rgb(124, 58, 237);
+    color: #ffffff;
+}
+
+.nav-btn.active:hover {
+    background-color: rgb(109, 40, 217);
+    border-color: rgb(109, 40, 217);
+}
+
+/* Active Home Button */
+
+.nav-btn.active {
+    background-color: rgb(124, 58, 237);
+    border-color: rgb(124, 58, 237);
+    color: #ffffff;
+}
+
+.nav-btn.active:hover {
+    background-color: rgb(109, 40, 217);
+    border-color: rgb(109, 40, 217);
+}
+
+
+/*   Mobile Navigation*/
+
+.mobile-nav-btn {
+    display: block;
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border-radius: 0.75rem;
+    color: #e5e7eb;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.mobile-nav-btn:hover {
+    background-color: rgba(76, 29, 149, 0.4);
+}
+
+/* Active Mobile Navigation */
+
+.mobile-nav-btn.active {
+    background-color: rgb(124, 58, 237);
+    color: #ffffff;
+}
+
+.mobile-nav-btn.active:hover {
+    background-color: rgb(109, 40, 217);
+}
+
+/*   Dashboard Search*/
+
+#serviceSearch {
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+#serviceSearch:focus {
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+}
+
+
+/*   Active Booking*/
+
+#activeBookingCard {
+    transition:
+        border-color 0.25s ease,
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+#activeBookingCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+
+/*   Category Cards*/
+
+.category-card {
+    transition:
+        border-color 0.25s ease,
+        background-color 0.25s ease,
+        transform 0.25s ease;
+}
+
+.category-card:hover {
+    transform: translateY(-3px);
+}
+
+
+/*   Popular Service Cards*/
+
+.service-card {
+    transition:
+        border-color 0.25s ease,
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.profile-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: #111827;
+    border: 1px solid #374151;
+    border-radius: 0.75rem;
+    color: #f9fafb;
+    outline: none;
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.profile-input:focus {
+    border-color: #8b5cf6;
+}
+
+.profile-input:disabled {
+    opacity: 0.75;
+    cursor: not-allowed;
+}
+
+
+/*   Responsive Adjustments*/
+
+@media (max-width: 640px) {
+
+    #activeBookingCard {
+        padding: 1.25rem;
+    }
+
+}

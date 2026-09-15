@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Customer Dashboard - ServiceHub</title>
+
+    <link rel="stylesheet" href="../CSS/output.css">
+    <link rel="stylesheet" href="../CSS/CustomerDashboard.css">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="../Images/favicon-32x32.png?v=3">
+
+    <link rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="../Images/favicon-16x16.png?v=3">
+
+</head>
+
+
+<body class="bg-gray-950 text-gray-100 min-h-screen">
+
+
+    <!-- Header -->
+
+    <div id="customerHeader"></div>
+
+
+    <!-- Main Content -->
+
+    <main class="max-w-7xl mx-auto px-6 py-10">
+
+
+        <!-- Welcome Section -->
+
+        <section class="mb-10">
+
+            <div class="flex flex-col md:flex-row md:items-center
+                        md:justify-between gap-6">
+
+                <div>
+
+                    <p class="text-violet-400 text-sm font-medium mb-2">
+                        Customer Dashboard
+                    </p>
+
+                    <h2 id="welcomeMessage"
+                        class="text-3xl md:text-4xl font-bold mb-3">
+
+                        Welcome back!
+
+                    </h2>
+
+                    <p class="text-gray-400 max-w-2xl">
+
+                        Find trusted professionals for your home and personal
+                        service needs.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Search -->
+
+        <section class="mb-12">
+
+            <div class="relative max-w-3xl">
+
+                <i class="fa-solid fa-magnifying-glass
+                          absolute left-5 top-1/2
+                          -translate-y-1/2 text-gray-500"></i>
+
+                <input
+                    type="text"
+                    id="serviceSearch"
+                    placeholder="Search for a service..."
+                    class="w-full bg-gray-900 border border-gray-800
+                           rounded-2xl py-4 pl-12 pr-5
+                           text-gray-100 placeholder-gray-500
+                           focus:outline-none focus:border-violet-500
+                           transition">
+
+            </div>
+
+        </section>
+
+
+        <!-- Active Booking -->
+
+        <section class="mb-14">
+
+            <div class="flex items-center justify-between mb-5">
+
+                <div>
+
+                    <h3 class="text-2xl font-bold">
+                        Active Booking
+                    </h3>
+
+                    <p class="text-sm text-gray-400 mt-1">
+                        Your currently ongoing service
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- Active Booking Card -->
+
+            <div id="activeBookingCard"
+                 class="hidden bg-gray-900 border border-gray-800
+                        rounded-2xl p-6
+                        hover:border-violet-500/50 transition">
+
+                <div class="flex flex-col lg:flex-row
+                            lg:items-center lg:justify-between gap-6">
+
+
+                    <!-- Booking Information -->
+
+                    <div class="flex items-start gap-5">
+
+                        <div class="w-14 h-14 rounded-xl
+                                    bg-violet-900/30
+                                    border border-violet-700/40
+                                    flex items-center justify-center
+                                    shrink-0">
+
+                            <i class="fa-solid fa-wrench
+                                      text-violet-400 text-xl"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <div class="flex flex-wrap
+                                        items-center gap-3 mb-2">
+
+                                <h4 id="activeBookingService"
+                                    class="text-lg font-semibold">
+                                </h4>
+
+                                <span id="activeBookingStatus"
+                                      class="px-3 py-1 rounded-full
+                                             text-xs font-medium
+                                             bg-yellow-900/30
+                                             text-yellow-400
+                                             border border-yellow-700/30">
+                                </span>
+
+                            </div>
+
+
+                            <p id="activeBookingDescription"
+                               class="text-sm text-gray-400 mb-3">
+                            </p>
+
+
+                            <div class="flex flex-wrap
+                                        gap-x-6 gap-y-2
+                                        text-sm text-gray-400">
+
+                                <span>
+                                    <i class="fa-solid fa-user mr-2
+                                              text-violet-400"></i>
+
+                                    <span id="activeBookingWorker">
+                                    </span>
+                                </span>
+
+
+                                <span>
+                                    <i class="fa-solid fa-calendar-days
+                                              mr-2 text-violet-400"></i>
+
+                                    <span id="activeBookingDate">
+                                    </span>
+                                </span>
+
+
+                                <span>
+                                    <i class="fa-solid fa-clock mr-2
+                                              text-violet-400"></i>
+
+                                    <span id="activeBookingTime">
+                                    </span>
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- View Details -->
+
+                    <div class="lg:text-right shrink-0">
+
+                        <button
+                            id="viewActiveBookingButton"
+                            class="inline-flex items-center
+                                   justify-center gap-2
+                                   px-5 py-3 rounded-xl
+                                   bg-violet-600 text-white
+                                   hover:bg-violet-700
+                                   transition font-medium">
+
+                            <span>View Details</span>
+
+                            <i class="fa-solid fa-arrow-right"></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- No Active Booking -->
+
+            <div id="noActiveBooking"
+                 class="bg-gray-900 border border-gray-800
+                        rounded-2xl p-10 text-center">
+
+                <div class="w-16 h-16 mx-auto mb-5
+                            rounded-full bg-gray-800
+                            flex items-center justify-center">
+
+                    <i class="fa-solid fa-calendar-check
+                              text-gray-500 text-2xl"></i>
+
+                </div>
+
+
+                <h4 class="text-lg font-semibold mb-2">
+                    No active bookings
+                </h4>
+
+
+                <p class="text-gray-400 text-sm">
+                    You don't have any ongoing services right now.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- Categories -->
+
+        <section id="services" class="mb-14">
+
+            <div class="flex items-center
+                        justify-between mb-6">
+
+                <div>
+
+                    <h3 class="text-2xl font-bold">
+                        Browse Categories
+                    </h3>
+
+                    <p class="text-sm text-gray-400 mt-1">
+                        Explore services based on your needs
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div id="categoryContainer"
+                 class="grid grid-cols-2 md:grid-cols-3
+                        lg:grid-cols-6 gap-4">
+
+            </div>
+
+        </section>
+
+
+        <!-- Popular Services -->
+
+        <section class="mb-10">
+
+            <div class="mb-6">
+
+                <h3 class="text-2xl font-bold">
+                    Popular Services
+                </h3>
+
+                <p class="text-sm text-gray-400 mt-1">
+                    Services customers commonly book
+                </p>
+
+            </div>
+
+
+            <div id="popularServicesContainer"
+                 class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <div id="serviceHubFooter"></div>
+
+
+    <script src="../JS/components/CustomerHeader.js"></script>
+    <script src="../JS/components/footer.js"></script>
+    <script src="../JS/CustomerDashboard.js"></script>
+
+</body>
+
+</html>

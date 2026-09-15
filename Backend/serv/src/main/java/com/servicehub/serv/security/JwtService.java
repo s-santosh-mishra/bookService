@@ -1,6 +1,7 @@
 package com.servicehub.serv.security;
 
 import com.servicehub.serv.entity.Credentials;
+import com.servicehub.serv.enums.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -16,6 +17,9 @@ public class JwtService {
 
     private final SecretKey secretKey;
     private final long expirationMillis;
+
+    private static final long USER_WORKER_EXPIRATION =
+            7L * 24 * 60 * 60 * 1000;
 
     public JwtService(
             @Value("${jwt.secret}") String secret,
@@ -38,9 +42,17 @@ public class JwtService {
 
         Date issuedAt = new Date();
 
+        long tokenExpiration = expirationMillis;
+
+        if (credentials.getRole() == UserRole.USER ||
+                credentials.getRole() == UserRole.WORKER) {
+
+            tokenExpiration = USER_WORKER_EXPIRATION;
+        }
+
         Date expiration =
                 new Date(
-                        issuedAt.getTime() + expirationMillis
+                        issuedAt.getTime() + tokenExpiration
                 );
 
         return Jwts.builder()

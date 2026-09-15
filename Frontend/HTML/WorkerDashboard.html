@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Worker Dashboard - ServiceHub</title>
+
+    <link rel="stylesheet" href="../CSS/output.css">
+    <link rel="stylesheet" href="../CSS/WorkerDashboard.css">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="../Images/favicon-32x32.png?v=3">
+
+    <link rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="../Images/favicon-16x16.png?v=3">
+
+</head>
+
+
+<body class="bg-gray-950 text-gray-100 min-h-screen">
+
+
+    <!-- Header -->
+
+    <div id="workerHeader"></div>
+
+    <!-- Main Content -->
+
+    <main id="dashboard"
+          class="max-w-7xl mx-auto px-6 py-10">
+
+
+        <!-- Welcome Section -->
+
+        <section class="mb-10">
+
+            <p class="text-violet-400 text-sm font-medium mb-2">
+                Worker Dashboard
+            </p>
+
+            <h2 id="welcomeMessage"
+                class="text-3xl md:text-4xl font-bold mb-3">
+
+                Welcome back!
+
+            </h2>
+
+            <p class="text-gray-400 max-w-2xl">
+
+                Manage your service requests, completed work and
+                professional services from one place.
+
+            </p>
+
+        </section>
+
+
+        <!-- Status -->
+
+        <section class="grid md:grid-cols-2 gap-6 mb-14">
+
+
+            <!-- Verification Status -->
+
+            <div class="bg-gray-900 border border-gray-800
+                        rounded-2xl p-6">
+
+                <div class="flex items-center justify-between gap-4">
+
+                    <div class="flex items-center gap-4">
+
+                        <div class="w-12 h-12 rounded-xl
+                                    bg-violet-900/30
+                                    border border-violet-700/40
+                                    flex items-center justify-center">
+
+                            <i class="fa-solid fa-shield-halved
+                                      text-violet-400 text-lg"></i>
+
+                        </div>
+
+                        <div>
+
+                            <p class="text-sm text-gray-400">
+                                Verification Status
+                            </p>
+
+                            <h3 id="verificationStatus"
+                                class="text-lg font-semibold mt-1">
+                                Verified
+                            </h3>
+
+                        </div>
+
+                    </div>
+
+                    <span id="verificationBadge"
+                          class="px-3 py-1 rounded-full
+                                 text-xs font-medium
+                                 bg-green-900/30
+                                 text-green-400
+                                 border border-green-700/30">
+
+                        Verified
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- Availability Status -->
+
+            <div class="bg-gray-900 border border-gray-800
+                        rounded-2xl p-6">
+
+                <div class="flex items-center justify-between gap-4">
+
+                    <div class="flex items-center gap-4">
+
+                        <div class="w-12 h-12 rounded-xl
+                                    bg-violet-900/30
+                                    border border-violet-700/40
+                                    flex items-center justify-center">
+
+                            <i class="fa-solid fa-circle-dot
+                                      text-violet-400 text-lg"></i>
+
+                        </div>
+
+                        <div>
+
+                            <p class="text-sm text-gray-400">
+                                Availability Status
+                            </p>
+
+                            <h3 id="availabilityStatus"
+                                class="text-lg font-semibold mt-1">
+                                Available
+                            </h3>
+
+                        </div>
+
+                    </div>
+
+                    <span id="availabilityBadge"
+                          class="px-3 py-1 rounded-full
+                                 text-xs font-medium
+                                 bg-green-900/30
+                                 text-green-400
+                                 border border-green-700/30">
+
+                        Available
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Booking Requests -->
+
+        <section id="bookingRequests"
+                 class="mb-14">
+
+            <div class="mb-6">
+
+                <h3 class="text-2xl font-bold">
+                    Booking Requests
+                </h3>
+
+                <p class="text-sm text-gray-400 mt-1">
+                    Review and manage requests from customers
+                </p>
+
+            </div>
+
+
+            <div id="bookingRequestsContainer"
+                 class="bg-gray-900 border border-gray-800
+                        rounded-2xl p-10 text-center">
+
+                <div class="w-16 h-16 mx-auto mb-5
+                            rounded-full bg-gray-800
+                            flex items-center justify-center">
+
+                    <i class="fa-solid fa-calendar-plus
+                              text-gray-500 text-2xl"></i>
+
+                </div>
+
+                <h4 class="text-lg font-semibold mb-2">
+                    No booking requests
+                </h4>
+
+                <p class="text-gray-400 text-sm">
+                    New service requests from customers will appear here.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- Completed Work -->
+
+        <section id="completedWork"
+                 class="mb-14">
+
+            <div class="mb-6">
+
+                <h3 class="text-2xl font-bold">
+                    Completed Work
+                </h3>
+
+                <p class="text-sm text-gray-400 mt-1">
+                    Keep track of the services you have completed
+                </p>
+
+            </div>
+
+
+            <div id="completedWorkContainer"
+                 class="bg-gray-900 border border-gray-800
+                        rounded-2xl p-10 text-center">
+
+                <div class="w-16 h-16 mx-auto mb-5
+                            rounded-full bg-gray-800
+                            flex items-center justify-center">
+
+                    <i class="fa-solid fa-circle-check
+                              text-gray-500 text-2xl"></i>
+
+                </div>
+
+                <h4 class="text-lg font-semibold mb-2">
+                    No completed work yet
+                </h4>
+
+                <p class="text-gray-400 text-sm">
+                    Your completed services will appear here.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- My Services -->
+
+        <section id="myServices"
+                 class="mb-10">
+
+            <div class="mb-6">
+
+                <h3 class="text-2xl font-bold">
+                    My Services
+                </h3>
+
+                <p class="text-sm text-gray-400 mt-1">
+                    Services you are currently offering to customers
+                </p>
+
+            </div>
+
+
+            <div id="myServicesContainer"
+                 class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+
+                <!-- Temporary service cards -->
+
+                <div class="worker-service-card">
+
+                    <div class="worker-service-icon">
+                        <i class="fa-solid fa-screwdriver-wrench"></i>
+                    </div>
+
+                    <div>
+
+                        <h4 class="text-lg font-semibold">
+                            My Service
+                        </h4>
+
+                        <p class="text-sm text-gray-400 mt-1">
+                            Your assigned services will appear here.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <div id="serviceHubFooter"></div>
+
+
+    <script src="../JS/components/WorkerHeader.js"></script>
+    <script src="../JS/components/footer.js"></script>
+    <script src="../JS/WorkerDashboard.js"></script>
+
+</body>
+
+</html>

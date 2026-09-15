@@ -1,3 +1,36 @@
+const ACCESS_TOKEN_KEY = "servicehub_access_token";
+const ROLE_KEY = "servicehub_user_role";
+
+function redirectLoggedInUser() {
+
+    const token =
+        localStorage.getItem(ACCESS_TOKEN_KEY);
+
+    const role =
+        localStorage.getItem(ROLE_KEY);
+
+    if (!token || !role) {
+        return;
+    }
+
+    if (role === "USER") {
+
+        window.location.href =
+            "/bookService/Frontend/HTML/CustomerDashboard.html";
+
+        return;
+    }
+
+    if (role === "WORKER") {
+
+        window.location.href =
+            "/bookService/Frontend/HTML/WorkerDashboard.html";
+
+        return;
+    }
+}
+
+redirectLoggedInUser();
 //MOBILE MENU
 
 const mobileMenuButton =

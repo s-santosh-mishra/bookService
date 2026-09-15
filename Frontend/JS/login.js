@@ -174,11 +174,72 @@ loginForm.addEventListener("submit", async (event) => {
             return;
         }
 
-        alert("Login successful!");
+        const token = result.token;
+        const userId = result.userId;
+        const fullName = result.fullName;
+        const email = result.email;
+        const role = result.role;
+
+        if (!token || !userId || !fullName || !email || !role) {
+
+            showMessage(
+                "Invalid login response from server.",
+                "error"
+            );
+
+            return;
+        }
+
+        localStorage.setItem(
+            "servicehub_access_token",
+            token
+        );
+
+        localStorage.setItem(
+            "servicehub_user_id",
+            userId
+        );
+
+        localStorage.setItem(
+            "servicehub_user_name",
+            fullName
+        );
+
+        localStorage.setItem(
+            "servicehub_user_email",
+            email
+        );
+
+        localStorage.setItem(
+            "servicehub_user_role",
+            role
+        );
+
         loginForm.reset();
 
+        if (role === "USER" && selectedRole === "customer") {
+
+            window.location.href = "CustomerDashboard.html";
+
+        } else if (role === "WORKER" && selectedRole === "worker") {
+
+            window.location.href = "WorkerDashboard.html";
+
+        } else {
+
+            localStorage.removeItem("servicehub_access_token");
+            localStorage.removeItem("servicehub_user_id");
+            localStorage.removeItem("servicehub_user_name");
+            localStorage.removeItem("servicehub_user_email");
+            localStorage.removeItem("servicehub_user_role");
+
+            showMessage(
+                "Invalid account type for this login.",
+                "error"
+            );
+        }
+
     } catch (error) {
-        console.error("Login error:", error);
         showMessage(
             "Unable to connect to the server. Please make sure the backend is running.",
             "error"

@@ -7,17 +7,20 @@ import java.util.UUID;
 public class LoginResDto {
 
     private UUID userId;
+    private String fullName;
     private String email;
     private UserRole role;
     private String token;
 
     public LoginResDto(
             UUID userId,
+            String fullName,
             String email,
             UserRole role,
             String token
     ) {
         this.userId = userId;
+        this.fullName = fullName;
         this.email = email;
         this.role = role;
         this.token = token;
@@ -27,6 +30,10 @@ public class LoginResDto {
 
     public UUID getUserId() {
         return userId;
+    }
+
+    public String getFullName() {
+        return fullName;
     }
 
     public String getEmail() {

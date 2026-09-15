@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>My Profile - ServiceHub</title>
+
+    <link
+        rel="stylesheet"
+        href="../CSS/output.css">
+
+    <link
+        rel="stylesheet"
+        href="../CSS/CustomerDashboard.css">
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <link
+        rel="icon"
+        href="../assets/favicon.ico">
+
+</head>
+
+<body class="bg-gray-950 text-white min-h-screen">
+
+    <!-- Header -->
+
+    <div id="customerHeader"></div>
+
+
+    <!-- Main Content -->
+
+    <main class="max-w-5xl mx-auto px-6 py-12">
+
+        <!-- Page Heading -->
+
+        <div class="mb-10">
+
+            <p class="text-violet-400 text-sm font-medium mb-2">
+                ACCOUNT
+            </p>
+
+            <h1 class="text-3xl md:text-4xl font-bold">
+                My Profile
+            </h1>
+
+            <p class="text-gray-400 mt-2">
+                View and manage your personal information.
+            </p>
+
+        </div>
+
+
+        <!-- Profile Card -->
+
+        <section
+            class="bg-gray-900 border border-gray-800 rounded-2xl p-6 md:p-8">
+
+            <!-- Section Header -->
+
+            <div
+                class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+
+                <div>
+
+                    <h2 class="text-xl font-semibold">
+                        Personal Information
+                    </h2>
+
+                    <p class="text-sm text-gray-500 mt-1">
+                        Keep your information up to date.
+                    </p>
+
+                </div>
+
+                <button
+                    id="editProfileBtn"
+                    type="button"
+                    class="px-5 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-700 transition font-medium">
+
+                    <i class="fa-solid fa-pen mr-2"></i>
+                    Edit Profile
+
+                </button>
+
+            </div>
+
+
+            <!-- Message -->
+
+            <div
+                id="profileMessage"
+                class="hidden mb-6 rounded-xl px-4 py-3 text-sm">
+            </div>
+
+
+            <!-- Profile Form -->
+
+            <form id="profileForm">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- Full Name -->
+
+                    <div>
+
+                        <label
+                            for="fullName"
+                            class="block text-sm font-medium text-gray-300 mb-2">
+                            Full Name
+                        </label>
+
+                        <input
+                            id="fullName"
+                            name="fullName"
+                            type="text"
+                            disabled
+                            required
+                            class="profile-input">
+
+                    </div>
+
+
+                    <!-- Email -->
+
+                    <div>
+
+                        <label
+                            for="email"
+                            class="block text-sm font-medium text-gray-300 mb-2">
+                            Email ( Cannot be modified )
+                        </label>
+
+                        <input
+                            id="email"
+                            name="email"
+                            type="email"
+                            disabled
+                            class="profile-input">
+
+                    </div>
+
+
+                    <!-- Age -->
+
+                    <div>
+
+                        <label
+                            for="age"
+                            class="block text-sm font-medium text-gray-300 mb-2">
+                            Age
+                        </label>
+
+                        <input
+                            id="age"
+                            name="age"
+                            type="number"
+                            min="1"
+                            disabled
+                            required
+                            class="profile-input">
+
+                    </div>
+
+
+                    <!-- Gender -->
+
+                    <div>
+
+                        <label
+                            for="gender"
+                            class="block text-sm font-medium text-gray-300 mb-2">
+                            Gender
+                        </label>
+
+                        <select
+                            id="gender"
+                            name="gender"
+                            disabled
+                            required
+                            class="profile-input">
+
+                            <option value="">
+                                Select Gender
+                            </option>
+
+                            <option value="Male">
+                                Male
+                            </option>
+
+                            <option value="Female">
+                                Female
+                            </option>
+
+                            <option value="Other">
+                                Other
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Phone -->
+
+                    <div>
+
+                        <label
+                            for="phone"
+                            class="block text-sm font-medium text-gray-300 mb-2">
+                            Phone
+                        </label>
+
+                        <input
+                            id="phone"
+                            name="phone"
+                            type="tel"
+                            disabled
+                            required
+                            class="profile-input">
+
+                    </div>
+
+
+                    <!-- Landmark -->
+
+                    <div>
+
+                        <label
+                            for="landmark"
+                            class="block text-sm font-medium text-gray-300 mb-2">
+                            Landmark
+                        </label>
+
+                        <input
+                            id="landmark"
+                            name="landmark"
+                            type="text"
+                            disabled
+                            class="profile-input">
+
+                    </div>
+
+
+                    <!-- Address Line 1 -->
+
+                    <div class="md:col-span-2">
+
+                        <label
+                            for="addressLine1"
+                            class="block text-sm font-medium text-gray-300 mb-2">
+                            Address Line 1
+                        </label>
+
+                        <input
+                            id="addressLine1"
+                            name="addressLine1"
+                            type="text"
+                            disabled
+                            required
+                            class="profile-input">
+
+                    </div>
+
+
+                    <!-- Address Line 2 -->
+
+                    <div class="md:col-span-2">
+
+                        <label
+                            for="addressLine2"
+                            class="block text-sm font-medium text-gray-300 mb-2">
+                            Address Line 2
+                        </label>
+
+                        <input
+                            id="addressLine2"
+                            name="addressLine2"
+                            type="text"
+                            disabled
+                            class="profile-input">
+
+                    </div>
+
+
+                    <!-- City -->
+
+                    <div>
+
+                        <label
+                            for="city"
+                            class="block text-sm font-medium text-gray-300 mb-2">
+                            City
+                        </label>
+
+                        <input
+                            id="city"
+                            name="city"
+                            type="text"
+                            disabled
+                            required
+                            class="profile-input">
+
+                    </div>
+
+
+                    <!-- State -->
+
+                    <div>
+
+                        <label
+                            for="state"
+                            class="block text-sm font-medium text-gray-300 mb-2">
+                            State
+                        </label>
+
+                        <input
+                            id="state"
+                            name="state"
+                            type="text"
+                            disabled
+                            required
+                            class="profile-input">
+
+                    </div>
+
+
+                    <!-- PIN Code -->
+
+                    <div>
+
+                        <label
+                            for="pinCode"
+                            class="block text-sm font-medium text-gray-300 mb-2">
+                            PIN Code
+                        </label>
+
+                        <input
+                            id="pinCode"
+                            name="pinCode"
+                            type="text"
+                            disabled
+                            required
+                            class="profile-input">
+
+                    </div>
+
+                </div>
+
+
+                <!-- Actions -->
+
+                <div
+                    id="profileActions"
+                    class="hidden flex justify-end gap-3 mt-8 pt-6 border-t border-gray-800">
+
+                    <button
+                        id="cancelProfileBtn"
+                        type="button"
+                        class="px-5 py-2.5 rounded-xl border border-gray-700 text-gray-300 hover:bg-gray-800 transition">
+
+                        Cancel
+
+                    </button>
+
+                    <button
+                        id="saveProfileBtn"
+                        type="submit"
+                        class="px-5 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-700 transition font-medium">
+
+                        <i class="fa-solid fa-check mr-2"></i>
+                        Save Changes
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+
+    <!-- Footer -->
+
+    <div id="serviceHubFooter"></div>
+
+
+    <!-- Components -->
+
+    <script src="../JS/components/CustomerHeader.js"></script>
+    <script src="../JS/components/Footer.js"></script>
+
+    <!-- Page JS -->
+
+    <script src="../JS/CustomerProfile.js"></script>
+
+</body>
+
+</html>

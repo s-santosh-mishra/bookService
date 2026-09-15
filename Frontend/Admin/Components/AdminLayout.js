@@ -144,8 +144,8 @@ const adminHeaderHTML = `
                         Administrator
                     </p>
 
-                    <p class="text-xs text-gray-500">
-                        System Admin
+                    <p id="adminEmail" class="text-xs text-gray-500">
+                        Loading...
                     </p>
 
                 </div>

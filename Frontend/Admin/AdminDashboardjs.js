@@ -1,125 +1,224 @@
-const sidebar = document.getElementById("sidebar");
-const sidebarOverlay = document.getElementById("sidebarOverlay");
-const menuButton = document.getElementById("menuButton");
-const menuIcon = document.getElementById("menuIcon");
+// Get Logged-in Admin Email
+const API_BASE_URL = "http://localhost:8080/api";
+function loadAdminEmail() {
 
+    const email = sessionStorage.getItem("servicehub_user_email");
 
-function openSidebar() {
+    const adminEmailElement =
+        document.getElementById("adminEmail");
 
-    sidebar.classList.remove("-translate-x-full");
-    sidebarOverlay.classList.remove("hidden");
+    if (adminEmailElement) {
 
-    menuIcon.classList.remove("fa-bars");
-    menuIcon.classList.add("fa-xmark");
+        adminEmailElement.textContent =
+            email || "Admin account";
+
+    }
 }
 
 
-function closeSidebar() {
+// Update Status Display
 
-    sidebar.classList.add("-translate-x-full");
-    sidebarOverlay.classList.add("hidden");
+function updateStatus(elementId, dotId, status, successStatus) {
 
-    menuIcon.classList.remove("fa-xmark");
-    menuIcon.classList.add("fa-bars");
-}
+    const statusElement =
+        document.getElementById(elementId);
 
+    const dotElement =
+        document.getElementById(dotId);
 
-menuButton.addEventListener("click", () => {
-
-    const isClosed =
-        sidebar.classList.contains("-translate-x-full");
-
-    if (isClosed) {
-        openSidebar();
-    } else {
-        closeSidebar();
+    if (!statusElement || !dotElement) {
+        return;
     }
 
-});
+
+    statusElement.textContent = status;
 
 
-sidebarOverlay.addEventListener("click", closeSidebar);
+    if (status === successStatus) {
+
+        statusElement.classList.remove(
+            "text-gray-400",
+            "text-red-400"
+        );
+
+        statusElement.classList.add(
+            "text-green-400"
+        );
+
+        dotElement.classList.remove(
+            "bg-gray-500",
+            "bg-red-400"
+        );
+
+        dotElement.classList.add(
+            "bg-green-400"
+        );
+
+    } else {
+
+        statusElement.classList.remove(
+            "text-gray-400",
+            "text-green-400"
+        );
+
+        statusElement.classList.add(
+            "text-red-400"
+        );
+
+        dotElement.classList.remove(
+            "bg-gray-500",
+            "bg-green-400"
+        );
+
+        dotElement.classList.add(
+            "bg-red-400"
+        );
+    }
+}
 
 
-// Close sidebar when clicking a navigation link on mobile
-sidebar.querySelectorAll("nav a").forEach(link => {
+// Load Dashboard Data
 
-    link.addEventListener("click", () => {
+async function loadDashboardData() {
 
-        if (window.innerWidth < 1024) {
-            closeSidebar();
+    const token =
+    sessionStorage.getItem("servicehub_access_token");
+
+
+    if (!token) {
+
+        window.location.href = "AdminLogin.html";
+        return;
+
+    }
+
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE_URL}/admin/dashboard`,
+            {
+                method: "GET",
+
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            }
+        );
+
+
+    
+        // Session / Authorization failure
+    
+
+        if (response.status === 401 ||
+            response.status === 403) {
+
+            sessionStorage.clear();
+
+            window.location.href = "AdminLogin.html";
+
+            return;
         }
 
-    });
 
-});
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load dashboard data."
+            );
+        }
 
 
-// Reset sidebar when switching between mobile and desktop
-window.addEventListener("resize", () => {
+        const data = await response.json();
 
-    if (window.innerWidth >= 1024) {
 
-        sidebar.classList.remove("-translate-x-full");
-        sidebarOverlay.classList.add("hidden");
+    
+        // Update Counts
+    
 
-        menuIcon.classList.remove("fa-xmark");
-        menuIcon.classList.add("fa-bars");
+        document.getElementById("totalCustomers")
+            .textContent = data.totalCustomers;
 
-    } else {
+        document.getElementById("totalWorkers")
+            .textContent = data.totalWorkers;
 
-        sidebar.classList.add("-translate-x-full");
+        document.getElementById("pendingWorkers")
+            .textContent = data.pendingWorkers;
 
+        document.getElementById("verifiedWorkers")
+            .textContent = data.verifiedWorkers;
+
+        document.getElementById("totalCategories")
+            .textContent = data.totalCategories;
+
+        document.getElementById("totalServices")
+            .textContent = data.totalServices;
+
+
+    
+        // Update System Status
+    
+
+        updateStatus(
+            "backendStatus",
+            "backendStatusDot",
+            data.backendStatus,
+            "Online"
+        );
+
+
+        updateStatus(
+            "databaseStatus",
+            "databaseStatusDot",
+            data.databaseStatus,
+            "Connected"
+        );
+
+
+        updateStatus(
+            "authenticationStatus",
+            "authenticationStatusDot",
+            data.authenticationStatus,
+            "Active"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Dashboard error:",
+            error
+        );
+
+
+        updateStatus(
+            "backendStatus",
+            "backendStatusDot",
+            "Offline",
+            "Online"
+        );
+
+
+        updateStatus(
+            "databaseStatus",
+            "databaseStatusDot",
+            "Unavailable",
+            "Connected"
+        );
+
+
+        updateStatus(
+            "authenticationStatus",
+            "authenticationStatusDot",
+            "Unavailable",
+            "Active"
+        );
     }
-
-});
-
-
-// ================================
-// ServiceHub Admin Dashboard
-// Authentication Guard
-// ================================
-
-const ACCESS_TOKEN_KEY = "servicehub_access_token";
-const ROLE_KEY = "servicehub_user_role";
-
-
-// --------------------------------
-// Check Admin Authentication
-// --------------------------------
-
-function checkAdminAuthentication() {
-
-    const token = sessionStorage.getItem(ACCESS_TOKEN_KEY);
-    const role = sessionStorage.getItem(ROLE_KEY);
-
-    // No login session
-    if (!token || role !== "ADMIN") {
-        window.location.href = "AdminLogin.html";
-        return false;
-    }
-
-    return true;
 }
 
 
-// --------------------------------
-// Logout
-// --------------------------------
+// Initialize Dashboard
 
-function logoutAdmin() {
-
-    sessionStorage.removeItem("servicehub_access_token");
-    sessionStorage.removeItem("servicehub_user_id");
-    sessionStorage.removeItem("servicehub_user_email");
-    sessionStorage.removeItem("servicehub_user_role");
-
-    window.location.href = "AdminLogin.html";
-}
-
-
-// --------------------------------
-// Run Authentication Check
-// --------------------------------
-
-checkAdminAuthentication();
+loadAdminEmail();
+loadDashboardData();
