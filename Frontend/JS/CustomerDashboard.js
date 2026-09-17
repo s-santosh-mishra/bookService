@@ -293,16 +293,16 @@ function renderCategories(categories) {
 
             <i class="fa-solid
                       ${getCategoryIcon(
-                          category.categoryName
-                      )}
+            category.categoryName
+        )}
                       text-2xl
                       text-violet-400
                       mb-3"></i>
 
             <p class="font-medium">
                 ${escapeHtml(
-                    category.categoryName
-                )}
+            category.categoryName
+        )}
             </p>
 
         `;
@@ -446,9 +446,9 @@ function getRandomServices(services) {
             shuffled[i],
             shuffled[randomIndex]
         ] = [
-            shuffled[randomIndex],
-            shuffled[i]
-        ];
+                shuffled[randomIndex],
+                shuffled[i]
+            ];
 
     }
 
@@ -542,8 +542,8 @@ function renderPopularServices() {
 
                 <i class="fa-solid
                           ${getServiceIcon(
-                              service.serviceName
-                          )}
+            service.serviceName
+        )}
                           text-violet-400">
                 </i>
 
@@ -555,8 +555,8 @@ function renderPopularServices() {
                       mb-2">
 
                 ${escapeHtml(
-                    service.categoryName
-                )}
+            service.categoryName
+        )}
 
             </p>
 
@@ -566,8 +566,8 @@ function renderPopularServices() {
                        mb-2">
 
                 ${escapeHtml(
-                    service.serviceName
-                )}
+            service.serviceName
+        )}
 
             </h4>
 
@@ -677,38 +677,246 @@ function applyServiceSearch() {
 
 /*   Active Booking*/
 
-/*
-   Booking API will be connected here
-   when the booking module is created.
+/*   Active Booking*/
 
-   Expected booking structure:
-
-   {
-       serviceName,
-       status,
-       workerName,
-       scheduledDate,
-       scheduledTime,
-       description
-   }
-*/
 
 async function loadActiveBooking() {
 
-    /*
-       No booking system exists yet,
-       so there is currently no active booking.
-    */
+    try {
 
-    const activeBooking = null;
+        const response = await fetch(
+            `${API_BASE_URL}/bookings`,
+            {
+                method: "GET",
+
+                headers: {
+                    "Authorization":
+                        `Bearer ${accessToken}`
+                }
+            }
+        );
 
 
-    renderActiveBooking(
-        activeBooking
-    );
+        if (response.status === 401) {
+
+            handleUnauthorized();
+            return;
+
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load bookings."
+            );
+
+        }
+
+
+        const bookings =
+            await response.json();
+
+
+        /*
+            Active bookings are:
+
+            PENDING
+            ACCEPTED
+            IN_PROGRESS
+        */
+
+        const activeBookings =
+            bookings.filter(booking =>
+                booking.status === "PENDING" ||
+                booking.status === "ACCEPTED" ||
+                booking.status === "IN_PROGRESS"
+            );
+
+
+        activeBookings.sort(
+            (a, b) =>
+                new Date(b.createdAt) -
+                new Date(a.createdAt)
+        );
+
+
+        /*
+            Prefer an active booking.
+        
+            If there is no active booking, check whether
+            the latest relevant booking ended with NO_WORKER.
+        */
+
+        let bookingToDisplay = null;
+
+
+        if (activeBookings.length > 0) {
+
+            bookingToDisplay =
+                activeBookings[0];
+
+        } else {
+
+            const noWorkerBookings =
+                bookings.filter(
+                    booking =>
+                        booking.status === "NO_WORKER"
+                );
+
+
+            noWorkerBookings.sort(
+                (a, b) =>
+                    new Date(b.createdAt) -
+                    new Date(a.createdAt)
+            );
+
+
+            if (noWorkerBookings.length > 0) {
+
+                bookingToDisplay =
+                    noWorkerBookings[0];
+
+            }
+
+        }
+
+
+        renderActiveBooking(
+            bookingToDisplay
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Booking loading error:",
+            error
+        );
+
+        renderActiveBooking(null);
+
+    }
 
 }
 
+
+/*   Render Active Booking*/
+
+
+function renderActiveBooking(booking) {
+
+    if (!booking) {
+
+        activeBookingCard.classList.add(
+            "hidden"
+        );
+
+        noActiveBooking.classList.remove(
+            "hidden"
+        );
+
+        return;
+
+    }
+
+
+    noActiveBooking.classList.add(
+        "hidden"
+    );
+
+    activeBookingCard.classList.remove(
+        "hidden"
+    );
+
+
+    /*
+        Service
+    */
+
+    const serviceName = booking.serviceName || "Service request";
+
+    /*
+        Status
+    */
+
+    activeBookingStatus.textContent =
+        booking.status;
+
+
+    /*
+        Status description
+    */
+
+    switch (booking.status) {
+
+        case "PENDING":
+
+            activeBookingDescription.textContent =
+                "Your request is waiting for a worker to accept it.";
+
+            break;
+
+
+        case "ACCEPTED":
+
+            activeBookingDescription.textContent =
+                "A worker has accepted your booking.";
+
+            break;
+
+
+        case "IN_PROGRESS":
+
+            activeBookingDescription.textContent =
+                "Your service is currently in progress.";
+
+            break;
+
+
+        case "NO_WORKER":
+
+            activeBookingDescription.textContent =
+                "No worker accepted your request within 30 minutes. You can try booking this service again.";
+
+            break;
+
+
+        default:
+
+            activeBookingDescription.textContent =
+                "Your service request status is currently being processed.";
+
+    }
+
+
+    /*
+        Worker -> workerId is null while the booking
+        is still PENDING.
+    */
+
+    activeBookingWorker.textContent =
+        booking.workerName || "Worker not assigned"
+
+
+    const createdAt =
+        new Date(booking.createdAt);
+
+
+    activeBookingDate.textContent =
+        createdAt.toLocaleDateString();
+
+
+    activeBookingTime.textContent =
+        createdAt.toLocaleTimeString(
+            [],
+            {
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
+
+}
 
 /*   Render Active Booking*/
 
@@ -876,10 +1084,16 @@ function escapeHtml(value) {
 
 /*   Initialize Dashboard*/
 
-loadCustomerName();
+async function initializeDashboard() {
 
-loadCustomerCategories();
+    loadCustomerName();
 
-loadCustomerServices();
+    await Promise.all([
+        loadCustomerCategories(),
+        loadCustomerServices()
+    ]);
 
-loadActiveBooking();
+    await loadActiveBooking();
+}
+
+initializeDashboard();

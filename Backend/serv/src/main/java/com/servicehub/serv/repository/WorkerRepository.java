@@ -1,6 +1,7 @@
 package com.servicehub.serv.repository;
 
 import com.servicehub.serv.entity.Worker;
+import com.servicehub.serv.enums.AvailabilityStatus;
 import com.servicehub.serv.enums.VerificationStatus;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +18,9 @@ public interface WorkerRepository extends JpaRepository<Worker, UUID> {
     long countByVerificationStatus(
             VerificationStatus verificationStatus
     );
+
+    List<Worker> findByVerificationStatusAndAvailabilityStatus(
+        VerificationStatus verificationStatus,
+        AvailabilityStatus availabilityStatus
+);
 }
