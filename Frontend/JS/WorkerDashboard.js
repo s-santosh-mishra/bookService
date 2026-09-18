@@ -2,6 +2,8 @@ const ACCESS_TOKEN_KEY = "servicehub_access_token";
 const ROLE_KEY = "servicehub_user_role";
 const USER_NAME_KEY = "servicehub_user_name";
 
+const API_BASE_URL = "http://localhost:8080/api/worker";
+
 
 // Authentication
 
@@ -13,14 +15,12 @@ function checkWorkerLogin() {
     const role =
         localStorage.getItem(ROLE_KEY);
 
-
     if (!token || role !== "WORKER") {
 
         window.location.href =
             "/bookService/Frontend/HTML/login.html";
 
         return false;
-
     }
 
     return true;
@@ -29,27 +29,1693 @@ function checkWorkerLogin() {
 
 // Worker Information
 
-function loadWorkerInformation() {
+async function loadWorkerInformation() {
 
-    const workerName =
-        localStorage.getItem(USER_NAME_KEY) || "Worker";
+    try {
 
-    const welcomeMessage =
-        document.getElementById("welcomeMessage");
+        const profile =
+            await workerApiRequest(
+                `${API_BASE_URL}/profile`
+            );
 
-    if (welcomeMessage) {
+        const workerName =
+            profile?.fullName || "Worker";
 
-        welcomeMessage.textContent =
-            `Welcome back, ${workerName}!`;
+        localStorage.setItem(
+            USER_NAME_KEY,
+            workerName
+        );
+
+        const welcomeMessage =
+            document.getElementById(
+                "welcomeMessage"
+            );
+
+        if (welcomeMessage) {
+
+            welcomeMessage.textContent =
+                `Welcome back, ${workerName}!`;
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load worker profile:",
+            error
+        );
+
+        const workerName =
+            localStorage.getItem(
+                USER_NAME_KEY
+            ) || "Worker";
+
+        const welcomeMessage =
+            document.getElementById(
+                "welcomeMessage"
+            );
+
+        if (welcomeMessage) {
+
+            welcomeMessage.textContent =
+                `Welcome back, ${workerName}!`;
+        }
+    }
+}
+
+
+// Worker Status
+
+async function loadWorkerStatus() {
+
+    try {
+
+        const status =
+            await workerApiRequest(
+                `${API_BASE_URL}/status`
+            );
+
+        renderWorkerStatus(status);
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load worker status:",
+            error
+        );
+
+        const statusElement =
+            document.getElementById(
+                "availabilityStatus"
+            );
+
+        const badge =
+            document.getElementById(
+                "availabilityBadge"
+            );
+
+        if (statusElement) {
+            statusElement.textContent =
+                "Unable to load";
+        }
+
+        if (badge) {
+            badge.textContent =
+                "Error";
+
+            badge.className =
+                "px-3 py-1 rounded-full " +
+                "text-xs font-medium " +
+                "bg-red-900/30 " +
+                "text-red-400 " +
+                "border border-red-700/30";
+        }
+
+    }
+}
+
+
+function renderWorkerStatus(status) {
+
+    const verificationStatusElement =
+        document.getElementById(
+            "verificationStatus"
+        );
+
+    const verificationBadge =
+        document.getElementById(
+            "verificationBadge"
+        );
+
+    const statusElement =
+        document.getElementById(
+            "availabilityStatus"
+        );
+
+    const badge =
+        document.getElementById(
+            "availabilityBadge"
+        );
+
+    const iconContainer =
+        document.getElementById(
+            "availabilityIcon"
+        );
+
+    if (!statusElement ||
+        !badge ||
+        !iconContainer) {
+
+        return;
+    }
+
+    if (status.verificationStatus) {
+
+        const verificationLabel =
+            status.verificationStatus
+                .replace(/_/g, " ")
+                .toLowerCase()
+                .replace(/^\w/, character =>
+                    character.toUpperCase()
+                );
+
+        if (verificationStatusElement) {
+            verificationStatusElement.textContent =
+                verificationLabel;
+        }
+
+        if (verificationBadge) {
+            verificationBadge.textContent =
+                verificationLabel;
+        }
+    }
+
+    /*
+     * Availability only applies to verified workers.
+     * A worker who is not verified cannot be considered available.
+     */
+
+    if (status.verificationStatus !== "VERIFIED") {
+
+        statusElement.textContent =
+            "Not Available";
+
+        badge.textContent =
+            "Not Available";
+
+        badge.className =
+            "px-3 py-1 rounded-full " +
+            "text-xs font-medium " +
+            "bg-gray-800 " +
+            "text-gray-400 " +
+            "border border-gray-700";
+
+        iconContainer.className =
+            "w-12 h-12 rounded-xl " +
+            "bg-gray-800 " +
+            "border border-gray-700 " +
+            "flex items-center justify-center";
+
+        iconContainer.innerHTML = `
+            <i class="fa-solid fa-lock
+                      text-gray-400 text-lg"></i>
+        `;
+
+        return;
+    }
+
+    const availability =
+        status.availabilityStatus;
+
+    // AVAILABLE
+
+    if (availability === "AVAILABLE") {
+
+        statusElement.textContent =
+            "Available";
+
+        badge.textContent =
+            "Available";
+
+        badge.className =
+            "px-3 py-1 rounded-full " +
+            "text-xs font-medium " +
+            "bg-green-900/30 " +
+            "text-green-400 " +
+            "border border-green-700/30";
+
+        iconContainer.className =
+            "w-12 h-12 rounded-xl " +
+            "bg-green-900/30 " +
+            "border border-green-700/40 " +
+            "flex items-center justify-center";
+
+        iconContainer.innerHTML = `
+            <i class="fa-solid fa-circle-check
+                      text-green-400 text-lg"></i>
+        `;
+
+        return;
+    }
+
+    // UNAVAILABLE
+
+    if (availability === "UNAVAILABLE") {
+
+        statusElement.textContent =
+            "Unavailable";
+
+        badge.textContent =
+            "Unavailable";
+
+        badge.className =
+            "px-3 py-1 rounded-full " +
+            "text-xs font-medium " +
+            "bg-gray-800 " +
+            "text-gray-400 " +
+            "border border-gray-700";
+
+        iconContainer.className =
+            "w-12 h-12 rounded-xl " +
+            "bg-gray-800 " +
+            "border border-gray-700 " +
+            "flex items-center justify-center";
+
+        iconContainer.innerHTML = `
+            <i class="fa-solid fa-circle-xmark
+                      text-gray-400 text-lg"></i>
+        `;
+
+        return;
+    }
+
+    // BUSY
+
+    if (availability === "BUSY") {
+
+        statusElement.textContent =
+            "Busy";
+
+        badge.textContent =
+            "Busy";
+
+        badge.className =
+            "px-3 py-1 rounded-full " +
+            "text-xs font-medium " +
+            "bg-yellow-900/30 " +
+            "text-yellow-400 " +
+            "border border-yellow-700/30";
+
+        iconContainer.className =
+            "w-12 h-12 rounded-xl " +
+            "bg-yellow-900/30 " +
+            "border border-yellow-700/40 " +
+            "flex items-center justify-center";
+
+        iconContainer.innerHTML = `
+            <i class="fa-solid fa-briefcase
+                      text-yellow-400 text-lg"></i>
+        `;
+
+        return;
+    }
+
+    // Unknown status
+
+    statusElement.textContent =
+        availability || "Unknown";
+
+    badge.textContent =
+        "Unknown";
+
+}
+
+
+// API Helper
+
+async function workerApiRequest(url, options = {}) {
+
+    const token =
+        localStorage.getItem(ACCESS_TOKEN_KEY);
+
+    const response =
+        await fetch(url, {
+            ...options,
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`,
+                ...(options.headers || {})
+            }
+        });
+
+
+    if (response.status === 401) {
+
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    localStorage.removeItem(ROLE_KEY);
+
+    window.location.href =
+        "/bookService/Frontend/HTML/login.html";
+
+    throw new Error("Unauthorized");
+}
+
+
+    if (!response.ok) {
+
+        let message =
+            "Something went wrong.";
+
+        try {
+
+            const data =
+                await response.json();
+
+            if (data.message) {
+                message = data.message;
+            }
+
+        } catch (error) {
+            // Ignore parsing errors
+        }
+
+        throw new Error(message);
+    }
+
+
+    if (response.status === 204) {
+        return null;
+    }
+
+
+    return response.json();
+}
+
+
+// Booking Requests
+
+async function loadBookingRequests() {
+
+    const container =
+        document.getElementById(
+            "bookingRequestsContainer"
+        );
+
+    if (!container) {
+        return;
+    }
+
+
+    try {
+
+        const requests =
+            await workerApiRequest(
+                `${API_BASE_URL}/bookings/requests`
+            );
+
+        renderBookingRequests(requests);
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load booking requests:",
+            error
+        );
+
+
+        container.innerHTML = `
+
+            <div class="bg-gray-900
+                        border border-gray-800
+                        rounded-2xl
+                        p-10
+                        text-center">
+
+                <div class="w-16 h-16
+                            mx-auto mb-5
+                            rounded-full
+                            bg-red-900/20
+                            flex items-center justify-center">
+
+                    <i class="fa-solid
+                              fa-triangle-exclamation
+                              text-red-400
+                              text-2xl"></i>
+
+                </div>
+
+
+                <h4 class="text-lg font-semibold mb-2">
+                    Unable to load booking requests
+                </h4>
+
+
+                <p class="text-gray-400 text-sm mb-5">
+                    ${escapeHtml(error.message)}
+                </p>
+
+
+                <button
+                    id="retryBookingRequests"
+                    class="px-5 py-2.5
+                           rounded-xl
+                           bg-violet-600
+                           hover:bg-violet-500
+                           text-white
+                           text-sm
+                           font-medium
+                           transition">
+
+                    Retry
+
+                </button>
+
+            </div>
+        `;
+
+
+        const retryButton =
+            document.getElementById(
+                "retryBookingRequests"
+            );
+
+
+        if (retryButton) {
+
+            retryButton.addEventListener(
+                "click",
+                loadBookingRequests
+            );
+        }
+    }
+}
+
+
+// Render Booking Requests
+
+function renderBookingRequests(requests) {
+
+    const container =
+        document.getElementById(
+            "bookingRequestsContainer"
+        );
+
+    if (!container) {
+        return;
+    }
+
+
+    if (!requests || requests.length === 0) {
+
+        container.innerHTML = `
+
+            <div class="bg-gray-900
+                        border border-gray-800
+                        rounded-2xl
+                        p-10
+                        text-center">
+
+                <div class="w-16 h-16
+                            mx-auto mb-5
+                            rounded-full
+                            bg-gray-800
+                            flex items-center justify-center">
+
+                    <i class="fa-solid
+                              fa-calendar-plus
+                              text-gray-500
+                              text-2xl"></i>
+
+                </div>
+
+
+                <h4 class="text-lg
+                           font-semibold
+                           mb-2">
+
+                    No booking requests
+
+                </h4>
+
+
+                <p class="text-gray-400 text-sm">
+
+                    New service requests from customers
+                    will appear here.
+
+                </p>
+
+            </div>
+        `;
+
+        return;
+    }
+
+
+    container.innerHTML =
+        requests.map(request => `
+
+            <div class="bg-gray-900
+                        border border-gray-800
+                        rounded-2xl
+                        p-6">
+
+                <div class="flex flex-col
+                            lg:flex-row
+                            lg:items-start
+                            lg:justify-between
+                            gap-6">
+
+
+                    <!-- Request Information -->
+
+                    <div class="flex-1">
+
+
+                        <!-- Service -->
+
+                        <div class="flex items-center
+                                    gap-3 mb-4">
+
+                            <div class="w-11 h-11
+                                        rounded-xl
+                                        bg-violet-900/30
+                                        border border-violet-700/40
+                                        flex items-center
+                                        justify-center">
+
+                                <i class="fa-solid
+                                          fa-screwdriver-wrench
+                                          text-violet-400"></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <p class="text-xs
+                                          text-gray-400">
+
+                                    Service Request
+
+                                </p>
+
+                                <h4 class="text-lg
+                                           font-semibold">
+
+                                    ${escapeHtml(
+            request.serviceName ||
+            "Service"
+        )}
+
+                                </h4>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Customer -->
+
+                        <div class="mb-4">
+
+                            <p class="text-sm
+                                      text-gray-400
+                                      mb-1">
+
+                                Customer
+
+                            </p>
+
+                            <p class="font-medium">
+
+                                ${escapeHtml(
+            request.customerName ||
+            "Customer"
+        )}
+
+                            </p>
+
+                        </div>
+
+
+                        <!-- Note -->
+
+                        ${request.customerNote
+                ? `
+
+                                <div class="mb-4">
+
+                                    <p class="text-sm
+                                              text-gray-400
+                                              mb-2">
+
+                                        Customer Note
+
+                                    </p>
+
+                                    <div class="bg-gray-800/50
+                                                border border-gray-700
+                                                rounded-xl
+                                                p-4
+                                                text-sm
+                                                text-gray-300">
+
+                                        ${escapeHtml(
+                    request.customerNote
+                )}
+
+                                    </div>
+
+                                </div>
+
+                            `
+                : ""
+            }
+
+
+                        <!-- Requested Time -->
+
+                        <p class="text-xs text-gray-500">
+
+                            Requested
+                            ${formatDateTime(
+                request.createdAt
+            )}
+
+                        </p>
+
+                    </div>
+
+
+                    <!-- Actions -->
+
+                    <div class="flex flex-col
+                                sm:flex-row
+                                lg:flex-col
+                                gap-3
+                                lg:min-w-36">
+
+                        <button
+                            class="accept-booking-btn
+                                   px-5 py-2.5
+                                   rounded-xl
+                                   bg-green-600
+                                   hover:bg-green-500
+                                   text-white
+                                   text-sm
+                                   font-medium
+                                   transition"
+                            data-booking-id="${request.bookingId}">
+
+                            <i class="fa-solid
+                                      fa-check
+                                      mr-2"></i>
+
+                            Accept
+
+                        </button>
+
+
+                        <button
+                            class="reject-booking-btn
+                                   px-5 py-2.5
+                                   rounded-xl
+                                   bg-gray-800
+                                   hover:bg-gray-700
+                                   border border-gray-700
+                                   text-gray-200
+                                   text-sm
+                                   font-medium
+                                   transition"
+                            data-booking-id="${request.bookingId}">
+
+                            <i class="fa-solid
+                                      fa-xmark
+                                      mr-2"></i>
+
+                            Reject
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        `).join("");
+}
+
+
+// Accept Booking
+
+async function acceptBooking(bookingId) {
+
+    const confirmed =
+        confirm(
+            "Are you sure you want to accept this booking?"
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        await workerApiRequest(
+            `${API_BASE_URL}/bookings/${bookingId}/accept`,
+            {
+                method: "POST"
+            }
+        );
+
+
+        /*
+         * Refresh both sections.
+         *
+         * The accepted booking disappears
+         * from requests and appears in Active Service.
+         */
+
+        await Promise.all([
+            loadBookingRequests(),
+            loadWorkerBookings()
+        ]);
+
+
+    } catch (error) {
+
+        alert(error.message);
+
+    }
+}
+
+
+// Reject Booking
+
+async function rejectBooking(bookingId) {
+
+    const confirmed =
+        confirm(
+            "Are you sure you want to reject this booking?"
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        await workerApiRequest(
+            `${API_BASE_URL}/bookings/${bookingId}/reject`,
+            {
+                method: "POST"
+            }
+        );
+
+
+        /*
+         * Rejecting does not change the booking status.
+         * Therefore the request can still appear again.
+         *
+         * We simply refresh the list.
+         */
+
+        await loadBookingRequests();
+
+
+    } catch (error) {
+
+        alert(error.message);
+
+    }
+}
+
+
+// Active Service
+
+async function loadWorkerBookings() {
+
+    const container =
+        document.getElementById(
+            "activeServiceContainer"
+        );
+
+    if (!container) {
+        return;
+    }
+
+
+    try {
+
+        const bookings =
+            await workerApiRequest(
+                `${API_BASE_URL}/bookings`
+            );
+
+        renderActiveService(bookings);
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load worker bookings:",
+            error
+        );
+
+
+        container.innerHTML = `
+
+            <div class="text-center">
+
+                <div class="w-16 h-16
+                            mx-auto mb-5
+                            rounded-full
+                            bg-red-900/20
+                            flex items-center
+                            justify-center">
+
+                    <i class="fa-solid
+                              fa-triangle-exclamation
+                              text-red-400
+                              text-2xl"></i>
+
+                </div>
+
+
+                <h4 class="text-lg
+                           font-semibold
+                           mb-2">
+
+                    Unable to load active service
+
+                </h4>
+
+
+                <p class="text-gray-400
+                          text-sm
+                          mb-5">
+
+                    ${escapeHtml(error.message)}
+
+                </p>
+
+
+                <button
+                    id="retryWorkerBookings"
+                    class="px-5 py-2.5
+                           rounded-xl
+                           bg-violet-600
+                           hover:bg-violet-500
+                           text-white
+                           text-sm
+                           font-medium
+                           transition">
+
+                    Retry
+
+                </button>
+
+            </div>
+        `;
+
+
+        const retryButton =
+            document.getElementById(
+                "retryWorkerBookings"
+            );
+
+
+        if (retryButton) {
+
+            retryButton.addEventListener(
+                "click",
+                loadWorkerBookings
+            );
+        }
+    }
+}
+
+
+// Render Active Service
+
+function renderActiveService(bookings) {
+
+    const container =
+        document.getElementById(
+            "activeServiceContainer"
+        );
+
+    if (!container) {
+        return;
+    }
+
+
+    const activeStatuses = [
+        "ACCEPTED",
+        "IN_PROGRESS"
+    ];
+
+
+    const activeBooking =
+        bookings.find(
+            booking =>
+                activeStatuses.includes(
+                    booking.status
+                )
+        );
+
+
+    if (!activeBooking) {
+
+        container.innerHTML = `
+
+            <div class="text-center">
+
+                <div class="w-16 h-16
+                            mx-auto mb-5
+                            rounded-full
+                            bg-gray-800
+                            flex items-center
+                            justify-center">
+
+                    <i class="fa-solid
+                              fa-briefcase
+                              text-gray-500
+                              text-2xl"></i>
+
+                </div>
+
+
+                <h4 class="text-lg
+                           font-semibold
+                           mb-2">
+
+                    No active service
+
+                </h4>
+
+
+                <p class="text-gray-400 text-sm">
+
+                    An accepted service will appear here.
+
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    const statusInfo =
+        getBookingStatusInfo(
+            activeBooking.status
+        );
+
+
+    let actionButton = "";
+
+
+    if (activeBooking.status === "ACCEPTED") {
+
+        actionButton = `
+
+            <button
+                class="start-service-btn
+                       w-full sm:w-auto
+                       px-6 py-3
+                       rounded-xl
+                       bg-violet-600
+                       hover:bg-violet-500
+                       text-white
+                       font-medium
+                       transition"
+                data-booking-id="${activeBooking.bookingId}">
+
+                <i class="fa-solid
+                          fa-play
+                          mr-2"></i>
+
+                Start Service
+
+            </button>
+
+        `;
+    }
+
+
+    if (activeBooking.status === "IN_PROGRESS") {
+
+        if (activeBooking.workerConfirmedCompletion) {
+
+            actionButton = `
+
+                <div class="text-sm
+                            text-yellow-400">
+
+                    <i class="fa-solid
+                              fa-clock
+                              mr-2"></i>
+
+                    Waiting for customer confirmation
+
+                </div>
+
+            `;
+
+        } else {
+
+            actionButton = `
+
+                <button
+                    class="complete-service-btn
+                           w-full sm:w-auto
+                           px-6 py-3
+                           rounded-xl
+                           bg-green-600
+                           hover:bg-green-500
+                           text-white
+                           font-medium
+                           transition"
+                    data-booking-id="${activeBooking.bookingId}">
+
+                    <i class="fa-solid
+                              fa-circle-check
+                              mr-2"></i>
+
+                    Mark Service Completed
+
+                </button>
+
+            `;
+        }
+    }
+
+
+    /*
+     * Build the customer's complete address.
+     *
+     * Only the fields that actually contain
+     * information will be displayed.
+     */
+
+    const addressParts = [
+
+        activeBooking.customerAddressLine1,
+
+        activeBooking.customerAddressLine2,
+
+        activeBooking.customerLandmark,
+
+        activeBooking.customerCity,
+
+        activeBooking.customerState,
+
+        activeBooking.customerPinCode
+
+    ].filter(Boolean);
+
+
+    const customerAddress =
+        addressParts.length > 0
+            ? addressParts
+                .map(part => escapeHtml(part))
+                .join(", ")
+            : "Address not provided";
+
+
+    const customerPhone =
+        activeBooking.customerPhone
+            ? escapeHtml(activeBooking.customerPhone)
+            : "Phone number not provided";
+
+
+    const callButton =
+        activeBooking.customerPhone
+            ? `
+
+                <a
+                    href="tel:${encodeURIComponent(
+                        activeBooking.customerPhone
+                    )}"
+                    class="inline-flex
+                           items-center
+                           justify-center
+                           gap-2
+                           px-4 py-2.5
+                           rounded-xl
+                           bg-green-600
+                           hover:bg-green-500
+                           text-white
+                           text-sm
+                           font-medium
+                           transition">
+
+                    <i class="fa-solid fa-phone"></i>
+
+                    Call Customer
+
+                </a>
+
+              `
+            : "";
+
+
+    container.innerHTML = `
+
+        <div class="text-left">
+
+
+            <!-- Header -->
+
+            <div class="flex flex-col
+                        md:flex-row
+                        md:items-start
+                        md:justify-between
+                        gap-5 mb-8">
+
+
+                <div>
+
+                    <p class="text-sm
+                              text-gray-400
+                              mb-2">
+
+                        Current Customer
+
+                    </p>
+
+
+                    <h4 class="text-2xl
+                               font-bold">
+
+                        ${escapeHtml(
+                            activeBooking.customerName ||
+                            "Customer"
+                        )}
+
+                    </h4>
+
+                </div>
+
+
+                <span class="inline-flex
+                             items-center
+                             self-start
+                             px-3 py-1.5
+                             rounded-full
+                             text-xs
+                             font-medium
+                             ${statusInfo.classes}">
+
+                    ${statusInfo.label}
+
+                </span>
+
+            </div>
+
+
+
+            <!-- Service + Requested Time -->
+
+            <div class="grid md:grid-cols-2
+                        gap-4 mb-6">
+
+
+                <div class="bg-gray-800/50
+                            border border-gray-700
+                            rounded-xl
+                            p-5">
+
+                    <p class="text-sm
+                              text-gray-400
+                              mb-1">
+
+                        Service
+
+                    </p>
+
+
+                    <p class="font-semibold">
+
+                        ${escapeHtml(
+                            activeBooking.serviceName ||
+                            "Service"
+                        )}
+
+                    </p>
+
+                </div>
+
+
+                <div class="bg-gray-800/50
+                            border border-gray-700
+                            rounded-xl
+                            p-5">
+
+                    <p class="text-sm
+                              text-gray-400
+                              mb-1">
+
+                        Requested
+
+                    </p>
+
+
+                    <p class="font-semibold">
+
+                        ${formatDateTime(
+                            activeBooking.createdAt
+                        )}
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- Customer Contact -->
+
+            <div class="bg-gray-800/50
+                        border border-gray-700
+                        rounded-xl
+                        p-5 mb-6">
+
+
+                <div class="flex items-center
+                            gap-3 mb-4">
+
+                    <div class="w-10 h-10
+                                rounded-xl
+                                bg-green-900/30
+                                border border-green-700/40
+                                flex items-center
+                                justify-center">
+
+                        <i class="fa-solid
+                                  fa-address-card
+                                  text-green-400"></i>
+
+                    </div>
+
+
+                    <div>
+
+                        <p class="text-sm
+                                  text-gray-400">
+
+                            Customer Contact
+
+                        </p>
+
+                        <p class="font-semibold">
+
+                            ${escapeHtml(
+                                activeBooking.customerName ||
+                                "Customer"
+                            )}
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="flex flex-col
+                            sm:flex-row
+                            sm:items-center
+                            gap-3">
+
+
+                    <div class="flex items-center
+                                gap-3
+                                text-gray-300">
+
+                        <i class="fa-solid
+                                  fa-phone
+                                  text-gray-500"></i>
+
+                        <span>
+
+                            ${customerPhone}
+
+                        </span>
+
+                    </div>
+
+
+                    ${callButton}
+
+                </div>
+
+            </div>
+
+
+
+            <!-- Customer Address -->
+
+            <div class="bg-gray-800/50
+                        border border-gray-700
+                        rounded-xl
+                        p-5 mb-6">
+
+
+                <div class="flex items-center
+                            gap-3 mb-4">
+
+                    <div class="w-10 h-10
+                                rounded-xl
+                                bg-violet-900/30
+                                border border-violet-700/40
+                                flex items-center
+                                justify-center">
+
+                        <i class="fa-solid
+                                  fa-location-dot
+                                  text-violet-400"></i>
+
+                    </div>
+
+
+                    <div>
+
+                        <p class="text-sm
+                                  text-gray-400">
+
+                            Service Location
+
+                        </p>
+
+                        <p class="font-semibold">
+
+                            Customer Address
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="flex items-start
+                            gap-3
+                            text-gray-300">
+
+                    <i class="fa-solid
+                              fa-map-pin
+                              text-gray-500
+                              mt-1"></i>
+
+
+                    <p class="text-sm
+                              leading-6">
+
+                        ${customerAddress}
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- Customer Note -->
+
+            ${activeBooking.customerNote
+                ? `
+
+                    <div class="mb-8">
+
+                        <p class="text-sm
+                                  text-gray-400
+                                  mb-2">
+
+                            Customer Note
+
+                        </p>
+
+
+                        <div class="bg-gray-800/50
+                                    border border-gray-700
+                                    rounded-xl
+                                    p-4
+                                    text-sm
+                                    text-gray-300">
+
+                            ${escapeHtml(
+                                activeBooking.customerNote
+                            )}
+
+                        </div>
+
+                    </div>
+
+                  `
+                : ""
+            }
+
+
+
+            <!-- Actions -->
+
+            <div class="flex flex-wrap
+                        items-center
+                        gap-4">
+
+                ${callButton}
+
+                ${actionButton}
+
+            </div>
+
+        </div>
+
+    `;
+}
+
+// Start Service
+
+async function startService(bookingId) {
+
+    const confirmed =
+        confirm(
+            "Are you sure you want to start this service?"
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        await workerApiRequest(
+            `${API_BASE_URL}/bookings/${bookingId}/start`,
+            {
+                method: "POST"
+            }
+        );
+
+
+        await loadWorkerBookings();
+
+
+    } catch (error) {
+
+        alert(error.message);
+
+    }
+}
+
+
+// Complete Service
+
+async function completeService(bookingId) {
+
+    const confirmed =
+        confirm(
+            "Have you finished providing this service?"
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        await workerApiRequest(
+            `${API_BASE_URL}/bookings/${bookingId}/complete`,
+            {
+                method: "POST"
+            }
+        );
+
+
+        await loadWorkerBookings();
+
+
+    } catch (error) {
+
+        alert(error.message);
+
+    }
+}
+
+
+// Event Delegation
+
+document.addEventListener("click", event => {
+
+    const acceptButton =
+        event.target.closest(
+            ".accept-booking-btn"
+        );
+
+
+    if (acceptButton) {
+
+        acceptBooking(
+            acceptButton.dataset.bookingId
+        );
+
+        return;
+    }
+
+
+    const rejectButton =
+        event.target.closest(
+            ".reject-booking-btn"
+        );
+
+
+    if (rejectButton) {
+
+        rejectBooking(
+            rejectButton.dataset.bookingId
+        );
+
+        return;
+    }
+
+
+    const startButton =
+        event.target.closest(
+            ".start-service-btn"
+        );
+
+
+    if (startButton) {
+
+        startService(
+            startButton.dataset.bookingId
+        );
+
+        return;
+    }
+
+
+    const completeButton =
+        event.target.closest(
+            ".complete-service-btn"
+        );
+
+
+    if (completeButton) {
+
+        completeService(
+            completeButton.dataset.bookingId
+        );
 
     }
 
+});
+
+
+// Helpers
+
+function getBookingStatusInfo(status) {
+
+    const statuses = {
+
+        ACCEPTED: {
+
+            label: "Accepted",
+
+            classes:
+                "bg-blue-900/30 " +
+                "text-blue-400 " +
+                "border border-blue-700/30"
+        },
+
+
+        IN_PROGRESS: {
+
+            label: "In Progress",
+
+            classes:
+                "bg-yellow-900/30 " +
+                "text-yellow-400 " +
+                "border border-yellow-700/30"
+        }
+
+    };
+
+
+    return statuses[status] || {
+
+        label: status || "Unknown",
+
+        classes:
+            "bg-gray-800 " +
+            "text-gray-400 " +
+            "border border-gray-700"
+    };
 }
+
+
+function formatDateTime(dateString) {
+
+    if (!dateString) {
+        return "—";
+    }
+
+
+    const date =
+        new Date(dateString);
+
+
+    if (Number.isNaN(date.getTime())) {
+        return "—";
+    }
+
+
+    return date.toLocaleString(
+        undefined,
+        {
+            dateStyle: "medium",
+            timeStyle: "short"
+        }
+    );
+}
+
+
+function escapeHtml(value) {
+
+    if (value === null ||
+        value === undefined) {
+
+        return "";
+    }
+
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 
 // Dashboard Initialisation
 
 if (checkWorkerLogin()) {
 
     loadWorkerInformation();
+
+    loadWorkerStatus();
+
+    loadBookingRequests();
+
+    loadWorkerBookings();
 
 }

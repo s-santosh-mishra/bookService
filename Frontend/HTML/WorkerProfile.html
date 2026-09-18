@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +12,7 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <link rel="stylesheet" href="../CSS/CustomerDashboard.css">
-    <link rel="stylesheet" href="../CSS/CustomerDashboard.css">
+    <link rel="stylesheet" href="../CSS/WorkerDashboard.css">
 
     <link rel="icon" type="image/png" sizes="32x32" href="../Images/favicon-32x32.png?v=3">
     <link rel="icon" type="image/png" sizes="16x16" href="../Images/favicon-16x16.png?v=3">
@@ -21,8 +20,8 @@
 
 <body class="bg-gray-950 text-white min-h-screen">
 
-    <!-- Customer Header -->
-    <header id="customerHeader"></header>
+    <!-- Worker Header -->
+    <header id="workerHeader"></header>
 
 
     <!-- Main Content -->
@@ -37,7 +36,7 @@
                 </h1>
 
                 <p class="text-gray-500 mt-1">
-                    Manage your personal information.
+                    Manage your personal and professional information.
                 </p>
             </div>
 
@@ -51,7 +50,6 @@
 
                 <i class="fa-solid fa-pen"></i>
                 Edit Profile
-
             </button>
 
         </div>
@@ -73,7 +71,6 @@
             <section class="bg-gray-900 border border-gray-800 rounded-2xl p-6 md:p-8 mb-6">
 
                 <div class="mb-7">
-
                     <h2 class="text-xl font-semibold">
                         Personal Information
                     </h2>
@@ -81,7 +78,6 @@
                     <p class="text-sm text-gray-500 mt-1">
                         Keep your personal information up to date.
                     </p>
-
                 </div>
 
 
@@ -90,7 +86,6 @@
 
                     <!-- Full Name -->
                     <div>
-
                         <label
                             for="fullName"
                             class="block text-sm font-medium text-gray-300 mb-2">
@@ -102,21 +97,17 @@
                             type="text"
                             class="profile-input w-full"
                             disabled>
-
                     </div>
 
 
-                    <!-- Email -->
+                    <!-- Email - NOT EDITABLE -->
                     <div>
-
                         <label
                             class="block text-sm font-medium text-gray-300 mb-2">
-
                             Email
                             <span class="text-gray-500 text-xs">
                                 (Cannot be modified)
                             </span>
-
                         </label>
 
                         <p
@@ -124,13 +115,11 @@
                             class="profile-value py-2">
                             —
                         </p>
-
                     </div>
 
 
                     <!-- Age -->
                     <div>
-
                         <label
                             for="age"
                             class="block text-sm font-medium text-gray-300 mb-2">
@@ -144,13 +133,11 @@
                             max="120"
                             class="profile-input w-full"
                             disabled>
-
                     </div>
 
 
                     <!-- Gender -->
                     <div>
-
                         <label
                             for="gender"
                             class="block text-sm font-medium text-gray-300 mb-2">
@@ -168,13 +155,11 @@
                             <option value="OTHER">Other</option>
 
                         </select>
-
                     </div>
 
 
                     <!-- Phone -->
                     <div>
-
                         <label
                             for="phone"
                             class="block text-sm font-medium text-gray-300 mb-2">
@@ -186,7 +171,6 @@
                             type="text"
                             class="profile-input w-full"
                             disabled>
-
                     </div>
 
                 </div>
@@ -200,11 +184,9 @@
             <section class="bg-gray-900 border border-gray-800 rounded-2xl p-6 md:p-8 mb-6">
 
                 <div class="mb-7">
-
                     <h2 class="text-xl font-semibold">
                         Address
                     </h2>
-
                 </div>
 
 
@@ -213,7 +195,6 @@
 
                     <!-- Address Line 1 -->
                     <div class="md:col-span-2">
-
                         <label
                             for="addressLine1"
                             class="block text-sm font-medium text-gray-300 mb-2">
@@ -225,15 +206,11 @@
                             type="text"
                             class="profile-input w-full"
                             disabled>
-
                     </div>
 
 
                     <!-- Address Line 2 -->
-                    <div
-                        id="addressLine2Container"
-                        class="md:col-span-2">
-
+                    <div id="addressLine2Container" class="md:col-span-2">
                         <label
                             for="addressLine2"
                             class="block text-sm font-medium text-gray-300 mb-2">
@@ -245,13 +222,11 @@
                             type="text"
                             class="profile-input w-full"
                             disabled>
-
                     </div>
 
 
                     <!-- Landmark -->
                     <div id="landmarkContainer">
-
                         <label
                             for="landmark"
                             class="block text-sm font-medium text-gray-300 mb-2">
@@ -263,13 +238,11 @@
                             type="text"
                             class="profile-input w-full"
                             disabled>
-
                     </div>
 
 
                     <!-- City -->
                     <div>
-
                         <label
                             for="city"
                             class="block text-sm font-medium text-gray-300 mb-2">
@@ -281,13 +254,11 @@
                             type="text"
                             class="profile-input w-full"
                             disabled>
-
                     </div>
 
 
                     <!-- State -->
                     <div>
-
                         <label
                             for="state"
                             class="block text-sm font-medium text-gray-300 mb-2">
@@ -299,13 +270,11 @@
                             type="text"
                             class="profile-input w-full"
                             disabled>
-
                     </div>
 
 
                     <!-- PIN Code -->
                     <div>
-
                         <label
                             for="pinCode"
                             class="block text-sm font-medium text-gray-300 mb-2">
@@ -317,6 +286,80 @@
                             type="text"
                             class="profile-input w-full"
                             disabled>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- PROFESSIONAL INFORMATION -->
+
+            <section class="bg-gray-900 border border-gray-800 rounded-2xl p-6 md:p-8 mb-6">
+
+                <div class="mb-7">
+                    <h2 class="text-xl font-semibold">
+                        Professional Information
+                    </h2>
+
+                    <p class="text-sm text-gray-500 mt-1">
+                        Information related to your professional profile.
+                    </p>
+                </div>
+
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+
+
+                    <!-- Experience -->
+                    <div>
+                        <label
+                            for="experienceYears"
+                            class="block text-sm font-medium text-gray-300 mb-2">
+                            Experience (Years)
+                        </label>
+
+                        <input
+                            id="experienceYears"
+                            type="number"
+                            min="0"
+                            class="profile-input w-full"
+                            disabled>
+                    </div>
+
+
+                    <!-- Qualification -->
+                    <div>
+                        <label
+                            for="qualification"
+                            class="block text-sm font-medium text-gray-300 mb-2">
+                            Qualification
+                        </label>
+
+                        <input
+                            id="qualification"
+                            type="text"
+                            class="profile-input w-full"
+                            disabled>
+                    </div>
+
+
+                    <!-- Bio -->
+                    <div id="bioContainer" class="md:col-span-2">
+
+                        <label
+                            for="bio"
+                            class="block text-sm font-medium text-gray-300 mb-2">
+                            Bio
+                        </label>
+
+                        <textarea
+                            id="bio"
+                            rows="3"
+                            class="profile-input w-full resize-none"
+                            disabled>
+                        </textarea>
 
                     </div>
 
@@ -326,7 +369,83 @@
 
 
 
-            <!-- FORM ACTIONS -->
+            <!-- PROVIDING SERVICES -->
+
+            <section class="bg-gray-900 border border-gray-800 rounded-2xl p-6 md:p-8 mb-6">
+
+                <div class="mb-7">
+                    <h2 class="text-xl font-semibold">
+                        Providing Services
+                    </h2>
+
+                    <p class="text-sm text-gray-500 mt-1">
+                        Services you currently provide.
+                    </p>
+                </div>
+
+
+                <div
+                    id="providingServices"
+                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+                    <!-- Services loaded by JavaScript -->
+
+                </div>
+
+            </section>
+
+
+
+            <!-- WORKER STATUS -->
+
+            <section class="bg-gray-900 border border-gray-800 rounded-2xl p-6 md:p-8 mb-6">
+
+                <div class="mb-7">
+                    <h2 class="text-xl font-semibold">
+                        Worker Status
+                    </h2>
+
+                    <p class="text-sm text-gray-500 mt-1">
+                        These statuses are managed by ServiceHub.
+                    </p>
+                </div>
+
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+
+
+                    <!-- Verification -->
+                    <div>
+                        <label
+                            class="block text-sm font-medium text-gray-300 mb-2">
+                            Verification Status
+                        </label>
+
+                        <div id="verificationStatus">
+                            —
+                        </div>
+                    </div>
+
+
+                    <!-- Availability -->
+                    <div>
+                        <label
+                            class="block text-sm font-medium text-gray-300 mb-2">
+                            Availability Status
+                        </label>
+
+                        <div id="availabilityStatus">
+                            —
+                        </div>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- SAVE / CANCEL -->
 
             <div
                 id="formActions"
@@ -363,17 +482,17 @@
     </main>
 
 
+
     <!-- Footer -->
     <footer id="footer"></footer>
 
 
     <!-- Components -->
-    <script src="../JS/components/CustomerHeader.js"></script>
+    <script src="../JS/components/WorkerHeader.js"></script>
     <script src="../JS/components/Footer.js"></script>
 
     <!-- Page JS -->
-    <script src="../JS/CustomerProfile.js"></script>
+    <script src="../JS/WorkerProfile.js"></script>
 
 </body>
-
 </html>

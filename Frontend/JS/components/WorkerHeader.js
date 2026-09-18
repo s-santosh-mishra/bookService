@@ -1,4 +1,5 @@
-/*   ServiceHub Worker Header */
+/*   ServiceHub Worker Header
+*/
 
 const workerHeader = `
 <header class="sticky top-0 z-50 bg-gray-950/90 backdrop-blur-md border-b border-gray-800">
@@ -40,40 +41,53 @@ const workerHeader = `
             </a>
 
 
+
             <!-- Desktop Navigation -->
 
             <div class="hidden lg:flex items-center gap-3">
 
                 <a href="WorkerDashboard.html"
                    class="worker-nav-btn">
+
                     Home
+
                 </a>
 
-                <a href="WorkerBookingRequests.html"
-                   class="worker-nav-btn">
-                    Booking Requests
-                </a>
 
-                <a href="WorkerCompletedWork.html"
+                <a href="CompletedWork.html"
                    class="worker-nav-btn">
+
                     Completed Work
+
                 </a>
 
-                <a href="WorkerServices.html"
+
+                <a href="WorkerProfile.html"
                    class="worker-nav-btn">
-                    My Services
+
+                    Profile
+
+                </a>
+
+                <a href="ContactFaq.html"
+                   class="worker-nav-btn">
+                    Contact & FAQ
                 </a>
 
 
                 <!-- Logout -->
 
                 <button id="workerLogoutButton"
-                    class="worker-nav-btn items-center">
+                        class="worker-nav-btn items-center">
+
                     <i class="fa-solid fa-arrow-right-from-bracket mr-2"></i>
+
                     Logout
+
                 </button>
 
             </div>
+
 
 
             <!-- Mobile Menu Button -->
@@ -89,6 +103,7 @@ const workerHeader = `
         </div>
 
 
+
         <!-- Mobile Navigation -->
 
         <div id="workerMobileMenu"
@@ -101,24 +116,28 @@ const workerHeader = `
                 Home
             </a>
 
-            <a href="WorkerBookingRequests.html"
-               class="worker-mobile-nav-btn">
-                Booking Requests
-            </a>
 
-            <a href="WorkerCompletedWork.html"
+            <a href="CompletedWork.html"
                class="worker-mobile-nav-btn">
                 Completed Work
             </a>
 
-            <a href="WorkerServices.html"
+
+            <a href="WorkerProfile.html"
                class="worker-mobile-nav-btn">
-                My Services
+                Profile
+            </a>
+
+            <a href="ContactFaq.html"
+               class="worker-mobile-nav-btn">
+                Contact & FAQ
             </a>
 
             <button id="workerMobileLogoutButton"
                     class="worker-mobile-nav-btn text-left flex items-center">
+
                 <i class="fa-solid fa-arrow-right-from-bracket mr-2"></i>
+
                 Logout
 
             </button>
@@ -132,18 +151,23 @@ const workerHeader = `
 
 
 
-/*   Insert Header */
+/*   Insert Header
+*/
 
 const workerHeaderContainer =
     document.getElementById("workerHeader");
 
 if (workerHeaderContainer) {
 
-    workerHeaderContainer.innerHTML = workerHeader;
+    workerHeaderContainer.innerHTML =
+        workerHeader;
 
 }
 
-/*   Highlight Current Page */
+
+
+/*   Highlight Current Page
+*/
 
 const currentWorkerPage =
     window.location.pathname.split("/").pop();
@@ -165,7 +189,8 @@ document
 
 
 
-/*   Mobile Menu */
+/*   Mobile Menu
+*/
 
 const workerMobileMenuButton =
     document.getElementById("workerMobileMenuButton");
@@ -214,15 +239,18 @@ if (workerMobileMenuButton && workerMobileMenu) {
 
 
 
-/*   Worker Logout */
+/*   Worker Logout
+*/
 
 function workerLogout() {
 
-    const confirmed = confirm("Are you sure you want to log out?");
+    const confirmed =
+        confirm("Are you sure you want to log out?");
 
     if (!confirmed) {
         return;
     }
+
 
     localStorage.removeItem("servicehub_access_token");
     localStorage.removeItem("servicehub_user_id");
@@ -230,9 +258,12 @@ function workerLogout() {
     localStorage.removeItem("servicehub_user_role");
     localStorage.removeItem("servicehub_user_name");
 
-    window.location.href = "login.html";
+
+    window.location.href =
+        "login.html";
 
 }
+
 
 
 const workerLogoutButton =

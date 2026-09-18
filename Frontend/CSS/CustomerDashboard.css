@@ -176,3 +176,40 @@
     }
 
 }
+
+/* Worker Profile */
+
+.profile-input {
+    background: transparent;
+    color: #f9fafb;
+    border: 1px solid transparent;
+    border-radius: 0.75rem;
+    padding: 0.5rem 0;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.profile-input:disabled {
+    cursor: default;
+    color: #f9fafb;
+}
+
+.profile-input-editing {
+    background-color: #111827;
+    border-color: #374151;
+    padding: 0.75rem 1rem;
+}
+
+.profile-input-editing:focus {
+    border-color: #7c3aed;
+    box-shadow: 0 0 0 1px #7c3aed;
+}
+
+.profile-input option {
+    background-color: #111827;
+    color: #f9fafb;
+}
+
+.profile-value {
+    color: #9ca3af;
+}

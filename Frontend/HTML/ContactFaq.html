@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Contact & FAQ - ServiceHub</title>
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link rel="stylesheet" href="../CSS/output.css">
+    <link rel="stylesheet" href="../CSS/CustomerDashboard.css">
+    <link rel="stylesheet" href="../CSS/WorkerDashboard.css">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="../Images/favicon-32x32.png?v=3">
+    <link rel="icon" type="image/png" sizes="16x16" href="../Images/favicon-16x16.png?v=3">
+
+</head>
+
+
+<body class="bg-gray-950 text-white min-h-screen">
+
+
+    <!-- Customer Header -->
+    <div id="customerHeader" class="hidden"></div>
+
+    <!-- Worker Header -->
+    <div id="workerHeader" class="hidden"></div>
+
+
+    <!-- MAIN -->
+
+    <main class="max-w-5xl mx-auto px-6 py-10">
+
+
+        <!-- PAGE HEADER -->
+
+        <div class="mb-10">
+
+            <h1 class="text-3xl md:text-4xl font-bold">
+                Contact & FAQ
+            </h1>
+
+            <p class="text-gray-500 mt-2 max-w-2xl">
+                Find answers to common questions or get in touch
+                with the ServiceHub support team.
+            </p>
+
+        </div>
+
+        <!-- FAQ SECTION -->
+
+        <section>
+
+            <div class="mb-6">
+
+                <h2 class="text-2xl font-semibold">
+                    Frequently Asked Questions
+                </h2>
+
+                <p id="faqSubtitle" class="text-sm text-gray-500 mt-1">
+                    Find answers to common questions.
+                </p>
+
+            </div>
+
+
+            <!-- FAQ container -->
+
+            <div id="faqContainer" class="space-y-3">
+
+                <!-- FAQs inserted by JavaScript -->
+
+            </div>
+
+        </section>
+
+        <!-- CONTACT SECTION -->
+
+        <section class="bg-gray-900 border border-gray-800 rounded-2xl
+                        p-6 md:p-8 mt-12">
+
+            <div class="mb-7">
+
+                <h2 class="text-xl font-semibold">
+                    Contact ServiceHub
+                </h2>
+
+                <p class="text-sm text-gray-500 mt-1">
+                    We're here to help with questions, problems,
+                    or concerns regarding your ServiceHub experience.
+                </p>
+
+            </div>
+
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+
+                <!-- Email -->
+                <a href="mailto:santoshku.mishra03@gmail.com" class="group bg-gray-950 border border-gray-800
+                           rounded-xl p-5
+                           hover:border-purple-600/50
+                           transition duration-200">
+
+                    <div class="flex items-center gap-3 mb-3">
+
+                        <div class="w-10 h-10 rounded-xl
+                                    bg-purple-900/30
+                                    flex items-center justify-center">
+
+                            <i class="fa-solid fa-envelope
+                                      text-purple-400">
+                            </i>
+
+                        </div>
+
+                        <span class="font-medium">
+                            Email
+                        </span>
+
+                    </div>
+
+                    <p class="text-sm text-gray-400
+                              break-all
+                              group-hover:text-gray-300">
+
+                        santoshku.mishra03@gmail.com
+
+                    </p>
+
+                    <p class="text-xs text-gray-600 mt-2">
+                        Click to send us an email
+                    </p>
+
+                </a>
+
+
+                <!-- Phone -->
+                <a href="tel:9178299774" class="group bg-gray-950 border border-gray-800
+                           rounded-xl p-5
+                           hover:border-purple-600/50
+                           transition duration-200">
+
+                    <div class="flex items-center gap-3 mb-3">
+
+                        <div class="w-10 h-10 rounded-xl
+                                    bg-green-900/30
+                                    flex items-center justify-center">
+
+                            <i class="fa-solid fa-phone
+                                      text-blue-400">
+                            </i>
+
+                        </div>
+
+                        <span class="font-medium">
+                            Phone
+                        </span>
+
+                    </div>
+
+                    <p class="text-sm text-gray-400">
+                        9178299774
+                    </p>
+
+                    <p class="text-xs text-gray-600 mt-2">
+                        Contact us directly
+                    </p>
+
+                </a>
+
+
+
+                <!-- LinkedIn -->
+                <a href="https://wa.me/+919178299774" target="_blank" rel="noopener noreferrer" class="group bg-gray-950 border border-gray-800
+                           rounded-xl p-5
+                           hover:border-purple-600/50
+                           transition duration-200">
+
+                    <div class="flex items-center gap-3 mb-3">
+
+                        <div class="w-10 h-10 rounded-xl
+                                    bg-blue-900/30
+                                    flex items-center justify-center">
+
+                            <i class="fa-brands fa-whatsapp text-green-500"></i>
+
+                        </div>
+
+                        <span class="font-medium">
+                            Whatsapp
+                        </span>
+
+                    </div>
+
+                    <p class="text-sm text-gray-400">
+                        ServiceHub
+                    </p>
+
+                    <p class="text-xs text-gray-600 mt-2">
+                        Contact us on Whatsapp
+                    </p>
+
+                </a>
+
+            </div>
+
+
+            <!-- Support note -->
+
+            <div class="mt-6 pt-6 border-t border-gray-800">
+
+                <div class="flex items-start gap-3">
+
+                    <i class="fa-solid fa-circle-info
+                              text-gray-500 mt-0.5">
+                    </i>
+
+                    <p class="text-sm text-gray-500 leading-relaxed">
+                        When contacting us about a booking or service,
+                        include the relevant details so our support team
+                        can understand the situation and assist you
+                        more efficiently.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- Footer -->
+    <footer id="footer"></footer>
+
+
+
+    <!-- Components -->
+    <script src="../JS/components/CustomerHeader.js"></script>
+    <script src="../JS/components/WorkerHeader.js"></script>
+    <script src="../JS/components/Footer.js"></script>
+
+
+    <!-- Page JS -->
+
+    <script src="../JS/ContactFaq.js?v=2"></script>
+
+
+</body>
+
+</html>

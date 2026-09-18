@@ -99,6 +99,17 @@
         </section>
 
 
+        <!-- Search Results -->
+
+        <section id="searchResultsSection" class="hidden mb-14">
+            <div class="mb-6">
+                <h3 class="text-2xl font-bold">Search Results</h3>
+                <p id="searchResultsDescription" class="text-sm text-gray-400 mt-1">Services matching your search</p>
+            </div>
+            <div id="searchResultsContainer" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+
+
         <!-- Active Booking -->
 
         <section class="mb-14">
@@ -296,6 +307,30 @@
         </section>
 
 
+        <!-- Category Results -->
+
+        <section id="categoryServicesSection" class="hidden mb-14">
+
+            <div class="mb-6">
+
+                <h3 id="categoryServicesHeading" class="text-2xl font-bold">
+                    Services
+                </h3>
+
+                <p id="categoryServicesDescription" class="text-sm text-gray-400 mt-1">
+                    Select a category to view its services
+                </p>
+
+            </div>
+
+            <div id="categoryServicesContainer"
+                 class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            </div>
+
+        </section>
+
+
         <!-- Popular Services -->
 
         <section class="mb-10">
@@ -323,6 +358,146 @@
 
     </main>
 
+
+    <!-- Create Booking Modal -->
+
+    <div id="createBookingModal"
+         class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm
+                flex items-center justify-center px-4 py-6">
+
+        <div class="w-full max-w-lg bg-gray-900 border border-gray-800
+                    rounded-2xl shadow-2xl">
+
+            <div class="flex items-center justify-between px-6 py-5 border-b border-gray-800">
+                <div>
+                    <p class="text-violet-400 text-sm font-medium mb-1">Book Service</p>
+                    <h3 id="createBookingService" class="text-xl font-bold">Service</h3>
+                </div>
+                <button id="closeCreateBookingButton" type="button"
+                        class="w-10 h-10 rounded-xl bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700 transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-5">
+                <p class="text-sm text-gray-400">A suitable available worker will receive your request.</p>
+
+                <div>
+                    <label for="customerBookingNote" class="block text-sm font-medium mb-2">Note (optional)</label>
+                    <textarea id="customerBookingNote" maxlength="500" rows="4"
+                              placeholder="Add any useful details for the worker..."
+                              class="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-gray-100 placeholder-gray-600 focus:outline-none focus:border-violet-500 transition resize-none"></textarea>
+                </div>
+
+                <div class="flex justify-end gap-3">
+                    <button id="cancelCreateBookingButton" type="button"
+                            class="px-5 py-3 rounded-xl bg-gray-800 text-gray-300 hover:bg-gray-700 transition">Cancel</button>
+                    <button id="confirmCreateBookingButton" type="button"
+                            class="px-5 py-3 rounded-xl bg-violet-600 text-white hover:bg-violet-700 transition font-medium">
+                        Request Service
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Booking Details Modal -->
+
+    <div id="bookingDetailsModal"
+         class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm
+                flex items-center justify-center px-4 py-6">
+
+        <div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto
+                    bg-gray-900 border border-gray-800 rounded-2xl
+                    shadow-2xl">
+
+            <div class="flex items-center justify-between
+                        px-6 py-5 border-b border-gray-800">
+
+                <div>
+                    <p class="text-violet-400 text-sm font-medium mb-1">
+                        Booking Details
+                    </p>
+
+                    <h3 id="bookingDetailsService"
+                        class="text-xl font-bold">
+                        Service
+                    </h3>
+                </div>
+
+                <button id="closeBookingDetailsButton"
+                        type="button"
+                        class="w-10 h-10 rounded-xl bg-gray-800
+                               text-gray-400 hover:text-white
+                               hover:bg-gray-700 transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+            </div>
+
+            <div class="p-6 space-y-6">
+
+                <div>
+                    <span id="bookingDetailsStatus"
+                          class="inline-flex px-3 py-1 rounded-full
+                                 text-xs font-medium bg-yellow-900/30
+                                 text-yellow-400 border border-yellow-700/30">
+                    </span>
+
+                    <p id="bookingDetailsDescription"
+                       class="text-sm text-gray-400 mt-3">
+                    </p>
+                </div>
+
+                <div class="grid sm:grid-cols-2 gap-4">
+
+                    <div class="bg-gray-950 border border-gray-800 rounded-xl p-4">
+                        <p class="text-xs text-gray-500 mb-1">Worker</p>
+                        <p id="bookingDetailsWorker" class="font-medium">
+                        </p>
+                    </div>
+
+                    <div class="bg-gray-950 border border-gray-800 rounded-xl p-4">
+                        <p class="text-xs text-gray-500 mb-1">Requested</p>
+                        <p id="bookingDetailsCreated" class="font-medium">
+                        </p>
+                    </div>
+
+                </div>
+
+                <div>
+                    <h4 class="text-sm font-semibold mb-3">Booking Timeline</h4>
+                    <div id="bookingDetailsTimeline" class="space-y-3">
+                    </div>
+                </div>
+
+                <div id="customerCompletionContainer"
+                     class="hidden bg-violet-950/20 border border-violet-700/30 rounded-xl p-4">
+                    <p class="text-sm text-gray-300 mb-3">
+                        The worker has marked the service as finished. Confirm that the work is actually complete to finish this booking.
+                    </p>
+                    <button id="confirmCustomerCompletionButton" type="button"
+                            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-violet-600 text-white hover:bg-violet-700 transition font-medium text-sm">
+                        <i class="fa-solid fa-check"></i>
+                        Confirm Work Completed
+                    </button>
+                </div>
+
+                <div id="bookingDetailsNoteContainer"
+                     class="hidden bg-gray-950 border border-gray-800
+                            rounded-xl p-4">
+                    <p class="text-xs text-gray-500 mb-1">Your Note</p>
+                    <p id="bookingDetailsNote"
+                       class="text-sm text-gray-300 whitespace-pre-wrap">
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 
     <div id="serviceHubFooter"></div>
 

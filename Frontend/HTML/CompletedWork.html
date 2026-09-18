@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Completed Work - ServiceHub</title>
+
+    <link rel="stylesheet" href="../CSS/output.css">
+    <link rel="stylesheet" href="../CSS/WorkerDashboard.css">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="../Images/favicon-32x32.png?v=3">
+
+    <link rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="../Images/favicon-16x16.png?v=3">
+
+</head>
+
+
+<body class="bg-gray-950 text-gray-100 min-h-screen">
+
+
+    <!-- Header -->
+
+    <div id="workerHeader"></div>
+
+
+    <!-- Main Content -->
+
+    <main class="max-w-7xl mx-auto px-6 py-10">
+
+
+        <!-- Page Heading -->
+
+        <section class="mb-10">
+
+            <p class="text-violet-400 text-sm font-medium mb-2">
+                Worker
+            </p>
+
+            <h2 class="text-3xl md:text-4xl font-bold mb-3">
+                Completed Work
+            </h2>
+
+            <p class="text-gray-400 max-w-2xl">
+                View the services you have successfully completed.
+            </p>
+
+        </section>
+
+
+        <!-- Completed Work -->
+
+        <section>
+
+            <div id="completedWorkContainer"
+                 class="space-y-6">
+
+
+                <!-- Loading State -->
+
+                <div class="bg-gray-900
+                            border border-gray-800
+                            rounded-2xl
+                            p-10
+                            text-center">
+
+                    <div class="w-16 h-16
+                                mx-auto mb-5
+                                rounded-full
+                                bg-gray-800
+                                flex items-center
+                                justify-center">
+
+                        <i class="fa-solid fa-spinner
+                                  fa-spin
+                                  text-violet-400
+                                  text-2xl"></i>
+
+                    </div>
+
+                    <h4 class="text-lg font-semibold mb-2">
+                        Loading completed work
+                    </h4>
+
+                    <p class="text-gray-400 text-sm">
+                        Please wait while your completed services are loaded.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- Footer -->
+
+    <div id="serviceHubFooter"></div>
+
+
+    <script src="../JS/components/WorkerHeader.js"></script>
+
+    <script src="../JS/components/footer.js"></script>
+
+    <script src="../JS/CompletedWork.js"></script>
+
+
+</body>
+
+</html>

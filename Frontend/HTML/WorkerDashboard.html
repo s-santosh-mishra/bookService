@@ -34,6 +34,7 @@
 
     <div id="workerHeader"></div>
 
+
     <!-- Main Content -->
 
     <main id="dashboard"
@@ -57,8 +58,8 @@
 
             <p class="text-gray-400 max-w-2xl">
 
-                Manage your service requests, completed work and
-                professional services from one place.
+                Manage your service requests and active services
+                from one place.
 
             </p>
 
@@ -97,12 +98,15 @@
 
                             <h3 id="verificationStatus"
                                 class="text-lg font-semibold mt-1">
+
                                 Verified
+
                             </h3>
 
                         </div>
 
                     </div>
+
 
                     <span id="verificationBadge"
                           class="px-3 py-1 rounded-full
@@ -129,13 +133,14 @@
 
                     <div class="flex items-center gap-4">
 
-                        <div class="w-12 h-12 rounded-xl
-                                    bg-violet-900/30
-                                    border border-violet-700/40
+                            <div id="availabilityIcon"
+                                class="w-12 h-12 rounded-xl
+                                                                        bg-gray-800
+                                                                        border border-gray-700
                                     flex items-center justify-center">
 
                             <i class="fa-solid fa-circle-dot
-                                      text-violet-400 text-lg"></i>
+                                                                            text-gray-400 text-lg"></i>
 
                         </div>
 
@@ -147,21 +152,21 @@
 
                             <h3 id="availabilityStatus"
                                 class="text-lg font-semibold mt-1">
-                                Available
+
+                                Loading...
+
                             </h3>
 
                         </div>
 
                     </div>
 
+
                     <span id="availabilityBadge"
                           class="px-3 py-1 rounded-full
-                                 text-xs font-medium
-                                 bg-green-900/30
-                                 text-green-400
-                                 border border-green-700/30">
+                                 text-xs font-medium">
 
-                        Available
+                        Loading...
 
                     </span>
 
@@ -172,10 +177,12 @@
         </section>
 
 
+
         <!-- Booking Requests -->
 
         <section id="bookingRequests"
                  class="mb-14">
+
 
             <div class="mb-6">
 
@@ -184,126 +191,93 @@
                 </h3>
 
                 <p class="text-sm text-gray-400 mt-1">
-                    Review and manage requests from customers
+                    Review service requests from customers
                 </p>
 
             </div>
 
 
             <div id="bookingRequestsContainer"
-                 class="bg-gray-900 border border-gray-800
-                        rounded-2xl p-10 text-center">
+                 class="space-y-4">
 
-                <div class="w-16 h-16 mx-auto mb-5
-                            rounded-full bg-gray-800
-                            flex items-center justify-center">
 
-                    <i class="fa-solid fa-calendar-plus
-                              text-gray-500 text-2xl"></i>
+                <!-- Empty State -->
+
+                <div class="bg-gray-900 border border-gray-800
+                            rounded-2xl p-10 text-center">
+
+                    <div class="w-16 h-16 mx-auto mb-5
+                                rounded-full bg-gray-800
+                                flex items-center justify-center">
+
+                        <i class="fa-solid fa-calendar-plus
+                                  text-gray-500 text-2xl"></i>
+
+                    </div>
+
+                    <h4 class="text-lg font-semibold mb-2">
+                        No booking requests
+                    </h4>
+
+                    <p class="text-gray-400 text-sm">
+                        New service requests from customers will
+                        appear here.
+                    </p>
 
                 </div>
-
-                <h4 class="text-lg font-semibold mb-2">
-                    No booking requests
-                </h4>
-
-                <p class="text-gray-400 text-sm">
-                    New service requests from customers will appear here.
-                </p>
 
             </div>
 
         </section>
 
 
-        <!-- Completed Work -->
 
-        <section id="completedWork"
-                 class="mb-14">
+        <!-- Active Service -->
 
-            <div class="mb-6">
-
-                <h3 class="text-2xl font-bold">
-                    Completed Work
-                </h3>
-
-                <p class="text-sm text-gray-400 mt-1">
-                    Keep track of the services you have completed
-                </p>
-
-            </div>
-
-
-            <div id="completedWorkContainer"
-                 class="bg-gray-900 border border-gray-800
-                        rounded-2xl p-10 text-center">
-
-                <div class="w-16 h-16 mx-auto mb-5
-                            rounded-full bg-gray-800
-                            flex items-center justify-center">
-
-                    <i class="fa-solid fa-circle-check
-                              text-gray-500 text-2xl"></i>
-
-                </div>
-
-                <h4 class="text-lg font-semibold mb-2">
-                    No completed work yet
-                </h4>
-
-                <p class="text-gray-400 text-sm">
-                    Your completed services will appear here.
-                </p>
-
-            </div>
-
-        </section>
-
-
-        <!-- My Services -->
-
-        <section id="myServices"
+        <section id="activeService"
                  class="mb-10">
 
+
             <div class="mb-6">
 
                 <h3 class="text-2xl font-bold">
-                    My Services
+                    Active Service
                 </h3>
 
                 <p class="text-sm text-gray-400 mt-1">
-                    Services you are currently offering to customers
+                    Manage your currently assigned service
                 </p>
 
             </div>
 
 
-            <div id="myServicesContainer"
-                 class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div id="activeServiceContainer"
+                 class="bg-gray-900 border border-gray-800
+                        rounded-2xl p-10 text-center">
 
 
-                <!-- Temporary service cards -->
+                <!-- Empty State -->
 
-                <div class="worker-service-card">
+                <div>
 
-                    <div class="worker-service-icon">
-                        <i class="fa-solid fa-screwdriver-wrench"></i>
-                    </div>
+                    <div class="w-16 h-16 mx-auto mb-5
+                                rounded-full bg-gray-800
+                                flex items-center justify-center">
 
-                    <div>
-
-                        <h4 class="text-lg font-semibold">
-                            My Service
-                        </h4>
-
-                        <p class="text-sm text-gray-400 mt-1">
-                            Your assigned services will appear here.
-                        </p>
+                        <i class="fa-solid fa-briefcase
+                                  text-gray-500 text-2xl"></i>
 
                     </div>
+
+                    <h4 class="text-lg font-semibold mb-2">
+                        No active service
+                    </h4>
+
+                    <p class="text-gray-400 text-sm">
+                        An accepted service will appear here.
+                    </p>
 
                 </div>
-
 
             </div>
 
@@ -312,6 +286,8 @@
 
     </main>
 
+
+    <!-- Footer -->
 
     <div id="serviceHubFooter"></div>
 

@@ -32,19 +32,28 @@ public class WorkerAdminService {
 
     // Approve Worker
 
+    // Approve Worker
+
     @Transactional
     public AdminActionResponseDto approveWorker(UUID workerId) {
 
         Worker worker = getWorkerEntity(workerId);
 
         if (worker.getVerificationStatus() != VerificationStatus.PENDING) {
-            throw new IllegalStateException("Only pending workers can be approved.");
+            throw new IllegalStateException(
+                    "Only pending workers can be approved.");
         }
 
-        worker.setVerificationStatus(VerificationStatus.VERIFIED);
+        worker.setVerificationStatus(
+                VerificationStatus.VERIFIED);
+
+        worker.setAvailabilityStatus(
+                AvailabilityStatus.AVAILABLE);
+
         workerRepository.save(worker);
 
-        return new AdminActionResponseDto("Worker approved successfully.");
+        return new AdminActionResponseDto(
+                "Worker approved successfully.");
     }
 
     // Reject Worker

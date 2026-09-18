@@ -49,6 +49,11 @@ const customerHeader = `
                     Profile
                 </a>
 
+                <a href="ContactFaq.html"
+                   class="nav-btn">
+                    Contact & FAQ
+                </a>
+
                 <button id="logoutButton"
                     class="nav-btn items-center">
                     <i class="fa-solid fa-arrow-right-from-bracket mr-2"></i>
@@ -87,6 +92,11 @@ const customerHeader = `
             <a href="CustomerProfile.html"
                class="mobile-nav-btn">
                 Profile
+            </a>
+
+            <a href="ContactFaq.html"
+               class="mobile-nav-btn">
+                Contact & FAQ
             </a>
 
             <button id="mobileLogoutButton"

@@ -1,24 +1,16 @@
-/*   Authentication Guard*/
-
-const accessToken = localStorage.getItem(
-    "servicehub_access_token"
-);
-
-const userId = localStorage.getItem(
-    "servicehub_user_id"
-);
-
-const userRole = localStorage.getItem(
-    "servicehub_user_role"
-);
+/* Authentication Guard */
+const accessToken = localStorage.getItem("servicehub_access_token");
+const userId = localStorage.getItem("servicehub_user_id");
+const userRole = localStorage.getItem("servicehub_user_role");
 
 if (!accessToken || !userId || userRole !== "USER") {
-
     window.location.href = "login.html";
-
 }
 
-/*   Dashboard Elements*/
+const API_BASE_URL = "http://localhost:8080/api/customer";
+
+
+/* Dashboard Elements */
 
 const welcomeMessage =
     document.getElementById("welcomeMessage");
@@ -29,73 +21,132 @@ const serviceSearch =
 const categoryContainer =
     document.getElementById("categoryContainer");
 
+const searchResultsSection =
+    document.getElementById("searchResultsSection");
+
+const searchResultsContainer =
+    document.getElementById("searchResultsContainer");
+
+const categoryServicesSection =
+    document.getElementById("categoryServicesSection");
+
+const categoryServicesContainer =
+    document.getElementById("categoryServicesContainer");
+
+const categoryServicesHeading =
+    document.getElementById("categoryServicesHeading");
+
+const categoryServicesDescription =
+    document.getElementById("categoryServicesDescription");
+
 const popularServicesContainer =
-    document.getElementById(
-        "popularServicesContainer"
-    );
+    document.getElementById("popularServicesContainer");
 
 
-/*   Active Booking Elements*/
+/* Active Booking Elements */
 
 const activeBookingCard =
-    document.getElementById(
-        "activeBookingCard"
-    );
+    document.getElementById("activeBookingCard");
 
 const noActiveBooking =
-    document.getElementById(
-        "noActiveBooking"
-    );
+    document.getElementById("noActiveBooking");
 
 const activeBookingService =
-    document.getElementById(
-        "activeBookingService"
-    );
+    document.getElementById("activeBookingService");
 
 const activeBookingStatus =
-    document.getElementById(
-        "activeBookingStatus"
-    );
+    document.getElementById("activeBookingStatus");
 
 const activeBookingDescription =
-    document.getElementById(
-        "activeBookingDescription"
-    );
+    document.getElementById("activeBookingDescription");
 
 const activeBookingWorker =
-    document.getElementById(
-        "activeBookingWorker"
-    );
+    document.getElementById("activeBookingWorker");
 
 const activeBookingDate =
-    document.getElementById(
-        "activeBookingDate"
-    );
+    document.getElementById("activeBookingDate");
 
 const activeBookingTime =
-    document.getElementById(
-        "activeBookingTime"
-    );
+    document.getElementById("activeBookingTime");
 
 const viewActiveBookingButton =
+    document.getElementById("viewActiveBookingButton");
+
+
+/* Create Booking Modal */
+
+const createBookingModal =
+    document.getElementById("createBookingModal");
+
+const createBookingService =
+    document.getElementById("createBookingService");
+
+const customerBookingNote =
+    document.getElementById("customerBookingNote");
+
+const confirmCreateBookingButton =
+    document.getElementById("confirmCreateBookingButton");
+
+const closeCreateBookingButton =
+    document.getElementById("closeCreateBookingButton");
+
+const cancelCreateBookingButton =
+    document.getElementById("cancelCreateBookingButton");
+
+
+/* Booking Details Modal */
+
+const bookingDetailsModal =
+    document.getElementById("bookingDetailsModal");
+
+const closeBookingDetailsButton =
+    document.getElementById("closeBookingDetailsButton");
+
+const bookingDetailsService =
+    document.getElementById("bookingDetailsService");
+
+const bookingDetailsStatus =
+    document.getElementById("bookingDetailsStatus");
+
+const bookingDetailsDescription =
+    document.getElementById("bookingDetailsDescription");
+
+const bookingDetailsWorker =
+    document.getElementById("bookingDetailsWorker");
+
+const bookingDetailsCreated =
+    document.getElementById("bookingDetailsCreated");
+
+const bookingDetailsTimeline =
+    document.getElementById("bookingDetailsTimeline");
+
+const bookingDetailsNoteContainer =
+    document.getElementById("bookingDetailsNoteContainer");
+
+const bookingDetailsNote =
+    document.getElementById("bookingDetailsNote");
+
+const customerCompletionContainer =
+    document.getElementById("customerCompletionContainer");
+
+const confirmCustomerCompletionButton =
     document.getElementById(
-        "viewActiveBookingButton"
+        "confirmCustomerCompletionButton"
     );
 
 
-/*   API*/
-
-const API_BASE_URL =
-    "http://localhost:8080/api/customer";
-
-
-/*   Dashboard Data*/
+/* Dashboard Data */
 
 let customerServices = [];
+
 let selectedCategoryId = null;
 
+let selectedBookingService = null;
 
-/*   Category Icons*/
+let activeBooking = null;
+
+
+/* Category Icons */
 
 const categoryIconMap = {
 
@@ -114,7 +165,7 @@ const categoryIconMap = {
 };
 
 
-/*   Service Icons*/
+/* Service Icons */
 
 const serviceIconMap = {
 
@@ -135,30 +186,30 @@ const serviceIconMap = {
 };
 
 
-/*   Get Category Icon*/
+/* Get Category Icon */
 
-function getCategoryIcon(categoryName) {
+function getCategoryIcon(name) {
 
-    const name =
-        categoryName.toLowerCase().trim();
-
-    return categoryIconMap[name]
-        || "fa-house";
+    return categoryIconMap[
+        (name || "").toLowerCase().trim()
+    ] || "fa-house";
 
 }
 
 
-/*   Get Service Icon*/
+/* Get Service Icon */
 
-function getServiceIcon(serviceName) {
+function getServiceIcon(name) {
 
-    const name =
-        serviceName.toLowerCase();
+    const value =
+        (name || "").toLowerCase();
 
     for (const keyword in serviceIconMap) {
 
-        if (name.includes(keyword)) {
+        if (value.includes(keyword)) {
+
             return serviceIconMap[keyword];
+
         }
 
     }
@@ -168,72 +219,151 @@ function getServiceIcon(serviceName) {
 }
 
 
-/*   Load Customer Name*/
+/* HTML Escape */
 
-function loadCustomerName() {
+function escapeHtml(value) {
 
-    const customerName =
-        localStorage.getItem(
-            "servicehub_user_name"
+    const div =
+        document.createElement("div");
+
+    div.textContent =
+        value ?? "";
+
+    return div.innerHTML;
+
+}
+
+
+/* Load Customer Name */
+
+async function loadCustomerName() {
+
+    try {
+
+        const profile =
+            await apiRequest(
+                `${API_BASE_URL}/profile`
+            );
+
+        const name =
+            profile?.fullName || "Customer";
+
+        localStorage.setItem(
+            "servicehub_user_name",
+            name
         );
 
-    if (customerName) {
+        welcomeMessage.textContent =
+            `Welcome back, ${name}!`;
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load customer profile:",
+            error
+        );
+
+        const name =
+            localStorage.getItem(
+                "servicehub_user_name"
+            );
 
         welcomeMessage.textContent =
-            `Welcome back, ${customerName}!`;
-
-    } else {
-
-        welcomeMessage.textContent =
-            "Welcome back!";
-
+            name
+                ? `Welcome back, ${name}!`
+                : "Welcome back!";
     }
 
 }
 
 
-/*   Load Categories*/
+/* API Request */
+
+async function apiRequest(
+    url,
+    options = {}
+) {
+
+    const response =
+        await fetch(
+            url,
+            {
+                ...options,
+
+                headers: {
+
+                    "Authorization":
+                        `Bearer ${accessToken}`,
+
+                    ...(options.headers || {})
+
+                }
+
+            }
+        );
+
+
+    if (response.status === 401) {
+
+        handleUnauthorized();
+
+        throw new Error(
+            "Unauthorized"
+        );
+
+    }
+
+
+    let data = null;
+
+    const contentType =
+        response.headers.get(
+            "content-type"
+        ) || "";
+
+
+    if (
+        contentType.includes(
+            "application/json"
+        )
+    ) {
+
+        data =
+            await response.json();
+
+    }
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            data?.message ||
+            data?.error ||
+            "Request failed."
+        );
+
+    }
+
+
+    return data;
+
+}
+
+
+/* Load Categories */
 
 async function loadCustomerCategories() {
 
     try {
 
-        const response = await fetch(
-            `${API_BASE_URL}/categories`,
-            {
-                method: "GET",
-
-                headers: {
-                    "Authorization":
-                        `Bearer ${accessToken}`
-                }
-            }
-        );
-
-
-        if (response.status === 401) {
-
-            handleUnauthorized();
-            return;
-
-        }
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Failed to load categories."
+        const categories =
+            await apiRequest(
+                `${API_BASE_URL}/categories`
             );
 
-        }
-
-
-        const categories =
-            await response.json();
-
-
-        renderCategories(categories);
-
+        renderCategories(
+            categories || []
+        );
 
     } catch (error) {
 
@@ -247,21 +377,27 @@ async function loadCustomerCategories() {
 }
 
 
-/*   Render Categories*/
+/* Render Categories */
 
-function renderCategories(categories) {
+function renderCategories(
+    categories
+) {
 
-    categoryContainer.innerHTML = "";
+    categoryContainer.innerHTML =
+        "";
 
-
-    if (categories.length === 0) {
+    if (
+        categories.length === 0
+    ) {
 
         categoryContainer.innerHTML = `
             <p class="col-span-full
                       text-center
                       text-gray-500
                       py-8">
+
                 No services are currently available.
+
             </p>
         `;
 
@@ -270,145 +406,164 @@ function renderCategories(categories) {
     }
 
 
-    categories.forEach(category => {
+    categories.forEach(
+        category => {
 
-        const categoryButton =
-            document.createElement("button");
-
-
-        categoryButton.className =
-            "category-card bg-gray-900 " +
-            "border border-gray-800 " +
-            "rounded-2xl p-5 text-center " +
-            "hover:border-violet-500/50 " +
-            "hover:bg-gray-900/80 " +
-            "transition";
+            const button =
+                document.createElement(
+                    "button"
+                );
 
 
-        categoryButton.dataset.categoryId =
-            category.categoryId;
+            button.className =
+                "category-card bg-gray-900 " +
+                "border border-gray-800 " +
+                "rounded-2xl p-5 text-center " +
+                "hover:border-violet-500/50 " +
+                "hover:bg-gray-900/80 transition";
 
 
-        categoryButton.innerHTML = `
-
-            <i class="fa-solid
-                      ${getCategoryIcon(
-            category.categoryName
-        )}
-                      text-2xl
-                      text-violet-400
-                      mb-3"></i>
-
-            <p class="font-medium">
-                ${escapeHtml(
-            category.categoryName
-        )}
-            </p>
-
-        `;
+            button.dataset.categoryId =
+                category.categoryId;
 
 
-        categoryButton.addEventListener(
-            "click",
-            () => {
+            button.innerHTML = `
 
-                if (
-                    selectedCategoryId ===
-                    category.categoryId
-                ) {
+                <i class="fa-solid
+                          ${getCategoryIcon(
+                              category.categoryName
+                          )}
+                          text-2xl
+                          text-violet-400
+                          mb-3"></i>
 
-                    selectedCategoryId = null;
+                <p class="font-medium">
 
-                    categoryButton.classList.remove(
-                        "border-violet-500",
-                        "bg-violet-900/20"
-                    );
+                    ${escapeHtml(
+                        category.categoryName
+                    )}
 
-                } else {
+                </p>
 
-                    selectedCategoryId =
-                        category.categoryId;
-
-
-                    document
-                        .querySelectorAll(
-                            ".category-card"
-                        )
-                        .forEach(button => {
-
-                            button.classList.remove(
-                                "border-violet-500",
-                                "bg-violet-900/20"
-                            );
-
-                        });
+            `;
 
 
-                    categoryButton.classList.add(
-                        "border-violet-500",
-                        "bg-violet-900/20"
-                    );
-
-                }
-
-
-                renderPopularServices();
-
-            }
-        );
+            button.addEventListener(
+                "click",
+                () =>
+                    selectCategory(
+                        category,
+                        button
+                    )
+            );
 
 
-        categoryContainer.appendChild(
-            categoryButton
-        );
+            categoryContainer.appendChild(
+                button
+            );
 
-    });
+        }
+    );
 
 }
 
 
-/*   Load Services*/
+/* Select Category */
+
+function selectCategory(
+    category,
+    button
+) {
+
+    if (
+        selectedCategoryId ===
+        category.categoryId
+    ) {
+
+        selectedCategoryId =
+            null;
+
+
+        document
+            .querySelectorAll(
+                ".category-card"
+            )
+            .forEach(item => {
+
+                item.classList.remove(
+                    "border-violet-500",
+                    "bg-violet-900/20"
+                );
+
+            });
+
+
+        hideCategoryResults();
+
+        return;
+
+    }
+
+
+    selectedCategoryId =
+        category.categoryId;
+
+
+    document
+        .querySelectorAll(
+            ".category-card"
+        )
+        .forEach(item => {
+
+            item.classList.remove(
+                "border-violet-500",
+                "bg-violet-900/20"
+            );
+
+        });
+
+
+    button.classList.add(
+        "border-violet-500",
+        "bg-violet-900/20"
+    );
+
+
+    renderCategoryResults(
+        category
+    );
+
+}
+
+
+/* Load Services */
 
 async function loadCustomerServices() {
 
     try {
 
-        const response = await fetch(
-            `${API_BASE_URL}/services`,
-            {
-                method: "GET",
-
-                headers: {
-                    "Authorization":
-                        `Bearer ${accessToken}`
-                }
-            }
-        );
-
-
-        if (response.status === 401) {
-
-            handleUnauthorized();
-            return;
-
-        }
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Failed to load services."
-            );
-
-        }
-
-
         customerServices =
-            await response.json();
+            await apiRequest(
+                `${API_BASE_URL}/services`
+            ) || [];
 
+
+        /*
+            Popular Services is independent.
+            It is rendered once and never
+            filtered by search/category.
+        */
 
         renderPopularServices();
 
+
+        /*
+            Results sections start hidden.
+        */
+
+        hideCategoryResults();
+
+        hideSearchResults();
 
     } catch (error) {
 
@@ -422,9 +577,11 @@ async function loadCustomerServices() {
 }
 
 
-/*   Get Random 6 Services*/
+/* Random Popular Services */
 
-function getRandomServices(services) {
+function getRandomServices(
+    services
+) {
 
     const shuffled =
         [...services];
@@ -438,7 +595,8 @@ function getRandomServices(services) {
 
         const randomIndex =
             Math.floor(
-                Math.random() * (i + 1)
+                Math.random() *
+                (i + 1)
             );
 
 
@@ -446,19 +604,127 @@ function getRandomServices(services) {
             shuffled[i],
             shuffled[randomIndex]
         ] = [
-                shuffled[randomIndex],
-                shuffled[i]
-            ];
+            shuffled[randomIndex],
+            shuffled[i]
+        ];
 
     }
 
 
-    return shuffled.slice(0, 6);
+    return shuffled.slice(
+        0,
+        6
+    );
 
 }
 
 
-/*   Render Popular Services*/
+/* Create Service Card */
+
+function createServiceCard(
+    service
+) {
+
+    const card =
+        document.createElement(
+            "div"
+        );
+
+
+    card.className =
+        "service-card bg-gray-900 " +
+        "border border-gray-800 " +
+        "rounded-2xl p-6 " +
+        "hover:border-violet-500/50 " +
+        "transition";
+
+
+    card.dataset.serviceName =
+        service.serviceName || "";
+
+
+    card.dataset.categoryId =
+        service.categoryId || "";
+
+
+    card.innerHTML = `
+
+        <div class="w-12 h-12
+                    rounded-xl
+                    bg-violet-900/30
+                    flex items-center
+                    justify-center
+                    mb-5">
+
+            <i class="fa-solid
+                      ${getServiceIcon(
+                          service.serviceName
+                      )}
+                      text-violet-400">
+
+            </i>
+
+        </div>
+
+
+        <p class="text-xs
+                  text-violet-400
+                  mb-2">
+
+            ${escapeHtml(
+                service.categoryName
+            )}
+
+        </p>
+
+
+        <h4 class="text-lg
+                   font-semibold
+                   mb-2">
+
+            ${escapeHtml(
+                service.serviceName
+            )}
+
+        </h4>
+
+
+        <p class="text-sm
+                  text-gray-400
+                  mb-5">
+
+            Professional service from
+            trusted workers.
+
+        </p>
+
+
+        <button
+            class="book-service-button
+                   text-violet-400
+                   text-sm
+                   font-medium
+                   hover:text-violet-300
+                   transition"
+            data-service-id="${service.serviceId}">
+
+            Book Service
+
+            <i class="fa-solid
+                      fa-arrow-right
+                      ml-2"></i>
+
+        </button>
+
+    `;
+
+
+    return card;
+
+}
+
+
+/* Popular Services */
 
 function renderPopularServices() {
 
@@ -466,32 +732,25 @@ function renderPopularServices() {
         "";
 
 
-    let services =
-        customerServices;
+    const services =
+        getRandomServices(
+            customerServices
+        );
 
 
-    /* Category filter */
-
-    if (selectedCategoryId) {
-
-        services =
-            services.filter(service =>
-                service.categoryId ===
-                selectedCategoryId
-            );
-
-    }
-
-
-    if (services.length === 0) {
+    if (
+        services.length === 0
+    ) {
 
         popularServicesContainer.innerHTML = `
             <p class="col-span-full
                       text-center
                       text-gray-500
                       py-8">
-                No services are currently available
-                in this category.
+
+                No popular services are
+                currently available.
+
             </p>
         `;
 
@@ -500,121 +759,232 @@ function renderPopularServices() {
     }
 
 
-    /*
-       Randomly select up to 6 services.
-       Later this can be replaced with
-       actual popularity from booking data.
-    */
+    services.forEach(
+        service => {
 
-    const displayedServices =
-        getRandomServices(services);
+            popularServicesContainer.appendChild(
+                createServiceCard(
+                    service
+                )
+            );
 
-
-    displayedServices.forEach(service => {
-
-        const serviceCard =
-            document.createElement("div");
-
-
-        serviceCard.className =
-            "service-card bg-gray-900 " +
-            "border border-gray-800 " +
-            "rounded-2xl p-6 " +
-            "hover:border-violet-500/50 " +
-            "transition";
-
-
-        serviceCard.dataset.serviceName =
-            service.serviceName;
-
-        serviceCard.dataset.categoryId =
-            service.categoryId;
-
-
-        serviceCard.innerHTML = `
-
-            <div class="w-12 h-12
-                        rounded-xl
-                        bg-violet-900/30
-                        flex items-center
-                        justify-center
-                        mb-5">
-
-                <i class="fa-solid
-                          ${getServiceIcon(
-            service.serviceName
-        )}
-                          text-violet-400">
-                </i>
-
-            </div>
-
-
-            <p class="text-xs
-                      text-violet-400
-                      mb-2">
-
-                ${escapeHtml(
-            service.categoryName
-        )}
-
-            </p>
-
-
-            <h4 class="text-lg
-                       font-semibold
-                       mb-2">
-
-                ${escapeHtml(
-            service.serviceName
-        )}
-
-            </h4>
-
-
-            <p class="text-sm
-                      text-gray-400
-                      mb-5">
-
-                Professional service from
-                trusted workers.
-
-            </p>
-
-
-            <button
-                class="book-service-button
-                       text-violet-400
-                       text-sm
-                       font-medium
-                       hover:text-violet-300
-                       transition"
-                data-service-id="${service.serviceId}">
-
-                Book Service
-
-                <i class="fa-solid
-                          fa-arrow-right
-                          ml-2"></i>
-
-            </button>
-
-        `;
-
-
-        popularServicesContainer.appendChild(
-            serviceCard
-        );
-
-    });
-
-
-    applyServiceSearch();
+        }
+    );
 
 }
 
 
-/*   Service Search*/
+/*
+    CATEGORY RESULTS
+
+    Controlled ONLY by category selection.
+*/
+
+function renderCategoryResults(
+    category
+) {
+
+    categoryServicesContainer.innerHTML =
+        "";
+
+
+    categoryServicesSection.classList.remove(
+        "hidden"
+    );
+
+
+    categoryServicesHeading.textContent =
+        `Services under ${category.categoryName}`;
+
+
+    categoryServicesDescription.textContent =
+        "Choose a service to request a worker.";
+
+
+    const services =
+        customerServices.filter(
+            service =>
+                String(
+                    service.categoryId
+                ) ===
+                String(
+                    category.categoryId
+                )
+        );
+
+
+    if (
+        services.length === 0
+    ) {
+
+        categoryServicesContainer.innerHTML = `
+            <p class="col-span-full
+                      text-center
+                      text-gray-500
+                      py-8">
+
+                No services are currently available
+                in this category.
+
+            </p>
+        `;
+
+        return;
+
+    }
+
+
+    services.forEach(
+        service => {
+
+            categoryServicesContainer.appendChild(
+                createServiceCard(
+                    service
+                )
+            );
+
+        }
+    );
+
+}
+
+
+/* Hide Category Results */
+
+function hideCategoryResults() {
+
+    categoryServicesSection.classList.add(
+        "hidden"
+    );
+
+
+    categoryServicesContainer.innerHTML =
+        "";
+
+}
+
+
+/*
+    SEARCH RESULTS
+
+    Controlled ONLY by search.
+*/
+
+function applyServiceSearch() {
+
+    const value =
+        serviceSearch.value
+            .trim()
+            .toLowerCase();
+
+
+    if (!value) {
+
+        hideSearchResults();
+
+        return;
+
+    }
+
+
+    const results =
+        customerServices.filter(
+            service =>
+
+                (
+                    service.serviceName ||
+                    ""
+                )
+                    .toLowerCase()
+                    .includes(value)
+
+                ||
+
+                (
+                    service.categoryName ||
+                    ""
+                )
+                    .toLowerCase()
+                    .includes(value)
+        );
+
+
+    searchResultsContainer.innerHTML =
+        "";
+
+
+    searchResultsSection.classList.remove(
+        "hidden"
+    );
+
+
+    const description =
+        document.getElementById(
+            "searchResultsDescription"
+        );
+
+
+    if (description) {
+
+        description.textContent =
+            `${results.length} service${
+                results.length === 1
+                    ? ""
+                    : "s"
+            } found`;
+
+    }
+
+
+    if (
+        results.length === 0
+    ) {
+
+        searchResultsContainer.innerHTML = `
+            <p class="col-span-full
+                      text-center
+                      text-gray-500
+                      py-8">
+
+                No services match your search.
+
+            </p>
+        `;
+
+        return;
+
+    }
+
+
+    results.forEach(
+        service => {
+
+            searchResultsContainer.appendChild(
+                createServiceCard(
+                    service
+                )
+            );
+
+        }
+    );
+
+}
+
+
+/* Hide Search Results */
+
+function hideSearchResults() {
+
+    searchResultsSection.classList.add(
+        "hidden"
+    );
+
+
+    searchResultsContainer.innerHTML =
+        "";
+
+}
+
 
 if (serviceSearch) {
 
@@ -626,185 +996,38 @@ if (serviceSearch) {
 }
 
 
-function applyServiceSearch() {
-
-    const searchValue =
-        serviceSearch.value
-            .trim()
-            .toLowerCase();
-
-
-    document
-        .querySelectorAll(".service-card")
-        .forEach(card => {
-
-            const serviceName =
-                card.dataset.serviceName
-                    .toLowerCase();
-
-
-            const categoryName =
-                card.textContent
-                    .toLowerCase();
-
-
-            if (
-                serviceName.includes(
-                    searchValue
-                )
-                ||
-                categoryName.includes(
-                    searchValue
-                )
-            ) {
-
-                card.classList.remove(
-                    "hidden"
-                );
-
-            } else {
-
-                card.classList.add(
-                    "hidden"
-                );
-
-            }
-
-        });
-
-}
-
-
-/*   Active Booking*/
-
-/*   Active Booking*/
-
+/* Active Booking */
 
 async function loadActiveBooking() {
-
     try {
+        const bookings = await apiRequest(`${API_BASE_URL}/bookings`) || [];
 
-        const response = await fetch(
-            `${API_BASE_URL}/bookings`,
-            {
-                method: "GET",
+        const active = bookings
+            .filter(b => ["PENDING", "ACCEPTED", "IN_PROGRESS"].includes(b.status))
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-                headers: {
-                    "Authorization":
-                        `Bearer ${accessToken}`
-                }
-            }
-        );
-
-
-        if (response.status === 401) {
-
-            handleUnauthorized();
-            return;
-
-        }
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Failed to load bookings."
-            );
-
-        }
-
-
-        const bookings =
-            await response.json();
-
-
-        /*
-            Active bookings are:
-
-            PENDING
-            ACCEPTED
-            IN_PROGRESS
-        */
-
-        const activeBookings =
-            bookings.filter(booking =>
-                booking.status === "PENDING" ||
-                booking.status === "ACCEPTED" ||
-                booking.status === "IN_PROGRESS"
-            );
-
-
-        activeBookings.sort(
-            (a, b) =>
-                new Date(b.createdAt) -
-                new Date(a.createdAt)
-        );
-
-
-        /*
-            Prefer an active booking.
-        
-            If there is no active booking, check whether
-            the latest relevant booking ended with NO_WORKER.
-        */
-
-        let bookingToDisplay = null;
-
-
-        if (activeBookings.length > 0) {
-
-            bookingToDisplay =
-                activeBookings[0];
-
+        if (active.length > 0) {
+            renderActiveBooking(active[0]);
         } else {
-
-            const noWorkerBookings =
-                bookings.filter(
-                    booking =>
-                        booking.status === "NO_WORKER"
-                );
-
-
-            noWorkerBookings.sort(
-                (a, b) =>
-                    new Date(b.createdAt) -
-                    new Date(a.createdAt)
-            );
-
-
-            if (noWorkerBookings.length > 0) {
-
-                bookingToDisplay =
-                    noWorkerBookings[0];
-
-            }
-
+            renderActiveBooking(null);
         }
-
-
-        renderActiveBooking(
-            bookingToDisplay
-        );
-
 
     } catch (error) {
-
-        console.error(
-            "Booking loading error:",
-            error
-        );
-
+        console.error("Booking loading error:", error);
         renderActiveBooking(null);
-
     }
-
 }
 
 
-/*   Render Active Booking*/
+/* Render Active Booking */
 
+function renderActiveBooking(
+    booking
+) {
 
-function renderActiveBooking(booking) {
+    activeBooking =
+        booking;
+
 
     if (!booking) {
 
@@ -812,9 +1035,11 @@ function renderActiveBooking(booking) {
             "hidden"
         );
 
+
         noActiveBooking.classList.remove(
             "hidden"
         );
+
 
         return;
 
@@ -825,30 +1050,30 @@ function renderActiveBooking(booking) {
         "hidden"
     );
 
+
     activeBookingCard.classList.remove(
         "hidden"
     );
 
 
-    /*
-        Service
-    */
+    activeBookingService.textContent =
+        booking.serviceName ||
+        "Service request";
 
-    const serviceName = booking.serviceName || "Service request";
-
-    /*
-        Status
-    */
 
     activeBookingStatus.textContent =
-        booking.status;
+        booking.status ||
+        "UNKNOWN";
 
 
-    /*
-        Status description
-    */
+    activeBookingWorker.textContent =
+        booking.workerName ||
+        "Worker not assigned";
 
-    switch (booking.status) {
+
+    switch (
+        booking.status
+    ) {
 
         case "PENDING":
 
@@ -868,8 +1093,19 @@ function renderActiveBooking(booking) {
 
         case "IN_PROGRESS":
 
-            activeBookingDescription.textContent =
-                "Your service is currently in progress.";
+            if (
+                booking.workerConfirmedCompletion
+            ) {
+
+                activeBookingDescription.textContent =
+                    "The worker has marked the service as finished. Please confirm the work.";
+
+            } else {
+
+                activeBookingDescription.textContent =
+                    "Your service is currently in progress.";
+
+            }
 
             break;
 
@@ -890,175 +1126,804 @@ function renderActiveBooking(booking) {
     }
 
 
-    /*
-        Worker -> workerId is null while the booking
-        is still PENDING.
-    */
-
-    activeBookingWorker.textContent =
-        booking.workerName || "Worker not assigned"
-
-
     const createdAt =
-        new Date(booking.createdAt);
+        new Date(
+            booking.createdAt
+        );
 
 
     activeBookingDate.textContent =
-        createdAt.toLocaleDateString();
+        Number.isNaN(
+            createdAt.getTime()
+        )
+            ? "-"
+            : createdAt.toLocaleDateString();
 
 
     activeBookingTime.textContent =
-        createdAt.toLocaleTimeString(
-            [],
-            {
-                hour: "2-digit",
-                minute: "2-digit"
+        Number.isNaN(
+            createdAt.getTime()
+        )
+            ? "-"
+            : createdAt.toLocaleTimeString(
+                [],
+                {
+                    hour: "2-digit",
+                    minute: "2-digit"
+                }
+            );
+
+}
+
+
+/* Booking Status Description */
+
+function getBookingStatusDescription(
+    status
+) {
+
+    switch (status) {
+
+        case "PENDING":
+
+            return "Your request is waiting for a worker to accept it.";
+
+
+        case "ACCEPTED":
+
+            return "A worker has accepted your booking and is assigned to the service.";
+
+
+        case "IN_PROGRESS":
+
+            return "Your service is currently in progress.";
+
+
+        case "COMPLETED":
+
+            return "The service has been completed by both parties.";
+
+
+        case "CANCELLED":
+
+            return "This booking was cancelled.";
+
+
+        case "NO_WORKER":
+
+            return "No worker accepted your request within 30 minutes.";
+
+
+        case "FAILED":
+
+            return "This booking could not be completed.";
+
+
+        default:
+
+            return "Your booking status is currently being processed.";
+
+    }
+
+}
+
+
+/* Format Booking Date */
+
+function formatBookingDateTime(
+    value
+) {
+
+    if (!value) {
+
+        return null;
+
+    }
+
+
+    const date =
+        new Date(value);
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return null;
+
+    }
+
+
+    return date.toLocaleString(
+        [],
+        {
+            dateStyle: "medium",
+            timeStyle: "short"
+        }
+    );
+
+}
+
+
+/* Booking Timeline */
+
+function renderBookingTimeline(
+    booking
+) {
+
+    const timeline = [
+
+        [
+            "Request created",
+            booking.createdAt
+        ],
+
+        [
+            "Worker accepted",
+            booking.acceptedAt
+        ],
+
+        [
+            "Service started",
+            booking.startedAt
+        ],
+
+        [
+            "Service completed",
+            booking.completedAt
+        ],
+
+        [
+            "Booking cancelled",
+            booking.cancelledAt
+        ],
+
+        [
+            "Booking failed",
+            booking.failedAt
+        ]
+
+    ];
+
+
+    bookingDetailsTimeline.innerHTML =
+        "";
+
+
+    timeline
+        .filter(
+            item => item[1]
+        )
+        .forEach(
+            item => {
+
+                const row =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                row.className =
+                    "flex items-center justify-between gap-4 " +
+                    "bg-gray-950 border border-gray-800 " +
+                    "rounded-xl px-4 py-3";
+
+
+                row.innerHTML = `
+
+                    <span class="text-sm text-gray-300">
+
+                        ${escapeHtml(
+                            item[0]
+                        )}
+
+                    </span>
+
+                    <span class="text-sm text-gray-500 text-right">
+
+                        ${escapeHtml(
+                            formatBookingDateTime(
+                                item[1]
+                            ) || "-"
+                        )}
+
+                    </span>
+
+                `;
+
+
+                bookingDetailsTimeline.appendChild(
+                    row
+                );
+
             }
         );
 
 }
 
-/*   Render Active Booking*/
 
-function renderActiveBooking(booking) {
+/* Open Booking Details */
+
+function openBookingDetails(
+    booking = activeBooking
+) {
 
     if (!booking) {
-
-        activeBookingCard.classList.add(
-            "hidden"
-        );
-
-        noActiveBooking.classList.remove(
-            "hidden"
-        );
 
         return;
 
     }
 
 
-    noActiveBooking.classList.add(
-        "hidden"
-    );
-
-    activeBookingCard.classList.remove(
-        "hidden"
-    );
+    activeBooking =
+        booking;
 
 
-    activeBookingService.textContent =
-        booking.serviceName;
+    bookingDetailsService.textContent =
+        booking.serviceName ||
+        "Service request";
 
 
-    activeBookingStatus.textContent =
-        booking.status;
+    bookingDetailsStatus.textContent =
+        booking.status ||
+        "UNKNOWN";
 
 
-    activeBookingDescription.textContent =
-        booking.description ||
-        "Your service request is currently being handled.";
+    bookingDetailsDescription.textContent =
+        getBookingStatusDescription(
+            booking.status
+        );
 
 
-    activeBookingWorker.textContent =
+    bookingDetailsWorker.textContent =
         booking.workerName ||
         "Worker not assigned";
 
 
-    activeBookingDate.textContent =
-        booking.scheduledDate ||
-        "Date not scheduled";
+    bookingDetailsCreated.textContent =
+        formatBookingDateTime(
+            booking.createdAt
+        ) || "-";
 
 
-    activeBookingTime.textContent =
-        booking.scheduledTime ||
-        "Time not scheduled";
-
-}
+    renderBookingTimeline(
+        booking
+    );
 
 
-/*   Active Booking Details*/
+    if (
+        booking.customerNote
+    ) {
 
-if (viewActiveBookingButton) {
+        bookingDetailsNote.textContent =
+            booking.customerNote;
 
-    viewActiveBookingButton.addEventListener(
-        "click",
-        () => {
 
-            console.log(
-                "Active booking details clicked."
-            );
+        bookingDetailsNoteContainer.classList.remove(
+            "hidden"
+        );
 
-            /*
-               Booking details dialog/page
-               will be implemented with
-               the booking module.
-            */
+    } else {
 
-        }
+        bookingDetailsNote.textContent =
+            "";
+
+
+        bookingDetailsNoteContainer.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    /*
+        Customer can confirm completion
+        only when the booking is IN_PROGRESS
+        and the customer has not already confirmed.
+    */
+
+    if (
+        booking.status ===
+            "IN_PROGRESS"
+        &&
+        !booking.customerConfirmedCompletion
+    ) {
+
+        customerCompletionContainer.classList.remove(
+            "hidden"
+        );
+
+
+        confirmCustomerCompletionButton.disabled =
+            false;
+
+    } else {
+
+        customerCompletionContainer.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    bookingDetailsModal.classList.remove(
+        "hidden"
+    );
+
+
+    document.body.classList.add(
+        "overflow-hidden"
     );
 
 }
 
 
-/*   Book Service*/
+/* Close Booking Details */
+
+function closeBookingDetails() {
+
+    bookingDetailsModal.classList.add(
+        "hidden"
+    );
+
+
+    document.body.classList.remove(
+        "overflow-hidden"
+    );
+
+}
+
+
+/* Open Create Booking */
+
+function openCreateBooking(
+    serviceId
+) {
+
+    selectedBookingService =
+        customerServices.find(
+            service =>
+                String(
+                    service.serviceId
+                ) ===
+                String(
+                    serviceId
+                )
+        );
+
+
+    if (
+        !selectedBookingService
+    ) {
+
+        return;
+
+    }
+
+
+    createBookingService.textContent =
+        selectedBookingService.serviceName;
+
+
+    customerBookingNote.value =
+        "";
+
+
+    createBookingModal.classList.remove(
+        "hidden"
+    );
+
+
+    document.body.classList.add(
+        "overflow-hidden"
+    );
+
+}
+
+
+/* Close Create Booking */
+
+function closeCreateBooking() {
+
+    createBookingModal.classList.add(
+        "hidden"
+    );
+
+
+    document.body.classList.remove(
+        "overflow-hidden"
+    );
+
+
+    selectedBookingService =
+        null;
+
+}
+
+
+/* Submit Booking */
+
+async function submitBooking() {
+
+    if (
+        !selectedBookingService
+    ) {
+
+        return;
+
+    }
+
+
+    confirmCreateBookingButton.disabled =
+        true;
+
+
+    confirmCreateBookingButton.textContent =
+        "Requesting...";
+
+
+    try {
+
+        await apiRequest(
+            `${API_BASE_URL}/bookings`,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body:
+                    JSON.stringify(
+                        {
+                            serviceId:
+                                selectedBookingService.serviceId,
+
+                            customerNote:
+                                customerBookingNote.value.trim()
+                                    || null
+                        }
+                    )
+            }
+        );
+
+
+        closeCreateBooking();
+
+
+        await loadActiveBooking();
+
+
+        alert(
+            "Service request created successfully."
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Booking creation error:",
+            error
+        );
+
+
+        alert(
+            error.message
+        );
+
+
+    } finally {
+
+        confirmCreateBookingButton.disabled =
+            false;
+
+
+        confirmCreateBookingButton.textContent =
+            "Request Service";
+
+    }
+
+}
+
+
+/*
+    CUSTOMER COMPLETION
+
+    This is the important final step.
+
+    Customer confirms that the work is
+    actually finished.
+
+    Backend will only mark COMPLETED
+    when the worker has also confirmed.
+*/
+
+async function confirmCustomerCompletion() {
+
+    if (
+        !activeBooking
+        ||
+        activeBooking.status !==
+            "IN_PROGRESS"
+    ) {
+
+        return;
+
+    }
+
+
+    const confirmed =
+        window.confirm(
+            "Confirm that the service work has actually been completed?"
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    confirmCustomerCompletionButton.disabled =
+        true;
+
+
+    confirmCustomerCompletionButton.textContent =
+        "Confirming...";
+
+
+    try {
+
+        const updatedBooking =
+            await apiRequest(
+                `${API_BASE_URL}/bookings/${activeBooking.bookingId}/complete`,
+                {
+                    method: "POST"
+                }
+            );
+
+
+        activeBooking =
+            updatedBooking;
+
+
+        closeBookingDetails();
+
+
+        await loadActiveBooking();
+
+
+        openBookingDetails(
+            updatedBooking
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Customer completion error:",
+            error
+        );
+
+
+        alert(
+            error.message
+        );
+
+
+    } finally {
+
+        confirmCustomerCompletionButton.disabled =
+            false;
+
+
+        confirmCustomerCompletionButton.innerHTML = `
+            <i class="fa-solid fa-check"></i>
+            Confirm Work Completed
+        `;
+
+    }
+
+}
+
+
+/* Event Delegation */
 
 document.addEventListener(
     "click",
     event => {
 
-        const button =
+        const bookButton =
             event.target.closest(
                 ".book-service-button"
             );
 
 
-        if (!button) {
+        if (!bookButton) {
+
             return;
+
         }
 
 
-        const serviceId =
-            button.dataset.serviceId;
-
-
-        console.log(
-            "Selected service:",
-            serviceId
+        openCreateBooking(
+            bookButton.dataset.serviceId
         );
-
-
-        /*
-           Booking flow will be connected
-           here later.
-        */
 
     }
 );
 
 
-/*   Authentication Error*/
+/* Buttons */
+
+if (
+    viewActiveBookingButton
+) {
+
+    viewActiveBookingButton.addEventListener(
+        "click",
+        () =>
+            openBookingDetails()
+    );
+
+}
+
+
+if (
+    closeBookingDetailsButton
+) {
+
+    closeBookingDetailsButton.addEventListener(
+        "click",
+        closeBookingDetails
+    );
+
+}
+
+
+if (
+    closeCreateBookingButton
+) {
+
+    closeCreateBookingButton.addEventListener(
+        "click",
+        closeCreateBooking
+    );
+
+}
+
+
+if (
+    cancelCreateBookingButton
+) {
+
+    cancelCreateBookingButton.addEventListener(
+        "click",
+        closeCreateBooking
+    );
+
+}
+
+
+if (
+    confirmCreateBookingButton
+) {
+
+    confirmCreateBookingButton.addEventListener(
+        "click",
+        submitBooking
+    );
+
+}
+
+
+if (
+    confirmCustomerCompletionButton
+) {
+
+    confirmCustomerCompletionButton.addEventListener(
+        "click",
+        confirmCustomerCompletion
+    );
+
+}
+
+
+/* Close Booking Details Outside */
+
+if (
+    bookingDetailsModal
+) {
+
+    bookingDetailsModal.addEventListener(
+        "click",
+        event => {
+
+            if (
+                event.target ===
+                bookingDetailsModal
+            ) {
+
+                closeBookingDetails();
+
+            }
+
+        }
+    );
+
+}
+
+
+/* Close Create Booking Outside */
+
+if (
+    createBookingModal
+) {
+
+    createBookingModal.addEventListener(
+        "click",
+        event => {
+
+            if (
+                event.target ===
+                createBookingModal
+            ) {
+
+                closeCreateBooking();
+
+            }
+
+        }
+    );
+
+}
+
+
+/* Escape */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key !==
+            "Escape"
+        ) {
+
+            return;
+
+        }
+
+
+        closeBookingDetails();
+
+        closeCreateBooking();
+
+    }
+);
+
+
+/* Authentication Error */
 
 function handleUnauthorized() {
 
-    localStorage.removeItem(
-        "servicehub_access_token"
-    );
-
-    localStorage.removeItem(
-        "servicehub_user_id"
-    );
-
-    localStorage.removeItem(
-        "servicehub_user_name"
-    );
-
-    localStorage.removeItem(
-        "servicehub_user_email"
-    );
-
-    localStorage.removeItem(
+    [
+        "servicehub_access_token",
+        "servicehub_user_id",
+        "servicehub_user_name",
+        "servicehub_user_email",
         "servicehub_user_role"
-    );
+    ]
+        .forEach(
+            key =>
+                localStorage.removeItem(
+                    key
+                )
+        );
 
 
     window.location.href =
@@ -1067,33 +1932,27 @@ function handleUnauthorized() {
 }
 
 
-/*   HTML Escape Helper*/
-
-function escapeHtml(value) {
-
-    const div =
-        document.createElement("div");
-
-    div.textContent =
-        value ?? "";
-
-    return div.innerHTML;
-
-}
-
-
-/*   Initialize Dashboard*/
+/* Initialize Dashboard */
 
 async function initializeDashboard() {
 
-    loadCustomerName();
+    await loadCustomerName();
 
-    await Promise.all([
-        loadCustomerCategories(),
-        loadCustomerServices()
-    ]);
+
+    await Promise.all(
+        [
+
+            loadCustomerCategories(),
+
+            loadCustomerServices()
+
+        ]
+    );
+
 
     await loadActiveBooking();
+
 }
+
 
 initializeDashboard();
