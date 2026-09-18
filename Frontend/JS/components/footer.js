@@ -4,7 +4,7 @@ const currentYear = new Date().getFullYear();
 
 const serviceHubFooter = `
 
-<footer class="border-t border-gray-800 mt-16">
+<footer class="w-full border-t border-gray-800 mt-16">
 
     <div class="max-w-7xl mx-auto px-6 py-8">
 

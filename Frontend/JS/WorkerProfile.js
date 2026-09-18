@@ -47,7 +47,7 @@ function checkAuthentication() {
     const role = localStorage.getItem(ROLE_KEY);
 
     if (!token || role !== "WORKER") {
-        window.location.href = "/bookService/Frontend/HTML/WorkerLogin.html";
+        window.location.href = "../HTML/login.html";
         return false;
     }
 
@@ -230,7 +230,7 @@ async function workerApiRequest(url, options = {}) {
         localStorage.removeItem(USER_NAME_KEY);
 
         window.location.href =
-            "/bookService/Frontend/HTML/WorkerLogin.html";
+            "../HTML/login.html";
 
         throw new Error("Unauthorized");
     }

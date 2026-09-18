@@ -40,4 +40,20 @@ public class CustomerBookingController {
                 UUID customerId = UUID.fromString(authentication.getName());
                 return ResponseEntity.ok(bookingService.customerConfirmCompletion(customerId, bookingId));
         }
+
+        @PostMapping("/{bookingId}/cancel")
+        public ResponseEntity<BookingDto> cancelBooking(
+                        @PathVariable UUID bookingId,
+                        Authentication authentication) {
+
+                UUID customerId = UUID.fromString(authentication.getName());
+
+                BookingDto booking = bookingService.cancelBooking(
+                                customerId,
+                                bookingId);
+
+                return ResponseEntity.ok(booking);
+        }
+
+        
 }

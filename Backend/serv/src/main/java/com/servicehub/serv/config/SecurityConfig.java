@@ -94,12 +94,16 @@ public class SecurityConfig {
                                                 .permitAll()
 
                                                 // Customer registration
-                                                .requestMatchers("/api/worker/register").permitAll()
-                                                .requestMatchers("/api/worker/**").hasRole("WORKER")
+                                                .requestMatchers("/api/user/register")
+                                                .permitAll()
 
                                                 // Worker registration
                                                 .requestMatchers("/api/worker/register")
                                                 .permitAll()
+
+                                                // Worker APIs require WORKER role
+                                                .requestMatchers("/api/worker/**")
+                                                .hasRole("WORKER")
 
                                                 // Public categories
                                                 .requestMatchers(HttpMethod.GET, "/api/categories")

@@ -21,9 +21,7 @@ public class WorkerProfileController {
         this.workerProfileService = workerProfileService;
     }
 
-    // ================================
     // Get Profile
-    // ================================
 
     @GetMapping
     public ResponseEntity<WorkerProfileDto> getProfile(
@@ -37,9 +35,7 @@ public class WorkerProfileController {
         );
     }
 
-    // ================================
     // Update Profile
-    // ================================
 
     @PutMapping
     public ResponseEntity<WorkerProfileDto> updateProfile(

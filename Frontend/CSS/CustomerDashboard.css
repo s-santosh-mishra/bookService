@@ -130,6 +130,23 @@
 }
 
 
+.category-services-enter {
+    animation: category-services-reveal 0.35s ease-out both;
+}
+
+@keyframes category-services-reveal {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
 /*   Popular Service Cards*/
 
 .service-card {

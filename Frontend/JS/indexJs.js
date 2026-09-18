@@ -16,7 +16,7 @@ function redirectLoggedInUser() {
     if (role === "USER") {
 
         window.location.href =
-            "/bookService/Frontend/HTML/CustomerDashboard.html";
+            "../HTML/CustomerDashboard.html";
 
         return;
     }
@@ -24,7 +24,7 @@ function redirectLoggedInUser() {
     if (role === "WORKER") {
 
         window.location.href =
-            "/bookService/Frontend/HTML/WorkerDashboard.html";
+            "../HTML/WorkerDashboard.html";
 
         return;
     }

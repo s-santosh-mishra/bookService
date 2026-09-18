@@ -21,9 +21,7 @@ public class CustomerProfileController {
         this.customerProfileService = customerProfileService;
     }
 
-    // ================================
     // Get Profile
-    // ================================
 
     @GetMapping
     public ResponseEntity<CustomerProfileDto> getProfile(
@@ -37,9 +35,7 @@ public class CustomerProfileController {
         );
     }
 
-    // ================================
     // Update Profile
-    // ================================
 
     @PutMapping
     public ResponseEntity<CustomerProfileDto> updateProfile(

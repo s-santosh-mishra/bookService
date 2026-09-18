@@ -14,7 +14,7 @@ function checkWorkerLogin() {
     if (!token || role !== "WORKER") {
 
         window.location.href =
-            "/bookService/Frontend/HTML/login.html";
+            "../HTML/login.html";
 
         return false;
     }
@@ -62,7 +62,7 @@ async function loadWorkerServices() {
             localStorage.removeItem(ROLE_KEY);
 
             window.location.href =
-                "/bookService/Frontend/HTML/login.html";
+                "../HTML/login.html";
 
             return;
         }

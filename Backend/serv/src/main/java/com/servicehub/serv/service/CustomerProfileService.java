@@ -19,9 +19,7 @@ public class CustomerProfileService {
         this.usersRepository = usersRepository;
     }
 
-    // ================================
     // Get Customer Profile
-    // ================================
 
     public CustomerProfileDto getProfile(UUID userId) {
 
@@ -32,9 +30,7 @@ public class CustomerProfileService {
         return toDto(user);
     }
 
-    // ================================
     // Update Customer Profile
-    // ================================
 
     public CustomerProfileDto updateProfile(
             UUID userId,
@@ -61,9 +57,7 @@ public class CustomerProfileService {
         return toDto(updatedUser);
     }
 
-    // ================================
     // Entity → DTO
-    // ================================
 
     private CustomerProfileDto toDto(Users user) {
 

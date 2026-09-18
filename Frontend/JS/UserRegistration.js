@@ -1,6 +1,4 @@
-// ================================================
 // ServiceHub Customer Registration
-// ================================================
 
 const registerForm = document.getElementById("registerForm");
 
@@ -35,9 +33,7 @@ const registerMessage =
     document.getElementById("registerMessage");
 
 
-// ================================================
 // Password Visibility
-// ================================================
 
 togglePassword.addEventListener("click", () => {
 
@@ -75,9 +71,7 @@ function togglePasswordVisibility(input, button) {
 }
 
 
-// ================================================
 // Input Restrictions
-// ================================================
 
 phone.addEventListener("input", () => {
 
@@ -103,9 +97,7 @@ age.addEventListener("input", () => {
 });
 
 
-// ================================================
 // Form Submission
-// ================================================
 
 registerForm.addEventListener("submit", async (event) => {
 
@@ -164,9 +156,7 @@ registerForm.addEventListener("submit", async (event) => {
     };
 
 
-    // ============================================
     // Loading State
-    // ============================================
 
     setLoading(true);
 
@@ -202,9 +192,7 @@ registerForm.addEventListener("submit", async (event) => {
         }
 
 
-        // ========================================
         // Success
-        // ========================================
 
         registerForm.reset();
 
@@ -232,9 +220,7 @@ registerForm.addEventListener("submit", async (event) => {
 });
 
 
-// ================================================
 // Validation
-// ================================================
 
 function validateForm() {
 
@@ -509,9 +495,7 @@ function validateForm() {
 }
 
 
-// ================================================
 // Loading
-// ================================================
 
 function setLoading(loading) {
 
@@ -537,9 +521,7 @@ function setLoading(loading) {
 }
 
 
-// ================================================
 // Success Message
-// ================================================
 
 function showSuccess() {
 
@@ -561,7 +543,7 @@ function showSuccess() {
             <p class="mt-1">
                 You can now
                 <a
-                    href="/bookService/Frontend/HTML/login.html"
+                    href="../HTML/login.html"
                     class="text-purple-400 hover:text-purple-300 font-medium"
                 >
                     Login
@@ -601,7 +583,7 @@ function showSuccess() {
                 clearInterval(countdownTimer);
 
                 window.location.href =
-                    "/bookService/Frontend/HTML/login.html";
+                    "../HTML/login.html";
 
             }
 
@@ -610,9 +592,7 @@ function showSuccess() {
 }
 
 
-// ================================================
 // Error / Message Helpers
-// ================================================
 
 function showError(
     input,

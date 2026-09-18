@@ -1,6 +1,4 @@
-/* ================================
-   ServiceHub Login
-================================ */
+//    ServiceHub Login
 
 const customerRole = document.getElementById("customerRole");
 const workerRole = document.getElementById("workerRole");

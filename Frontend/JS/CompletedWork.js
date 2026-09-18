@@ -17,7 +17,7 @@ function checkWorkerLogin() {
     if (!token || role !== "WORKER") {
 
         window.location.href =
-            "/bookService/Frontend/HTML/login.html";
+            "../HTML/login.html";
 
         return false;
     }
@@ -69,7 +69,7 @@ async function workerApiRequest(url, options = {}) {
         );
 
         window.location.href =
-            "/bookService/Frontend/HTML/login.html";
+            "../HTML/login.html";
 
         throw new Error("Unauthorized");
     }
@@ -318,6 +318,8 @@ function renderCompletedWork(bookings) {
 
 // Completed Booking Card
 
+// Completed Booking Card
+
 function createCompletedBookingCard(booking) {
 
     const customerName =
@@ -332,173 +334,265 @@ function createCompletedBookingCard(booking) {
             "Service"
         );
 
+    const requestedDateTime =
+        formatDateTime(
+            booking.createdAt
+        );
+
+    const completedDateTime =
+        formatDateTime(
+            booking.completedAt
+        );
+
+
     return `
 
         <article
-            class="bg-gray-900
-                   border border-gray-800
-                   rounded-2xl
-                   p-5 md:p-6">
+            class="border border-gray-800 bg-gray-900/40 rounded-2xl p-6"
+        >
 
-            <!-- Header -->
-
-            <div class="flex items-start
-                        justify-between
-                        gap-4
-                        mb-5">
-
-                <div>
-
-                    <p class="text-xs
-                              text-gray-500
-                              mb-1">
-
-                        Completed Service
-
-                    </p>
-
-                    <h3 class="text-lg
-                               md:text-xl
-                               font-semibold">
-
-                        ${serviceName}
-
-                    </h3>
-
-                </div>
+            <div class="flex flex-col gap-5">
 
 
-                <span
-                    class="inline-flex
-                           items-center
-                           px-3
-                           py-1
-                           rounded-full
-                           text-xs
-                           font-medium
-                           bg-green-900/30
-                           text-green-400
-                           border border-green-700/30">
+                <!-- Top -->
 
-                    <i class="fa-solid
-                              fa-check
-                              mr-1.5"></i>
+                <div
+                    class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4"
+                >
 
-                    Completed
+                    <div>
 
-                </span>
+                        <p
+                            class="text-sm text-gray-500 mb-1"
+                        >
+                            Service
+                        </p>
 
-            </div>
-
-
-            <!-- Customer -->
-
-            <div class="mb-5">
-
-                <p class="text-xs
-                          text-gray-500
-                          mb-1">
-
-                    Customer
-
-                </p>
-
-                <p class="font-medium">
-
-                    ${customerName}
-
-                </p>
-
-            </div>
-
-
-            <!-- Booking Times -->
-
-            <div class="grid grid-cols-2
-                        gap-4
-                        mb-5">
-
-                <div>
-
-                    <p class="text-xs
-                              text-gray-500
-                              mb-1">
-
-                        Booked
-
-                    </p>
-
-                    <p class="text-sm
-                              text-gray-300">
-
-                        ${formatDateTime(
-                            booking.createdAt
-                        )}
-
-                    </p>
-
-                </div>
-
-
-                <div>
-
-                    <p class="text-xs
-                              text-gray-500
-                              mb-1">
-
-                        Completed
-
-                    </p>
-
-                    <p class="text-sm
-                              text-gray-300">
-
-                        ${formatDateTime(
-                            booking.completedAt
-                        )}
-
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <!-- Payment -->
-
-            <div class="pt-4
-                        border-t
-                        border-gray-800">
-
-                <div class="flex items-center
-                            justify-between
-                            gap-4">
-
-                    <div class="flex items-center
-                                gap-2">
-
-                        <i class="fa-solid
-                                  fa-credit-card
-                                  text-gray-500"></i>
-
-                        <span class="text-sm
-                                     text-gray-400">
-
-                            Payment
-
-                        </span>
+                        <h2
+                            class="text-xl font-semibold text-white"
+                        >
+                            ${serviceName}
+                        </h2>
 
                     </div>
 
 
-                    <span class="text-sm
-                                 text-gray-500">
+                    <span
+                        class="inline-flex w-fit items-center px-3 py-1.5 rounded-full border text-sm font-medium bg-green-500/10 text-green-400 border-green-500/30"
+                    >
 
-                        Not available yet
+                        <i
+                            class="fa-solid fa-check mr-1.5"
+                        ></i>
+
+                        Completed
 
                     </span>
 
                 </div>
+
+
+
+                <!-- Description -->
+
+                <div>
+
+                    <p
+                        class="text-gray-400 text-sm"
+                    >
+                        This service has been completed.
+                    </p>
+
+                </div>
+
+
+
+                <!-- Details -->
+
+                <div
+                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-4 border-t border-gray-800"
+                >
+
+
+                    <!-- Customer -->
+
+                    <div
+                        class="flex items-center gap-3"
+                    >
+
+                        <div
+                            class="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center shrink-0"
+                        >
+
+                            <i
+                                class="fa-solid fa-user text-gray-400"
+                            ></i>
+
+                        </div>
+
+                        <div>
+
+                            <p
+                                class="text-xs text-gray-500 mb-1"
+                            >
+                                Customer
+                            </p>
+
+                            <p
+                                class="text-sm text-gray-200"
+                            >
+                                ${customerName}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- Requested -->
+
+                    <div
+                        class="flex items-center gap-3"
+                    >
+
+                        <div
+                            class="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center shrink-0"
+                        >
+
+                            <i
+                                class="fa-solid fa-calendar text-gray-400"
+                            ></i>
+
+                        </div>
+
+                        <div>
+
+                            <p
+                                class="text-xs text-gray-500 mb-1"
+                            >
+                                Requested
+                            </p>
+
+                            <p
+                                class="text-sm text-gray-200"
+                            >
+                                ${requestedDateTime}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- Completed -->
+
+                    <div
+                        class="flex items-center gap-3"
+                    >
+
+                        <div
+                            class="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center shrink-0"
+                        >
+
+                            <i
+                                class="fa-solid fa-check text-green-400"
+                            ></i>
+
+                        </div>
+
+                        <div>
+
+                            <p
+                                class="text-xs text-gray-500 mb-1"
+                            >
+                                Completed
+                            </p>
+
+                            <p
+                                class="text-sm text-gray-200"
+                            >
+                                ${completedDateTime}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- Customer Note -->
+
+                ${booking.customerNote
+            ? `
+
+                            <div
+                                class="pt-4 border-t border-gray-800"
+                            >
+
+                                <p
+                                    class="text-xs text-gray-500 mb-1"
+                                >
+                                    Customer Note
+                                </p>
+
+                                <p
+                                    class="text-sm text-gray-300 leading-relaxed"
+                                >
+                                    ${escapeHtml(
+                booking.customerNote
+            )}
+                                </p>
+
+                            </div>
+
+                        `
+            : ""
+        }
+
+
+
+                <!-- Payment -->
+
+                <div
+                    class="pt-4 border-t border-gray-800"
+                >
+
+                    <div
+                        class="flex items-center justify-between gap-4"
+                    >
+
+                        <div
+                            class="flex items-center gap-2"
+                        >
+
+                            <i
+                                class="fa-solid fa-credit-card text-gray-500"
+                            ></i>
+
+                            <span
+                                class="text-sm text-gray-400"
+                            >
+                                Payment
+                            </span>
+
+                        </div>
+
+
+                        <span
+                            class="text-sm text-gray-500"
+                        >
+                            Not available yet
+                        </span>
+
+                    </div>
+
+                </div>
+
 
             </div>
 

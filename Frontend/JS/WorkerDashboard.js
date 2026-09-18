@@ -18,7 +18,7 @@ function checkWorkerLogin() {
     if (!token || role !== "WORKER") {
 
         window.location.href =
-            "/bookService/Frontend/HTML/login.html";
+            "../HTML/login.html";
 
         return false;
     }
@@ -354,7 +354,7 @@ async function workerApiRequest(url, options = {}) {
     localStorage.removeItem(ROLE_KEY);
 
     window.location.href =
-        "/bookService/Frontend/HTML/login.html";
+        "../HTML/login.html";
 
     throw new Error("Unauthorized");
 }
@@ -634,6 +634,59 @@ function renderBookingRequests(requests) {
         )}
 
                             </p>
+
+                        </div>
+
+
+                        <!-- Customer Address -->
+
+                        <div class="mb-4">
+
+                            <div class="flex items-start gap-3">
+
+                                <div class="w-9 h-9 rounded-lg
+                                            bg-violet-900/30
+                                            border border-violet-700/30
+                                            flex items-center justify-center
+                                            shrink-0">
+
+                                    <i class="fa-solid
+                                              fa-location-dot
+                                              text-violet-400"></i>
+
+                                </div>
+
+                                <div>
+
+                                    <p class="text-sm
+                                              text-gray-400
+                                              mb-1">
+
+                                        Service Location
+
+                                    </p>
+
+                                    <p class="text-sm
+                                              text-gray-300
+                                              leading-6">
+
+                                        ${
+                                            [
+                                                request.customerAddressLine1,
+                                                request.customerCity
+                                            ]
+                                            .filter(Boolean)
+                                            .map(part => escapeHtml(part))
+                                            .join(", ")
+                                            ||
+                                            "Address not provided"
+                                        }
+
+                                    </p>
+
+                                </div>
+
+                            </div>
 
                         </div>
 

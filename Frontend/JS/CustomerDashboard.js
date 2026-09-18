@@ -129,6 +129,11 @@ const bookingDetailsNote =
 const customerCompletionContainer =
     document.getElementById("customerCompletionContainer");
 
+const customerCancelContainer =
+    document.getElementById(
+        "customerCancelContainer"
+    );
+
 const confirmCustomerCompletionButton =
     document.getElementById(
         "confirmCustomerCompletionButton"
@@ -789,7 +794,20 @@ function renderCategoryResults(
 
 
     categoryServicesSection.classList.remove(
+        "category-services-enter"
+    );
+
+
+    categoryServicesSection.classList.remove(
         "hidden"
+    );
+
+
+    void categoryServicesSection.offsetWidth;
+
+
+    categoryServicesSection.classList.add(
+        "category-services-enter"
     );
 
 
@@ -1448,6 +1466,80 @@ function openBookingDetails(
     }
 
 
+    /* Customer Booking Action */
+
+    customerCancelContainer.innerHTML = "";
+
+    if (booking.status === "PENDING") {
+
+        customerCancelContainer.innerHTML = `
+            <button
+                id="cancelCustomerBookingButton"
+                type="button"
+                class="w-full inline-flex items-center
+                       justify-center gap-2
+                       px-5 py-3
+                       rounded-xl
+                       border border-red-500/30
+                       bg-red-500/10
+                       text-red-400
+                       hover:bg-red-500/20
+                       transition
+                       font-medium"
+            >
+
+                <i class="fa-solid fa-xmark"></i>
+
+                Cancel Booking
+
+            </button>
+        `;
+
+        customerCancelContainer.classList.remove(
+            "hidden"
+        );
+
+        document
+            .getElementById(
+                "cancelCustomerBookingButton"
+            )
+            .addEventListener(
+                "click",
+                cancelCustomerBooking
+            );
+
+    } else if (booking.status === "ACCEPTED") {
+
+        customerCancelContainer.innerHTML = `
+            <p class="text-sm text-gray-400 text-center">
+
+                Need to cancel this booking?
+
+                <a
+                    href="ContactFaq.html"
+                    class="text-violet-400
+                           hover:text-violet-300
+                           transition"
+                >
+                    Contact Support
+                </a>
+
+            </p>
+        `;
+
+        customerCancelContainer.classList.remove(
+            "hidden"
+        );
+
+    } else {
+
+        customerCancelContainer.classList.add(
+            "hidden"
+        );
+
+    }
+
+
     bookingDetailsModal.classList.remove(
         "hidden"
     );
@@ -1728,6 +1820,82 @@ async function confirmCustomerCompletion() {
 
     }
 
+}
+
+
+async function cancelCustomerBooking() {
+
+    if (
+        !activeBooking ||
+        activeBooking.status !== "PENDING"
+    ) {
+        return;
+    }
+
+    const confirmed =
+        window.confirm(
+            "Are you sure you want to cancel this booking?"
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+    const button =
+        document.getElementById(
+            "cancelCustomerBookingButton"
+        );
+
+    if (button) {
+
+        button.disabled = true;
+
+        button.textContent =
+            "Cancelling...";
+
+    }
+
+    try {
+
+        const updatedBooking =
+            await apiRequest(
+                `${API_BASE_URL}/bookings/${activeBooking.bookingId}/cancel`,
+                {
+                    method: "POST"
+                }
+            );
+
+        activeBooking = updatedBooking;
+
+        closeBookingDetails();
+
+        await loadActiveBooking();
+
+        openBookingDetails(
+            updatedBooking
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Booking cancellation error:",
+            error
+        );
+
+        alert(
+            error.message
+        );
+
+        if (button) {
+
+            button.disabled = false;
+
+            button.innerHTML = `
+                <i class="fa-solid fa-xmark"></i>
+                Cancel Booking
+            `;
+        }
+    }
 }
 
 

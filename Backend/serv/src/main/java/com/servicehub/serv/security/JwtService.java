@@ -34,9 +34,7 @@ public class JwtService {
     }
 
 
-    // ================================
     // Generate JWT
-    // ================================
 
     public String generateToken(Credentials credentials) {
 
@@ -66,9 +64,7 @@ public class JwtService {
     }
 
 
-    // ================================
     // Parse and Validate JWT
-    // ================================
 
     private Claims extractAllClaims(String token) {
 
@@ -80,9 +76,7 @@ public class JwtService {
     }
 
 
-    // ================================
     // Extract User ID
-    // ================================
 
     public String extractUserId(String token) {
 
@@ -91,9 +85,7 @@ public class JwtService {
     }
 
 
-    // ================================
     // Extract Role
-    // ================================
 
     public String extractRole(String token) {
 

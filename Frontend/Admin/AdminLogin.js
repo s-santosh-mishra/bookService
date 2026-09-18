@@ -25,9 +25,7 @@ const adminLoginButton =
     document.getElementById("adminLoginButton");
 
 
-// ================================
 // Password Visibility
-// ================================
 
 togglePassword.addEventListener("click", () => {
 
@@ -45,9 +43,7 @@ togglePassword.addEventListener("click", () => {
 });
 
 
-// ================================
 // Admin Login
-// ================================
 
 adminLoginForm.addEventListener(
     "submit",
@@ -101,9 +97,7 @@ adminLoginForm.addEventListener(
         }
 
 
-        // ================================
         // Loading State
-        // ================================
 
         adminLoginButton.disabled = true;
 
@@ -135,9 +129,7 @@ adminLoginForm.addEventListener(
             const result = await response.json();
 
 
-            // ================================
             // Backend Error
-            // ================================
 
             if (!response.ok) {
 
@@ -150,9 +142,7 @@ adminLoginForm.addEventListener(
             }
 
 
-            // ================================
             // Admin Role Check
-            // ================================
 
             if (result.role !== "ADMIN") {
 
@@ -165,9 +155,7 @@ adminLoginForm.addEventListener(
             }
 
 
-            // ================================
             // JWT Check
-            // ================================
 
             if (!result.token) {
 
@@ -184,9 +172,7 @@ adminLoginForm.addEventListener(
             }
 
 
-            // ================================
             // Store Authentication Token
-            // ================================
 
             sessionStorage.setItem(
                 "servicehub_access_token",
@@ -211,9 +197,7 @@ adminLoginForm.addEventListener(
             );
 
 
-            // ================================
             // Successful Admin Login
-            // ================================
 
             showMessage(
                 "Admin login successful!",
@@ -261,9 +245,7 @@ adminLoginForm.addEventListener(
 );
 
 
-// ================================
 // Helper Functions
-// ================================
 
 function showError(
     input,

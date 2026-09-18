@@ -1,6 +1,4 @@
-// ================================================
 // ServiceHub Worker Registration
-// ================================================
 
 const API_BASE = "http://localhost:8080";
 
@@ -82,9 +80,7 @@ const servicesError =
 let categories = [];
 
 
-// ================================================
 // Load Categories
-// ================================================
 
 async function loadCategories() {
 
@@ -121,9 +117,7 @@ async function loadCategories() {
 }
 
 
-// ================================================
 // Render Categories
-// ================================================
 
 function renderCategories() {
 
@@ -262,9 +256,7 @@ function renderCategories() {
 }
 
 
-// ================================================
 // Service Listeners
-// ================================================
 
 function addServiceListeners() {
 
@@ -330,9 +322,7 @@ function addServiceListeners() {
 }
 
 
-// ================================================
 // Update Category State
-// ================================================
 
 function updateCategoryState(categoryId) {
 
@@ -363,9 +353,7 @@ function updateCategoryState(categoryId) {
 }
 
 
-// ================================================
 // Get Selected Categories
-// ================================================
 
 function getSelectedCategoryIds() {
 
@@ -391,9 +379,7 @@ function getSelectedCategoryIds() {
 }
 
 
-// ================================================
 // Maximum 3 Categories
-// ================================================
 
 function updateCategoryLimit() {
 
@@ -469,9 +455,7 @@ function updateCategoryLimit() {
 }
 
 
-// ================================================
 // Password Visibility
-// ================================================
 
 togglePassword.addEventListener(
     "click",
@@ -522,9 +506,7 @@ function togglePasswordVisibility(
 }
 
 
-// ================================================
 // Input Restrictions
-// ================================================
 
 phone.addEventListener(
     "input",
@@ -578,9 +560,7 @@ experienceYears.addEventListener(
 );
 
 
-// ================================================
 // Form Submission
-// ================================================
 
 registerForm.addEventListener(
     "submit",
@@ -633,9 +613,7 @@ registerForm.addEventListener(
         }
 
 
-        // ========================================
         // Request Data
-        // ========================================
 
         const formData = {
 
@@ -698,9 +676,7 @@ registerForm.addEventListener(
         };
 
 
-        // ========================================
         // Loading
-        // ========================================
 
         setLoading(true);
 
@@ -744,9 +720,7 @@ registerForm.addEventListener(
             }
 
 
-            // ====================================
             // Success
-            // ====================================
 
             registerForm.reset();
 
@@ -807,9 +781,7 @@ registerForm.addEventListener(
 );
 
 
-// ================================================
 // Validation
-// ================================================
 
 function validateForm() {
 
@@ -1121,9 +1093,7 @@ function validateForm() {
 }
 
 
-// ================================================
 // Loading State
-// ================================================
 
 function setLoading(loading) {
 
@@ -1150,9 +1120,7 @@ function setLoading(loading) {
 }
 
 
-// ================================================
 // Success
-// ================================================
 
 function showSuccess() {
 
@@ -1215,7 +1183,7 @@ function showSuccess() {
                 );
 
                 window.location.href =
-                    "/bookService/Frontend/HTML/login.html";
+                    "../HTML/login.html";
 
             }
 
@@ -1224,9 +1192,7 @@ function showSuccess() {
 }
 
 
-// ================================================
 // Error Helpers
-// ================================================
 
 function showError(
     input,
@@ -1387,8 +1353,6 @@ function isValidEmail(value) {
 }
 
 
-// ================================================
 // Initialize
-// ================================================
 
 loadCategories();

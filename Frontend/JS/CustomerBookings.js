@@ -22,12 +22,12 @@ if (
 ) {
 
     window.location.href =
-        "/bookService/Frontend/HTML/Login.html";
+        "../HTML/login.html";
 
 }
 
 
-/* ELEMENTS*/ 
+/* ELEMENTS*/
 
 const bookingsLoading =
     document.getElementById(
@@ -437,80 +437,139 @@ function createBookingCard(booking) {
             <!-- Details -->
 
             <div
-                class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-800"
+                class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-gray-800"
             >
 
 
                 <!-- Worker -->
 
                 <div
-                    class="flex items-center gap-3"
+                    class="bg-gray-950/60 border border-gray-800 rounded-xl p-4"
                 >
 
-                    <div
-                        class="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center"
-                    >
+                    <div class="flex items-center gap-3">
 
-                        <i
-                            class="fa-solid fa-user text-gray-400"
-                        ></i>
-
-                    </div>
-
-                    <div>
-
-                        <p
-                            class="text-xs text-gray-500"
+                        <div
+                            class="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center shrink-0"
                         >
-                            Worker
-                        </p>
 
-                        <p
-                            class="text-sm text-gray-200"
-                        >
-                            ${workerText}
-                        </p>
+                            <i
+                                class="fa-solid fa-user text-gray-400"
+                            ></i>
+
+                        </div>
+
+                        <div>
+
+                            <p
+                                class="text-xs text-gray-500 mb-1"
+                            >
+                                Worker
+                            </p>
+
+                            <p
+                                class="text-sm font-medium text-gray-200"
+                            >
+                                ${workerText}
+                            </p>
+
+                        </div>
 
                     </div>
 
                 </div>
 
 
-                <!-- Request Time -->
+
+                <!-- Requested -->
 
                 <div
-                    class="flex items-center gap-3"
+                    class="bg-gray-950/60 border border-gray-800 rounded-xl p-4"
                 >
 
-                    <div
-                        class="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center"
-                    >
+                    <div class="flex items-center gap-3">
 
-                        <i
-                            class="fa-solid fa-calendar text-gray-400"
-                        ></i>
-
-                    </div>
-
-                    <div>
-
-                        <p
-                            class="text-xs text-gray-500"
+                        <div
+                            class="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center shrink-0"
                         >
-                            Requested
-                        </p>
 
-                        <p
-                            class="text-sm text-gray-200"
-                        >
-                            ${dateTime.date}
-                            ·
-                            ${dateTime.time}
-                        </p>
+                            <i
+                                class="fa-solid fa-calendar text-gray-400"
+                            ></i>
+
+                        </div>
+
+                        <div>
+
+                            <p
+                                class="text-xs text-gray-500 mb-1"
+                            >
+                                Requested
+                            </p>
+
+                            <p
+                                class="text-sm text-gray-200"
+                            >
+                                ${dateTime.date}
+                                ·
+                                ${dateTime.time}
+                            </p>
+
+                        </div>
 
                     </div>
 
                 </div>
+
+
+
+                <!-- Completed -->
+
+                ${
+                    booking.completedAt
+                        ? `
+
+                            <div
+                                class="bg-green-950/10 border border-green-900/30 rounded-xl p-4"
+                            >
+
+                                <div class="flex items-center gap-3">
+
+                                    <div
+                                        class="w-10 h-10 rounded-lg bg-green-900/20 flex items-center justify-center shrink-0"
+                                    >
+
+                                        <i
+                                            class="fa-solid fa-check text-green-400"
+                                        ></i>
+
+                                    </div>
+
+                                    <div>
+
+                                        <p
+                                            class="text-xs text-gray-500 mb-1"
+                                        >
+                                            Completed
+                                        </p>
+
+                                        <p
+                                            class="text-sm text-gray-200"
+                                        >
+                                            ${formatDateTime(booking.completedAt).date}
+                                            ·
+                                            ${formatDateTime(booking.completedAt).time}
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        `
+                        : ""
+                }
 
 
             </div>
@@ -518,9 +577,8 @@ function createBookingCard(booking) {
 
             <!-- Customer Note -->
 
-            ${
-                booking.customerNote
-                    ? `
+            ${booking.customerNote
+            ? `
 
                     <div
                         class="pt-4 border-t border-gray-800"
@@ -541,8 +599,8 @@ function createBookingCard(booking) {
                     </div>
 
                     `
-                    : ""
-            }
+            : ""
+        }
 
 
         </div>
@@ -624,7 +682,7 @@ function showError(message) {
 }
 
 
-/* UNAUTHORIZED*/ 
+/* UNAUTHORIZED*/
 
 function handleUnauthorized() {
 
@@ -645,12 +703,12 @@ function handleUnauthorized() {
     );
 
     window.location.href =
-        "/bookService/Frontend/HTML/Login.html";
+        "../HTML/login.html";
 
 }
 
 
-/* RETRY*/ 
+/* RETRY*/
 
 retryBookingsButton.addEventListener(
     "click",
@@ -658,6 +716,6 @@ retryBookingsButton.addEventListener(
 );
 
 
-/* INITIALIZE*/ 
+/* INITIALIZE*/
 
 loadBookings();

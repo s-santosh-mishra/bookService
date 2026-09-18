@@ -58,7 +58,7 @@ function checkAuthentication() {
     if (!token || role !== "USER") {
 
         window.location.href =
-            "/bookService/Frontend/HTML/Login.html";
+            "../HTML/login.html";
 
         return false;
     }
@@ -158,7 +158,7 @@ async function customerApiRequest(url, options = {}) {
 
 
         window.location.href =
-            "/bookService/Frontend/HTML/Login.html";
+            "../HTML/login.html";
 
 
         throw new Error("Unauthorized");
