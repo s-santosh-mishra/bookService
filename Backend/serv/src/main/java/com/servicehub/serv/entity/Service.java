@@ -3,6 +3,7 @@ package com.servicehub.serv.entity;
 import jakarta.persistence.*;
 
 import java.util.UUID;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "services")
@@ -22,6 +23,12 @@ public class Service {
 
     @Column(nullable = false)
     private boolean active = true;
+
+    @Column(name = "base_price_per_hour", nullable = false, precision = 10, scale = 2)
+    private BigDecimal basePricePerHour;
+
+    @Column(name = "minimum_service_fee", nullable = false, precision = 10, scale = 2)
+    private BigDecimal minimumServiceFee;
 
     // Getters and Setters
 
@@ -55,5 +62,21 @@ public class Service {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public BigDecimal getBasePricePerHour() {
+        return basePricePerHour;
+    }
+
+    public void setBasePricePerHour(BigDecimal basePricePerHour) {
+        this.basePricePerHour = basePricePerHour;
+    }
+
+    public BigDecimal getMinimumServiceFee() {
+        return minimumServiceFee;
+    }
+
+    public void setMinimumServiceFee(BigDecimal minimumServiceFee) {
+        this.minimumServiceFee = minimumServiceFee;
     }
 }

@@ -2,6 +2,8 @@ package com.servicehub.serv.entity;
 
 import com.servicehub.serv.enums.BookingStatus;
 import jakarta.persistence.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -47,6 +49,9 @@ public class Booking {
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
+    @Column(name = "worker_completed_at")
+    private LocalDateTime workerCompletedAt;
+
     @Column(name = "cancelled_at")
     private LocalDateTime cancelledAt;
 
@@ -67,6 +72,18 @@ public class Booking {
 
     @Column(name = "customer_confirmed_completion", nullable = false)
     private boolean customerConfirmedCompletion = false;
+
+    @Column(name = "service_latitude", precision = 10, scale = 7, nullable = false)
+    private BigDecimal serviceLatitude;
+
+    @Column(name = "service_longitude", precision = 10, scale = 7, nullable = false)
+    private BigDecimal serviceLongitude;
+
+    @Column(name = "worker_acceptance_latitude", nullable = false, precision = 10, scale = 7)
+private BigDecimal workerAcceptanceLatitude;
+
+@Column(name = "worker_acceptance_longitude", nullable = false, precision = 10, scale = 7)
+private BigDecimal workerAcceptanceLongitude;
 
     @PrePersist
     protected void onCreate() {
@@ -162,6 +179,14 @@ public class Booking {
         completedAt = v;
     }
 
+    public LocalDateTime getWorkerCompletedAt() {
+        return workerCompletedAt;
+    }
+
+    public void setWorkerCompletedAt(LocalDateTime v) {
+        workerCompletedAt = v;
+    }
+
     public LocalDateTime getCancelledAt() {
         return cancelledAt;
     }
@@ -217,4 +242,36 @@ public class Booking {
     public void setCustomerConfirmedCompletion(boolean v) {
         customerConfirmedCompletion = v;
     }
+
+    public BigDecimal getServiceLatitude() {
+        return serviceLatitude;
+    }
+
+    public void setServiceLatitude(BigDecimal serviceLatitude) {
+        this.serviceLatitude = serviceLatitude;
+    }
+
+    public BigDecimal getServiceLongitude() {
+        return serviceLongitude;
+    }
+
+    public void setServiceLongitude(BigDecimal serviceLongitude) {
+        this.serviceLongitude = serviceLongitude;
+    }
+
+    public BigDecimal getWorkerAcceptanceLatitude() {
+    return workerAcceptanceLatitude;
+}
+
+public void setWorkerAcceptanceLatitude(BigDecimal workerAcceptanceLatitude) {
+    this.workerAcceptanceLatitude = workerAcceptanceLatitude;
+}
+
+public BigDecimal getWorkerAcceptanceLongitude() {
+    return workerAcceptanceLongitude;
+}
+
+public void setWorkerAcceptanceLongitude(BigDecimal workerAcceptanceLongitude) {
+    this.workerAcceptanceLongitude = workerAcceptanceLongitude;
+}
 }

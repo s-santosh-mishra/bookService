@@ -1,367 +1,254 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Login | ServiceHub</title>
 
     <!-- Tailwind -->
-    <link rel="stylesheet" href="../CSS/output.css">
+    <link rel="stylesheet" href="../CSS/output.css" />
 
     <!-- Font Awesome -->
     <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-    >
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    />
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="../CSS/login.css">
+    <link rel="stylesheet" href="../CSS/login.css" />
 
-    <link rel="icon" type="image/png" sizes="32x32" href="../Images/favicon-32x32.png?v=3">
-    <link rel="icon" type="image/png" sizes="16x16" href="../Images/favicon-16x16.png?v=3">
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../Images/favicon-32x32.png?v=3"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="../Images/favicon-16x16.png?v=3"
+    />
+  </head>
 
-</head>
-
-<body class="min-h-screen bg-[#0b0f19] text-white">
-
+  <body class="min-h-screen bg-[#0b0f19] text-white">
     <main class="min-h-screen flex items-center justify-center px-6 py-10">
-
-        <div class="w-full max-w-6xl">
-
-            <!-- Top branding -->
-            <div class="text-center mb-8">
-
-                <a href="index.html"
-                   class="inline-flex items-center gap-2 text-2xl font-bold tracking-wide">
-
-                    <span class="text-purple-400">
-                        <i class="fa-solid fa-screwdriver-wrench"></i>
-                    </span>
-
-                    <span>Service<span class="text-purple-400">Hub</span></span>
-
-                </a>
-
-                <p class="text-gray-400 mt-2">
-                    Welcome back. Login to continue.
-                </p>
-
-            </div>
-
-
-            <!-- Main Login Container -->
-            <div class="grid lg:grid-cols-[1fr_280px] gap-6">
-
-
-                <!-- Login Card -->
-                <section
-                    class="login-card rounded-2xl border border-white/10
-                           bg-[#111827]/90 backdrop-blur-xl
-                           p-7 md:p-10 shadow-2xl"
-                >
-
-                    <!-- Header -->
-                    <div class="mb-8">
-
-                        <h1 class="text-3xl font-bold">
-                            Login
-                        </h1>
-
-                        <p class="text-gray-400 mt-2">
-                            Select your account type to continue.
-                        </p>
-
-                    </div>
-
-
-                    <!-- Role Selection -->
-                    <div class="mb-8">
-
-                        <label class="block text-sm font-medium text-gray-300 mb-3">
-                            Login as
-                        </label>
-
-                        <div class="grid sm:grid-cols-2 gap-4">
-
-                            <!-- Customer -->
-                            <button
-                                type="button"
-                                id="customerRole"
-                                class="role-btn active"
-                            >
-
-                                <i class="fa-solid fa-user text-xl"></i>
-
-                                <div class="text-left">
-                                    <p class="font-semibold">
-                                        Customer
-                                    </p>
-
-                                    <p class="text-xs text-gray-400">
-                                        Book a service
-                                    </p>
-                                </div>
-
-                            </button>
-
-
-                            <!-- Worker -->
-                            <button
-                                type="button"
-                                id="workerRole"
-                                class="role-btn"
-                            >
-
-                                <i class="fa-solid fa-user-gear text-xl"></i>
-
-                                <div class="text-left">
-                                    <p class="font-semibold">
-                                        Worker
-                                    </p>
-
-                                    <p class="text-xs text-gray-400">
-                                        Manage your services
-                                    </p>
-                                </div>
-
-                            </button>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Login Form -->
-                    <form id="loginForm" novalidate>
-
-                        <!-- ID -->
-                        <div class="mb-5">
-
-                            <label
-                                for="userId"
-                                id="idLabel"
-                                class="block text-sm font-medium text-gray-300 mb-2"
-                            >
-                                Email ID
-                            </label>
-
-                            <div class="relative">
-
-                                <i
-                                    class="fa-solid fa-id-card absolute left-4 top-1/2
-                                           -translate-y-1/2 text-gray-500"
-                                ></i>
-
-                                <input
-                                    type="text"
-                                    id="userId"
-                                    name="userId"
-                                    autocomplete="username"
-                                    placeholder="Enter your Email ID"
-                                    class="login-input"
-                                >
-
-                            </div>
-
-                            <p
-                                id="idError"
-                                class="error-message hidden"
-                            ></p>
-
-                        </div>
-
-
-                        <!-- Password -->
-                        <div class="mb-3">
-
-                            <label
-                                for="password"
-                                class="block text-sm font-medium text-gray-300 mb-2"
-                            >
-                                Password
-                            </label>
-
-                            <div class="relative">
-
-                                <i
-                                    class="fa-solid fa-lock absolute left-4 top-1/2
-                                           -translate-y-1/2 text-gray-500"
-                                ></i>
-
-                                <input
-                                    type="password"
-                                    id="password"
-                                    name="password"
-                                    autocomplete="current-password"
-                                    placeholder="Enter your password"
-                                    class="login-input pr-12"
-                                >
-
-                                <button
-                                    type="button"
-                                    id="togglePassword"
-                                    class="absolute right-4 top-1/2
-                                           -translate-y-1/2 text-gray-500
-                                           hover:text-purple-400 transition"
-                                >
-
-                                    <i class="fa-solid fa-eye"></i>
-
-                                </button>
-
-                            </div>
-
-                            <p
-                                id="passwordError"
-                                class="error-message hidden"
-                            ></p>
-
-                        </div>
-
-
-                        <!-- Forgot Password -->
-                        <p class="text-sm text-gray-500 mb-7">
-                            Forgot your password?
-                            <span class="text-gray-400">
-                                Please contact the developer.
-                            </span>
-                        </p>
-
-
-                        <!-- General Error -->
-                        <div
-                            id="loginMessage"
-                            class="hidden mb-5 rounded-lg border px-4 py-3 text-sm"
-                        ></div>
-
-
-                        <!-- Login Button -->
-                        <button
-                            type="submit"
-                            id="loginButton"
-                            class="w-full py-3.5 rounded-xl
-                                   bg-purple-500 hover:bg-purple-400
-                                   text-black font-semibold
-                                   transition duration-200
-                                   flex items-center justify-center gap-2"
-                        >
-
-                            <i class="fa-solid fa-right-to-bracket"></i>
-
-                            <span>Login</span>
-
-                        </button>
-
-                    </form>
-
-
-                    <!-- Register -->
-                    <div class="relative my-8">
-
-                        <div class="absolute inset-0 flex items-center">
-                            <div class="w-full border-t border-white/10"></div>
-                        </div>
-
-                        <div class="relative flex justify-center">
-                            <span class="bg-[#111827] px-4 text-sm text-gray-500">
-                                New to ServiceHub?
-                            </span>
-                        </div>
-
-                    </div>
-
-
-                    <a
-                        href="UserRegistration.html"
-                        class="w-full py-3 rounded-xl
-                               border border-white/10
-                               hover:border-purple-400/50
-                               hover:bg-white/5
-                               transition
-                               flex items-center justify-center gap-2
-                               text-gray-200"
-                    >
-
-                        <i class="fa-solid fa-user-plus"></i>
-
-                        Create an account
-
-                    </a>
-
-                </section>
-
-
-                <!-- Right Side -->
-                <aside
-                    class="rounded-2xl border border-white/10
-                           bg-[#111827]/80
-                           p-7 flex flex-col justify-between"
-                >
-
-                    <div>
-
-                        <div
-                            class="w-12 h-12 rounded-xl
-                                   bg-purple-500/10
-                                   border border-purple-400/20
-                                   flex items-center justify-center
-                                   text-purple-400 text-xl mb-5"
-                        >
-
-                            <i class="fa-solid fa-shield-halved"></i>
-
-                        </div>
-
-
-                        <h2 class="text-xl font-semibold mb-3">
-                            Administrator?
-                        </h2>
-
-                        <p class="text-sm text-gray-400 leading-6">
-                            Access the administration panel using the
-                            administrator login.
-                        </p>
-
-                    </div>
-
-
-                    <a
-                        href="../Admin/adminLogin.html"
-                        class="mt-8 w-full py-3 rounded-xl
-                               border border-purple-400/20
-                               text-purple-300
-                               hover:bg-purple-500/10
-                               transition
-                               text-center"
-                    >
-
-                        <i class="fa-solid fa-lock mr-2"></i>
-
-                        Admin Login
-
-                    </a>
-
-                </aside>
-
-            </div>
-
-
-            <!-- Footer -->
-            <div class="text-center mt-8">
-
-                <p class="text-xs text-gray-600">
-                    © 2026 ServiceHub. All rights reserved.
-                </p>
-
-            </div>
-
+      <div class="w-full max-w-6xl">
+        <!-- Top branding -->
+        <div class="text-center mb-8">
+          <a
+            href="index.html"
+            class="inline-flex items-center gap-2 text-2xl font-bold tracking-wide"
+          >
+            <span class="text-purple-400">
+              <i class="fa-solid fa-screwdriver-wrench"></i>
+            </span>
+
+            <span>Service<span class="text-purple-400">Hub</span></span>
+          </a>
+
+          <p class="text-gray-400 mt-2">Welcome back. Login to continue.</p>
         </div>
 
+        <!-- Main Login Container -->
+        <div class="grid lg:grid-cols-[1fr_280px] gap-6">
+          <!-- Login Card -->
+          <section
+            class="login-card rounded-2xl border border-white/10 bg-[#111827]/90 backdrop-blur-xl p-7 md:p-10 shadow-2xl"
+          >
+            <!-- Header -->
+            <div class="mb-8">
+              <h1 class="text-3xl font-bold">Login</h1>
+
+              <p class="text-gray-400 mt-2">
+                Select your account type to continue.
+              </p>
+            </div>
+
+            <!-- Role Selection -->
+            <div class="mb-8">
+              <label class="block text-sm font-medium text-gray-300 mb-3">
+                Login as
+              </label>
+
+              <div class="grid sm:grid-cols-2 gap-4">
+                <!-- Customer -->
+                <button type="button" id="customerRole" class="role-btn active">
+                  <i class="fa-solid fa-user text-xl"></i>
+
+                  <div class="text-left">
+                    <p class="font-semibold">Customer</p>
+
+                    <p class="text-xs text-gray-400">Book a service</p>
+                  </div>
+                </button>
+
+                <!-- Worker -->
+                <button type="button" id="workerRole" class="role-btn">
+                  <i class="fa-solid fa-user-gear text-xl"></i>
+
+                  <div class="text-left">
+                    <p class="font-semibold">Worker</p>
+
+                    <p class="text-xs text-gray-400">Manage your services</p>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" novalidate>
+              <!-- ID -->
+              <div class="mb-5">
+                <label
+                  for="userId"
+                  id="idLabel"
+                  class="block text-sm font-medium text-gray-300 mb-2"
+                >
+                  Email ID
+                </label>
+
+                <div class="relative">
+                  <i
+                    class="fa-solid fa-id-card absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
+                  ></i>
+
+                  <input
+                    type="text"
+                    id="userId"
+                    name="userId"
+                    autocomplete="username"
+                    placeholder="Enter your Email ID"
+                    class="login-input"
+                  />
+                </div>
+
+                <p id="idError" class="error-message hidden"></p>
+              </div>
+
+              <!-- Password -->
+              <div class="mb-3">
+                <label
+                  for="password"
+                  class="block text-sm font-medium text-gray-300 mb-2"
+                >
+                  Password
+                </label>
+
+                <div class="relative">
+                  <i
+                    class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
+                  ></i>
+
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    autocomplete="current-password"
+                    placeholder="Enter your password"
+                    class="login-input pr-12"
+                  />
+
+                  <button
+                    type="button"
+                    id="togglePassword"
+                    class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-purple-400 transition"
+                  >
+                    <i class="fa-solid fa-eye"></i>
+                  </button>
+                </div>
+
+                <p id="passwordError" class="error-message hidden"></p>
+              </div>
+
+              <!-- Forgot Password -->
+              <p class="text-sm text-gray-500 mb-7">
+                Forgot your password?
+                <span class="text-gray-400">
+                  Please contact the developer.
+                </span>
+              </p>
+
+              <!-- General Error -->
+              <div
+                id="loginMessage"
+                class="hidden mb-5 rounded-lg border px-4 py-3 text-sm"
+              ></div>
+
+              <!-- Login Button -->
+              <button
+                type="submit"
+                id="loginButton"
+                class="w-full py-3.5 rounded-xl bg-purple-500 hover:bg-purple-400 text-black font-semibold transition duration-200 flex items-center justify-center gap-2"
+              >
+                <i class="fa-solid fa-right-to-bracket"></i>
+
+                <span>Login</span>
+              </button>
+            </form>
+
+            <!-- Register -->
+            <div class="relative my-8">
+              <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-white/10"></div>
+              </div>
+
+              <div class="relative flex justify-center">
+                <span class="bg-[#111827] px-4 text-sm text-gray-500">
+                  New to ServiceHub?
+                </span>
+              </div>
+            </div>
+
+            <a
+              href="UserRegistration.html"
+              class="w-full py-3 rounded-xl border border-white/10 hover:border-purple-400/50 hover:bg-white/5 transition flex items-center justify-center gap-2 text-gray-200"
+            >
+              <i class="fa-solid fa-user-plus"></i>
+
+              Create an account
+            </a>
+          </section>
+
+          <!-- Right Side -->
+          <aside
+            class="rounded-2xl border border-white/10 bg-[#111827]/80 p-7 flex flex-col justify-between"
+          >
+            <div>
+              <div
+                class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-400/20 flex items-center justify-center text-purple-400 text-xl mb-5"
+              >
+                <i class="fa-solid fa-shield-halved"></i>
+              </div>
+
+              <h2 class="text-xl font-semibold mb-3">Administrator?</h2>
+
+              <p class="text-sm text-gray-400 leading-6">
+                Access the administration panel using the administrator login.
+              </p>
+            </div>
+
+            <a
+              href="../Admin/adminLogin.html"
+              class="mt-8 w-full py-3 rounded-xl border border-purple-400/20 text-purple-300 hover:bg-purple-500/10 transition text-center"
+            >
+              <i class="fa-solid fa-lock mr-2"></i>
+
+              Admin Login
+            </a>
+          </aside>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-8">
+          <p class="text-xs text-gray-600">
+            © 2026 ServiceHub. All rights reserved.
+          </p>
+        </div>
+      </div>
     </main>
 
-
     <script src="../JS/login.js"></script>
-
-</body>
+  </body>
 </html>

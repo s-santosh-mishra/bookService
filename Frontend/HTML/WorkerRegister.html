@@ -1,911 +1,672 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Worker Registration | ServiceHub</title>
 
-    <link rel="stylesheet" href="../CSS/output.css">
+    <link rel="stylesheet" href="../CSS/output.css" />
 
     <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-    >
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    />
+
+    <link rel="stylesheet" href="../CSS/UserRegistration.css" />
 
     <link
-        rel="stylesheet"
-        href="../CSS/UserRegistration.css"
-    >
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../Images/favicon-32x32.png?v=3"
+    />
 
     <link
-        rel="icon"
-        type="image/png"
-        sizes="32x32"
-        href="../Images/favicon-32x32.png?v=3"
-    >
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="../Images/favicon-16x16.png?v=3"
+    />
+  </head>
 
-    <link
-        rel="icon"
-        type="image/png"
-        sizes="16x16"
-        href="../Images/favicon-16x16.png?v=3"
-    >
-
-</head>
-
-
-<body class="min-h-screen bg-[#0b0f19] text-white">
-
-<main class="min-h-screen flex items-center justify-center px-5 py-10">
-
-    <div class="w-full max-w-4xl">
-
-
+  <body class="min-h-screen bg-[#0b0f19] text-white">
+    <main class="min-h-screen flex items-center justify-center px-5 py-10">
+      <div class="w-full max-w-4xl">
         <!-- Branding -->
 
         <div class="text-center mb-8">
+          <a
+            href="index.html"
+            class="inline-flex items-center gap-2 text-2xl font-bold tracking-wide"
+          >
+            <span class="text-purple-400">
+              <i class="fa-solid fa-screwdriver-wrench"></i>
+            </span>
 
-            <a
-                href="index.html"
-                class="inline-flex items-center gap-2 text-2xl font-bold tracking-wide"
-            >
+            <span> Service<span class="text-purple-400">Hub</span> </span>
+          </a>
 
-                <span class="text-purple-400">
-                    <i class="fa-solid fa-screwdriver-wrench"></i>
-                </span>
+          <h1 class="text-3xl md:text-4xl font-bold mt-6">
+            Join as a Service Professional
+          </h1>
 
-                <span>
-                    Service<span class="text-purple-400">Hub</span>
-                </span>
-
-            </a>
-
-
-            <h1 class="text-3xl md:text-4xl font-bold mt-6">
-                Join as a Service Professional
-            </h1>
-
-
-            <p class="text-gray-400 mt-2">
-                Offer your skills to customers through ServiceHub.
-            </p>
-
+          <p class="text-gray-400 mt-2">
+            Offer your skills to customers through ServiceHub.
+          </p>
         </div>
-
 
         <!-- Registration Card -->
 
         <section
-            class="register-card rounded-2xl border border-white/10
-                   bg-[#111827]/90 backdrop-blur-xl
-                   p-6 md:p-10 shadow-2xl"
+          class="register-card rounded-2xl border border-white/10 bg-[#111827]/90 backdrop-blur-xl p-6 md:p-10 shadow-2xl"
         >
-
-            <form id="workerRegisterForm" novalidate>
-
-
-                <!-- =================================
+          <form id="workerRegisterForm" novalidate>
+            <!-- =================================
                      Personal Information
                 ================================== -->
 
-                <div class="section-header">
+            <div class="section-header">
+              <div class="section-icon">
+                <i class="fa-solid fa-user"></i>
+              </div>
 
-                    <div class="section-icon">
-                        <i class="fa-solid fa-user"></i>
-                    </div>
+              <div>
+                <h2 class="text-xl font-semibold">Personal Information</h2>
 
-                    <div>
+                <p class="text-sm text-gray-500 mt-1">
+                  Tell us a little about yourself.
+                </p>
+              </div>
+            </div>
 
-                        <h2 class="text-xl font-semibold">
-                            Personal Information
-                        </h2>
+            <div class="grid md:grid-cols-[1fr_140px] gap-5 mb-5">
+              <!-- Full Name -->
 
-                        <p class="text-sm text-gray-500 mt-1">
-                            Tell us a little about yourself.
-                        </p>
+              <div>
+                <label for="fullName" class="input-label">
+                  Full Name <span>*</span>
+                </label>
 
-                    </div>
+                <div class="input-wrapper">
+                  <i class="fa-solid fa-user"></i>
 
+                  <input
+                    type="text"
+                    id="fullName"
+                    name="fullName"
+                    placeholder="Enter your full name"
+                    autocomplete="name"
+                    class="form-input"
+                  />
                 </div>
 
+                <p id="fullNameError" class="error-message hidden"></p>
+              </div>
 
-                <div class="grid md:grid-cols-[1fr_140px] gap-5 mb-5">
+              <!-- Age -->
 
-                    <!-- Full Name -->
+              <div>
+                <label for="age" class="input-label">
+                  Age <span>*</span>
+                </label>
 
-                    <div>
+                <div class="input-wrapper">
+                  <i class="fa-solid fa-calendar"></i>
 
-                        <label for="fullName" class="input-label">
-                            Full Name <span>*</span>
-                        </label>
-
-                        <div class="input-wrapper">
-
-                            <i class="fa-solid fa-user"></i>
-
-                            <input
-                                type="text"
-                                id="fullName"
-                                name="fullName"
-                                placeholder="Enter your full name"
-                                autocomplete="name"
-                                class="form-input"
-                            >
-
-                        </div>
-
-                        <p id="fullNameError"
-                           class="error-message hidden"></p>
-
-                    </div>
-
-
-                    <!-- Age -->
-
-                    <div>
-
-                        <label for="age" class="input-label">
-                            Age <span>*</span>
-                        </label>
-
-                        <div class="input-wrapper">
-
-                            <i class="fa-solid fa-calendar"></i>
-
-                            <input
-                                type="number"
-                                id="age"
-                                name="age"
-                                min="18"
-                                max="100"
-                                placeholder="Age"
-                                class="form-input"
-                            >
-
-                        </div>
-
-                        <p id="ageError"
-                           class="error-message hidden"></p>
-
-                    </div>
-
+                  <input
+                    type="number"
+                    id="age"
+                    name="age"
+                    min="18"
+                    max="100"
+                    placeholder="Age"
+                    class="form-input"
+                  />
                 </div>
 
+                <p id="ageError" class="error-message hidden"></p>
+              </div>
+            </div>
 
-                <!-- Gender -->
+            <!-- Gender -->
 
-                <div class="mb-5">
+            <div class="mb-5">
+              <label for="gender" class="input-label">
+                Gender <span>*</span>
+              </label>
 
-                    <label for="gender" class="input-label">
-                        Gender <span>*</span>
-                    </label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-venus-mars"></i>
 
-                    <div class="input-wrapper">
+                <select
+                  id="gender"
+                  name="gender"
+                  class="form-input form-select"
+                >
+                  <option value="">Select your gender</option>
 
-                        <i class="fa-solid fa-venus-mars"></i>
+                  <option value="male">Male</option>
 
-                        <select
-                            id="gender"
-                            name="gender"
-                            class="form-input form-select"
-                        >
+                  <option value="female">Female</option>
 
-                            <option value="">
-                                Select your gender
-                            </option>
+                  <option value="other">Other</option>
 
-                            <option value="male">
-                                Male
-                            </option>
+                  <option value="prefer_not_to_say">Prefer not to say</option>
+                </select>
+              </div>
 
-                            <option value="female">
-                                Female
-                            </option>
+              <p id="genderError" class="error-message hidden"></p>
+            </div>
 
-                            <option value="other">
-                                Other
-                            </option>
+            <!-- Email -->
 
-                            <option value="prefer_not_to_say">
-                                Prefer not to say
-                            </option>
+            <div class="mb-5">
+              <label for="email" class="input-label">
+                Email ID <span>*</span>
+              </label>
 
-                        </select>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-envelope"></i>
 
-                    </div>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="Enter your email address"
+                  autocomplete="email"
+                  class="form-input"
+                />
+              </div>
 
-                    <p id="genderError"
-                       class="error-message hidden"></p>
+              <p id="emailError" class="error-message hidden"></p>
+            </div>
 
-                </div>
+            <!-- Phone -->
 
+            <div class="mb-8">
+              <label for="phone" class="input-label">
+                Phone Number <span>*</span>
+              </label>
 
-                <!-- Email -->
+              <div class="input-wrapper">
+                <span class="country-code"> +91 </span>
 
-                <div class="mb-5">
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  maxlength="10"
+                  placeholder="Enter 10-digit mobile number"
+                  autocomplete="tel"
+                  class="form-input phone-input"
+                />
+              </div>
 
-                    <label for="email" class="input-label">
-                        Email ID <span>*</span>
-                    </label>
+              <p id="phoneError" class="error-message hidden"></p>
+            </div>
 
-                    <div class="input-wrapper">
+            <div class="section-divider"></div>
 
-                        <i class="fa-solid fa-envelope"></i>
-
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            placeholder="Enter your email address"
-                            autocomplete="email"
-                            class="form-input"
-                        >
-
-                    </div>
-
-                    <p id="emailError"
-                       class="error-message hidden"></p>
-
-                </div>
-
-
-                <!-- Phone -->
-
-                <div class="mb-8">
-
-                    <label for="phone" class="input-label">
-                        Phone Number <span>*</span>
-                    </label>
-
-                    <div class="input-wrapper">
-
-                        <span class="country-code">
-                            +91
-                        </span>
-
-                        <input
-                            type="tel"
-                            id="phone"
-                            name="phone"
-                            maxlength="10"
-                            placeholder="Enter 10-digit mobile number"
-                            autocomplete="tel"
-                            class="form-input phone-input"
-                        >
-
-                    </div>
-
-                    <p id="phoneError"
-                       class="error-message hidden"></p>
-
-                </div>
-
-
-                <div class="section-divider"></div>
-
-
-                <!-- =================================
+            <!-- =================================
                      Address
                 ================================== -->
 
-                <div class="section-header">
+            <div class="section-header">
+              <div class="section-icon">
+                <i class="fa-solid fa-location-dot"></i>
+              </div>
 
-                    <div class="section-icon">
-                        <i class="fa-solid fa-location-dot"></i>
-                    </div>
+              <div>
+                <h2 class="text-xl font-semibold">Address</h2>
 
-                    <div>
+                <p class="text-sm text-gray-500 mt-1">
+                  Tell us where you provide your services.
+                </p>
+              </div>
+            </div>
 
-                        <h2 class="text-xl font-semibold">
-                            Address
-                        </h2>
+            <!-- Address Line 1 -->
 
-                        <p class="text-sm text-gray-500 mt-1">
-                            Tell us where you provide your services.
-                        </p>
+            <div class="mb-5">
+              <label for="addressLine1" class="input-label">
+                Address Line 1 <span>*</span>
+              </label>
 
-                    </div>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-house"></i>
 
+                <input
+                  type="text"
+                  id="addressLine1"
+                  name="addressLine1"
+                  placeholder="House / Flat No., Street"
+                  autocomplete="address-line1"
+                  class="form-input"
+                />
+              </div>
+
+              <p id="addressLine1Error" class="error-message hidden"></p>
+            </div>
+
+            <!-- Address Line 2 -->
+
+            <div class="mb-5">
+              <label for="addressLine2" class="input-label">
+                Address Line 2
+                <span class="optional">(Optional)</span>
+              </label>
+
+              <div class="input-wrapper">
+                <i class="fa-solid fa-building"></i>
+
+                <input
+                  type="text"
+                  id="addressLine2"
+                  name="addressLine2"
+                  placeholder="Apartment, area, colony"
+                  autocomplete="address-line2"
+                  class="form-input"
+                />
+              </div>
+            </div>
+
+            <!-- Landmark -->
+
+            <div class="mb-5">
+              <label for="landmark" class="input-label">
+                Landmark
+                <span class="optional">(Optional)</span>
+              </label>
+
+              <div class="input-wrapper">
+                <i class="fa-solid fa-map-pin"></i>
+
+                <input
+                  type="text"
+                  id="landmark"
+                  name="landmark"
+                  placeholder="Nearby landmark"
+                  class="form-input"
+                />
+              </div>
+            </div>
+
+            <!-- City + State -->
+
+            <div class="grid md:grid-cols-2 gap-5 mb-5">
+              <!-- City -->
+
+              <div>
+                <label for="city" class="input-label">
+                  City <span>*</span>
+                </label>
+
+                <div class="input-wrapper">
+                  <i class="fa-solid fa-city"></i>
+
+                  <input
+                    type="text"
+                    id="city"
+                    name="city"
+                    placeholder="Enter your city"
+                    autocomplete="address-level2"
+                    class="form-input"
+                  />
                 </div>
 
+                <p id="cityError" class="error-message hidden"></p>
+              </div>
 
-                <!-- Address Line 1 -->
+              <!-- State -->
 
-                <div class="mb-5">
+              <div>
+                <label for="state" class="input-label">
+                  State <span>*</span>
+                </label>
 
-                    <label for="addressLine1" class="input-label">
-                        Address Line 1 <span>*</span>
-                    </label>
+                <div class="input-wrapper">
+                  <i class="fa-solid fa-map"></i>
 
-                    <div class="input-wrapper">
+                  <select
+                    id="state"
+                    name="state"
+                    class="form-input form-select"
+                  >
+                    <option value="">Select state</option>
 
-                        <i class="fa-solid fa-house"></i>
+                    <option>Andhra Pradesh</option>
+                    <option>Arunachal Pradesh</option>
+                    <option>Assam</option>
+                    <option>Bihar</option>
+                    <option>Chhattisgarh</option>
+                    <option>Goa</option>
+                    <option>Gujarat</option>
+                    <option>Haryana</option>
+                    <option>Himachal Pradesh</option>
+                    <option>Jharkhand</option>
+                    <option>Karnataka</option>
+                    <option>Kerala</option>
+                    <option>Madhya Pradesh</option>
+                    <option>Maharashtra</option>
+                    <option>Manipur</option>
+                    <option>Meghalaya</option>
+                    <option>Mizoram</option>
+                    <option>Nagaland</option>
+                    <option>Odisha</option>
+                    <option>Punjab</option>
+                    <option>Rajasthan</option>
+                    <option>Sikkim</option>
+                    <option>Tamil Nadu</option>
+                    <option>Telangana</option>
+                    <option>Tripura</option>
+                    <option>Uttar Pradesh</option>
+                    <option>Uttarakhand</option>
+                    <option>West Bengal</option>
 
-                        <input
-                            type="text"
-                            id="addressLine1"
-                            name="addressLine1"
-                            placeholder="House / Flat No., Street"
-                            autocomplete="address-line1"
-                            class="form-input"
-                        >
-
-                    </div>
-
-                    <p id="addressLine1Error"
-                       class="error-message hidden"></p>
-
+                    <option>Andaman and Nicobar Islands</option>
+                    <option>Chandigarh</option>
+                    <option>Dadra and Nagar Haveli and Daman and Diu</option>
+                    <option>Delhi</option>
+                    <option>Jammu and Kashmir</option>
+                    <option>Ladakh</option>
+                    <option>Lakshadweep</option>
+                    <option>Puducherry</option>
+                  </select>
                 </div>
 
+                <p id="stateError" class="error-message hidden"></p>
+              </div>
+            </div>
 
-                <!-- Address Line 2 -->
+            <!-- PIN -->
 
-                <div class="mb-5">
+            <div class="mb-8">
+              <label for="pincode" class="input-label">
+                PIN Code <span>*</span>
+              </label>
 
-                    <label for="addressLine2" class="input-label">
-                        Address Line 2
-                        <span class="optional">(Optional)</span>
-                    </label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-location-crosshairs"></i>
 
-                    <div class="input-wrapper">
+                <input
+                  type="text"
+                  id="pincode"
+                  name="pincode"
+                  maxlength="6"
+                  placeholder="Enter 6-digit PIN code"
+                  autocomplete="postal-code"
+                  class="form-input"
+                />
+              </div>
 
-                        <i class="fa-solid fa-building"></i>
+              <p id="pincodeError" class="error-message hidden"></p>
+            </div>
 
-                        <input
-                            type="text"
-                            id="addressLine2"
-                            name="addressLine2"
-                            placeholder="Apartment, area, colony"
-                            autocomplete="address-line2"
-                            class="form-input"
-                        >
+            <div class="section-divider"></div>
 
-                    </div>
-
-                </div>
-
-
-                <!-- Landmark -->
-
-                <div class="mb-5">
-
-                    <label for="landmark" class="input-label">
-                        Landmark
-                        <span class="optional">(Optional)</span>
-                    </label>
-
-                    <div class="input-wrapper">
-
-                        <i class="fa-solid fa-map-pin"></i>
-
-                        <input
-                            type="text"
-                            id="landmark"
-                            name="landmark"
-                            placeholder="Nearby landmark"
-                            class="form-input"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <!-- City + State -->
-
-                <div class="grid md:grid-cols-2 gap-5 mb-5">
-
-                    <!-- City -->
-
-                    <div>
-
-                        <label for="city" class="input-label">
-                            City <span>*</span>
-                        </label>
-
-                        <div class="input-wrapper">
-
-                            <i class="fa-solid fa-city"></i>
-
-                            <input
-                                type="text"
-                                id="city"
-                                name="city"
-                                placeholder="Enter your city"
-                                autocomplete="address-level2"
-                                class="form-input"
-                            >
-
-                        </div>
-
-                        <p id="cityError"
-                           class="error-message hidden"></p>
-
-                    </div>
-
-
-                    <!-- State -->
-
-                    <div>
-
-                        <label for="state" class="input-label">
-                            State <span>*</span>
-                        </label>
-
-                        <div class="input-wrapper">
-
-                            <i class="fa-solid fa-map"></i>
-
-                            <select
-                                id="state"
-                                name="state"
-                                class="form-input form-select"
-                            >
-
-                                <option value="">
-                                    Select state
-                                </option>
-
-                                <option>Andhra Pradesh</option>
-                                <option>Arunachal Pradesh</option>
-                                <option>Assam</option>
-                                <option>Bihar</option>
-                                <option>Chhattisgarh</option>
-                                <option>Goa</option>
-                                <option>Gujarat</option>
-                                <option>Haryana</option>
-                                <option>Himachal Pradesh</option>
-                                <option>Jharkhand</option>
-                                <option>Karnataka</option>
-                                <option>Kerala</option>
-                                <option>Madhya Pradesh</option>
-                                <option>Maharashtra</option>
-                                <option>Manipur</option>
-                                <option>Meghalaya</option>
-                                <option>Mizoram</option>
-                                <option>Nagaland</option>
-                                <option>Odisha</option>
-                                <option>Punjab</option>
-                                <option>Rajasthan</option>
-                                <option>Sikkim</option>
-                                <option>Tamil Nadu</option>
-                                <option>Telangana</option>
-                                <option>Tripura</option>
-                                <option>Uttar Pradesh</option>
-                                <option>Uttarakhand</option>
-                                <option>West Bengal</option>
-
-                                <option>Andaman and Nicobar Islands</option>
-                                <option>Chandigarh</option>
-                                <option>Dadra and Nagar Haveli and Daman and Diu</option>
-                                <option>Delhi</option>
-                                <option>Jammu and Kashmir</option>
-                                <option>Ladakh</option>
-                                <option>Lakshadweep</option>
-                                <option>Puducherry</option>
-
-                            </select>
-
-                        </div>
-
-                        <p id="stateError"
-                           class="error-message hidden"></p>
-
-                    </div>
-
-                </div>
-
-
-                <!-- PIN -->
-
-                <div class="mb-8">
-
-                    <label for="pincode" class="input-label">
-                        PIN Code <span>*</span>
-                    </label>
-
-                    <div class="input-wrapper">
-
-                        <i class="fa-solid fa-location-crosshairs"></i>
-
-                        <input
-                            type="text"
-                            id="pincode"
-                            name="pincode"
-                            maxlength="6"
-                            placeholder="Enter 6-digit PIN code"
-                            autocomplete="postal-code"
-                            class="form-input"
-                        >
-
-                    </div>
-
-                    <p id="pincodeError"
-                       class="error-message hidden"></p>
-
-                </div>
-
-
-                <div class="section-divider"></div>
-
-
-                <!-- =================================
+            <!-- =================================
                      Professional Information
                 ================================== -->
 
-                <div class="section-header">
+            <div class="section-header">
+              <div class="section-icon">
+                <i class="fa-solid fa-briefcase"></i>
+              </div>
 
-                    <div class="section-icon">
-                        <i class="fa-solid fa-briefcase"></i>
-                    </div>
+              <div>
+                <h2 class="text-xl font-semibold">Professional Information</h2>
 
-                    <div>
+                <p class="text-sm text-gray-500 mt-1">
+                  Tell customers about your experience and skills.
+                </p>
+              </div>
+            </div>
 
-                        <h2 class="text-xl font-semibold">
-                            Professional Information
-                        </h2>
+            <!-- Experience -->
 
-                        <p class="text-sm text-gray-500 mt-1">
-                            Tell customers about your experience and skills.
-                        </p>
+            <div class="mb-5">
+              <label for="experienceYears" class="input-label">
+                Years of Experience <span>*</span>
+              </label>
 
-                    </div>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-clock"></i>
 
-                </div>
+                <input
+                  type="number"
+                  id="experienceYears"
+                  name="experienceYears"
+                  min="0"
+                  max="80"
+                  placeholder="e.g. 5"
+                  class="form-input"
+                />
+              </div>
 
+              <p id="experienceYearsError" class="error-message hidden"></p>
+            </div>
 
-                <!-- Experience -->
+            <!-- Qualification -->
 
-                <div class="mb-5">
+            <div class="mb-5">
+              <label for="qualification" class="input-label">
+                Qualification <span>*</span>
+              </label>
 
-                    <label
-                        for="experienceYears"
-                        class="input-label"
-                    >
-                        Years of Experience <span>*</span>
-                    </label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-certificate"></i>
 
-                    <div class="input-wrapper">
+                <input
+                  type="text"
+                  id="qualification"
+                  name="qualification"
+                  placeholder="e.g. ITI, Diploma, Certification"
+                  class="form-input"
+                />
+              </div>
 
-                        <i class="fa-solid fa-clock"></i>
+              <p id="qualificationError" class="error-message hidden"></p>
+            </div>
 
-                        <input
-                            type="number"
-                            id="experienceYears"
-                            name="experienceYears"
-                            min="0"
-                            max="80"
-                            placeholder="e.g. 5"
-                            class="form-input"
-                        >
+            <!-- Bio -->
 
-                    </div>
+            <div class="mb-8">
+              <label for="bio" class="input-label">
+                Professional Bio
+                <span class="optional">(Optional)</span>
+              </label>
 
-                    <p
-                        id="experienceYearsError"
-                        class="error-message hidden"
-                    ></p>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-align-left"></i>
 
-                </div>
+                <textarea
+                  id="bio"
+                  name="bio"
+                  rows="4"
+                  placeholder="Tell customers about your skills and experience"
+                  class="form-input resize-none"
+                ></textarea>
+              </div>
+            </div>
 
+            <div class="section-divider"></div>
 
-                <!-- Qualification -->
-
-                <div class="mb-5">
-
-                    <label
-                        for="qualification"
-                        class="input-label"
-                    >
-                        Qualification <span>*</span>
-                    </label>
-
-                    <div class="input-wrapper">
-
-                        <i class="fa-solid fa-certificate"></i>
-
-                        <input
-                            type="text"
-                            id="qualification"
-                            name="qualification"
-                            placeholder="e.g. ITI, Diploma, Certification"
-                            class="form-input"
-                        >
-
-                    </div>
-
-                    <p
-                        id="qualificationError"
-                        class="error-message hidden"
-                    ></p>
-
-                </div>
-
-
-                <!-- Bio -->
-
-                <div class="mb-8">
-
-                    <label for="bio" class="input-label">
-                        Professional Bio
-                        <span class="optional">(Optional)</span>
-                    </label>
-
-                    <div class="input-wrapper">
-
-                        <i class="fa-solid fa-align-left"></i>
-
-                        <textarea
-                            id="bio"
-                            name="bio"
-                            rows="4"
-                            placeholder="Tell customers about your skills and experience"
-                            class="form-input resize-none"
-                        ></textarea>
-
-                    </div>
-
-                </div>
-
-
-                <div class="section-divider"></div>
-
-
-                <!-- =================================
+            <!-- =================================
                      Services
                 ================================== -->
 
-                <div class="section-header">
+            <div class="section-header">
+              <div class="section-icon">
+                <i class="fa-solid fa-screwdriver-wrench"></i>
+              </div>
 
-                    <div class="section-icon">
-                        <i class="fa-solid fa-screwdriver-wrench"></i>
-                    </div>
+              <div>
+                <h2 class="text-xl font-semibold">Services You Provide</h2>
 
-                    <div>
-
-                        <h2 class="text-xl font-semibold">
-                            Services You Provide
-                        </h2>
-
-                        <p class="text-sm text-gray-500 mt-1">
-                            Select the services you are comfortable providing.
-                            You can choose services from a maximum of 3 categories.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <p
-                    id="categoryLimitMessage"
-                    class="hidden mt-4 text-sm text-yellow-400"
-                >
-                    Maximum 3 categories can be chosen.
+                <p class="text-sm text-gray-500 mt-1">
+                  Select the services you are comfortable providing. You can
+                  choose services from a maximum of 3 categories.
                 </p>
+              </div>
+            </div>
 
+            <p
+              id="categoryLimitMessage"
+              class="hidden mt-4 text-sm text-yellow-400"
+            >
+              Maximum 3 categories can be chosen.
+            </p>
 
-                <div
-                    id="categoriesContainer"
-                    class="mt-6 space-y-4"
-                >
+            <div id="categoriesContainer" class="mt-6 space-y-4">
+              <p class="text-sm text-gray-500">Loading services...</p>
+            </div>
 
-                    <p class="text-sm text-gray-500">
-                        Loading services...
-                    </p>
+            <p id="servicesError" class="error-message hidden mt-3"></p>
 
-                </div>
+            <div class="section-divider mt-8"></div>
 
-
-                <p
-                    id="servicesError"
-                    class="error-message hidden mt-3"
-                ></p>
-
-
-                <div class="section-divider mt-8"></div>
-
-
-                <!-- =================================
+            <!-- =================================
                      Account Security
                 ================================== -->
 
-                <div class="section-header">
+            <div class="section-header">
+              <div class="section-icon">
+                <i class="fa-solid fa-shield-halved"></i>
+              </div>
 
-                    <div class="section-icon">
-                        <i class="fa-solid fa-shield-halved"></i>
-                    </div>
+              <div>
+                <h2 class="text-xl font-semibold">Account Security</h2>
 
-                    <div>
+                <p class="text-sm text-gray-500 mt-1">
+                  Create your ServiceHub login credentials.
+                </p>
+              </div>
+            </div>
 
-                        <h2 class="text-xl font-semibold">
-                            Account Security
-                        </h2>
+            <!-- Password -->
 
-                        <p class="text-sm text-gray-500 mt-1">
-                            Create your ServiceHub login credentials.
-                        </p>
+            <div class="mb-5">
+              <label for="password" class="input-label">
+                Password <span>*</span>
+              </label>
 
-                    </div>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-lock"></i>
 
-                </div>
-
-
-                <!-- Password -->
-
-                <div class="mb-5">
-
-                    <label for="password" class="input-label">
-                        Password <span>*</span>
-                    </label>
-
-                    <div class="input-wrapper">
-
-                        <i class="fa-solid fa-lock"></i>
-
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            placeholder="Create a password"
-                            autocomplete="new-password"
-                            class="form-input password-input"
-                        >
-
-                        <button
-                            type="button"
-                            id="togglePassword"
-                            class="password-toggle"
-                        >
-                            <i class="fa-solid fa-eye"></i>
-                        </button>
-
-                    </div>
-
-                    <p class="password-hint">
-                        Use at least 8 characters.
-                    </p>
-
-                    <p
-                        id="passwordError"
-                        class="error-message hidden"
-                    ></p>
-
-                </div>
-
-
-                <!-- Confirm Password -->
-
-                <div class="mb-6">
-
-                    <label
-                        for="confirmPassword"
-                        class="input-label"
-                    >
-                        Confirm Password <span>*</span>
-                    </label>
-
-                    <div class="input-wrapper">
-
-                        <i class="fa-solid fa-lock"></i>
-
-                        <input
-                            type="password"
-                            id="confirmPassword"
-                            name="confirmPassword"
-                            placeholder="Re-enter your password"
-                            autocomplete="new-password"
-                            class="form-input password-input"
-                        >
-
-                        <button
-                            type="button"
-                            id="toggleConfirmPassword"
-                            class="password-toggle"
-                        >
-                            <i class="fa-solid fa-eye"></i>
-                        </button>
-
-                    </div>
-
-                    <p
-                        id="confirmPasswordError"
-                        class="error-message hidden"
-                    ></p>
-
-                </div>
-
-
-                <!-- Terms -->
-
-                <label class="terms-container">
-
-                    <input
-                        type="checkbox"
-                        id="terms"
-                        name="terms"
-                    >
-
-                    <span>
-                        I agree to the
-                        <a href="#" class="terms-link">
-                            Terms & Conditions
-                        </a>
-                        and
-                        <a href="#" class="terms-link">
-                            Privacy Policy
-                        </a>.
-                    </span>
-
-                </label>
-
-
-                <p
-                    id="termsError"
-                    class="error-message hidden"
-                ></p>
-
-
-                <!-- Message -->
-
-                <div
-                    id="registerMessage"
-                    class="hidden mt-6 rounded-lg border px-4 py-3 text-sm"
-                ></div>
-
-
-                <!-- Submit -->
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder="Create a password"
+                  autocomplete="new-password"
+                  class="form-input password-input"
+                />
 
                 <button
-                    type="submit"
-                    id="registerButton"
-                    class="register-button mt-7"
+                  type="button"
+                  id="togglePassword"
+                  class="password-toggle"
                 >
-
-                    <i class="fa-solid fa-user-plus"></i>
-
-                    <span>
-                        Submit Registration
-                    </span>
-
+                  <i class="fa-solid fa-eye"></i>
                 </button>
+              </div>
 
+              <p class="password-hint">Use at least 8 characters.</p>
 
-                <!-- Login -->
+              <p id="passwordError" class="error-message hidden"></p>
+            </div>
 
-                <p class="text-center text-sm text-gray-500 mt-6">
+            <!-- Confirm Password -->
 
-                    Already have an account?
+            <div class="mb-6">
+              <label for="confirmPassword" class="input-label">
+                Confirm Password <span>*</span>
+              </label>
 
-                    <a
-                        href="login.html"
-                        class="text-purple-400 hover:text-purple-300
-                               transition font-medium"
-                    >
-                        Login
-                    </a>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-lock"></i>
 
-                </p>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  placeholder="Re-enter your password"
+                  autocomplete="new-password"
+                  class="form-input password-input"
+                />
 
-            </form>
+                <button
+                  type="button"
+                  id="toggleConfirmPassword"
+                  class="password-toggle"
+                >
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
 
+              <p id="confirmPasswordError" class="error-message hidden"></p>
+            </div>
+
+            <!-- Terms -->
+
+            <label class="terms-container">
+              <input type="checkbox" id="terms" name="terms" />
+
+              <span>
+                I agree to the
+                <a href="Company.html#workerTerms" class="terms-link">
+                  Terms & Conditions
+                </a>
+                and
+                <a href="Company.html#privacy" class="terms-link">
+                  Privacy Policy </a
+                >.
+              </span>
+            </label>
+
+            <p id="termsError" class="error-message hidden"></p>
+
+            <!-- Message -->
+
+            <div
+              id="registerMessage"
+              class="hidden mt-6 rounded-lg border px-4 py-3 text-sm"
+            ></div>
+
+            <!-- Submit -->
+
+            <button
+              type="submit"
+              id="registerButton"
+              class="register-button mt-7"
+            >
+              <i class="fa-solid fa-user-plus"></i>
+
+              <span> Submit Registration </span>
+            </button>
+
+            <!-- Login -->
+
+            <p class="text-center text-sm text-gray-500 mt-6">
+              Already have an account?
+
+              <a
+                href="login.html"
+                class="text-purple-400 hover:text-purple-300 transition font-medium"
+              >
+                Login
+              </a>
+            </p>
+          </form>
         </section>
 
-
         <p class="text-center text-xs text-gray-600 mt-7">
-            © 2026 ServiceHub. All rights reserved.
+          © 2026 ServiceHub. All rights reserved.
         </p>
+      </div>
+    </main>
 
-    </div>
-
-</main>
-
-
-<script src="../JS/WorkerRegister.js"></script>
-
-</body>
-
+    <script src="../JS/WorkerRegister.js"></script>
+  </body>
 </html>

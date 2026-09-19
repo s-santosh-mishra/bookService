@@ -30,6 +30,7 @@
     --color-green-950: oklch(26.6% 0.065 152.934);
     --color-blue-400: oklch(70.7% 0.165 254.624);
     --color-blue-500: oklch(62.3% 0.214 259.815);
+    --color-blue-600: oklch(54.6% 0.245 262.881);
     --color-blue-700: oklch(48.8% 0.243 264.376);
     --color-blue-900: oklch(37.9% 0.146 265.522);
     --color-violet-50: oklch(96.9% 0.016 293.756);
@@ -323,6 +324,9 @@
   }
   .z-50 {
     z-index: 50;
+  }
+  .z-\[100\] {
+    z-index: 100;
   }
   .col-span-full {
     grid-column: 1 / -1;
@@ -1061,6 +1065,9 @@
       background-color: color-mix(in oklab, var(--color-blue-500) 10%, transparent);
     }
   }
+  .bg-blue-600 {
+    background-color: var(--color-blue-600);
+  }
   .bg-blue-900 {
     background-color: var(--color-blue-900);
   }
@@ -1466,6 +1473,9 @@
   .pt-8 {
     padding-top: calc(var(--spacing) * 8);
   }
+  .pr-4 {
+    padding-right: calc(var(--spacing) * 4);
+  }
   .pr-5 {
     padding-right: calc(var(--spacing) * 5);
   }
@@ -1480,6 +1490,9 @@
   }
   .pl-5 {
     padding-left: calc(var(--spacing) * 5);
+  }
+  .pl-11 {
+    padding-left: calc(var(--spacing) * 11);
   }
   .pl-12 {
     padding-left: calc(var(--spacing) * 12);
@@ -1782,14 +1795,6 @@
         border-color: color-mix(in oklab, var(--color-purple-600) 50%, transparent);
       }
     }
-    .hover\:border-red-500\/50:hover {
-      border-color: color-mix(in srgb, oklch(63.7% 0.237 25.331) 50%, transparent);
-    }
-    @supports (color: color-mix(in lab, red, red)) {
-      .hover\:border-red-500\/50:hover {
-        border-color: color-mix(in oklab, var(--color-red-500) 50%, transparent);
-      }
-    }
     .hover\:border-violet-500\/50:hover {
       border-color: color-mix(in srgb, oklch(60.6% 0.25 292.717) 50%, transparent);
     }
@@ -1797,6 +1802,9 @@
       .hover\:border-violet-500\/50:hover {
         border-color: color-mix(in oklab, var(--color-violet-500) 50%, transparent);
       }
+    }
+    .hover\:bg-blue-700:hover {
+      background-color: var(--color-blue-700);
     }
     .hover\:bg-gray-200:hover {
       background-color: var(--color-gray-200);
@@ -1878,6 +1886,9 @@
     .hover\:bg-purple-700:hover {
       background-color: var(--color-purple-700);
     }
+    .hover\:bg-red-500:hover {
+      background-color: var(--color-red-500);
+    }
     .hover\:bg-red-500\/20:hover {
       background-color: color-mix(in srgb, oklch(63.7% 0.237 25.331) 20%, transparent);
     }
@@ -1947,6 +1958,9 @@
     .hover\:bg-yellow-600:hover {
       background-color: var(--color-yellow-600);
     }
+    .hover\:text-gray-300:hover {
+      color: var(--color-gray-300);
+    }
     .hover\:text-purple-300:hover {
       color: var(--color-purple-300);
     }
@@ -1969,6 +1983,9 @@
   .focus\:border-gray-700:focus {
     border-color: var(--color-gray-700);
   }
+  .focus\:border-purple-600:focus {
+    border-color: var(--color-purple-600);
+  }
   .focus\:border-violet-500:focus {
     border-color: var(--color-violet-500);
   }
@@ -1982,9 +1999,6 @@
     }
     .sm\:w-64 {
       width: calc(var(--spacing) * 64);
-    }
-    .sm\:w-auto {
-      width: auto;
     }
     .sm\:grid-cols-2 {
       grid-template-columns: repeat(2, minmax(0, 1fr));

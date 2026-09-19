@@ -20,520 +20,311 @@ const confirmPassword = document.getElementById("confirmPassword");
 
 const terms = document.getElementById("terms");
 
-const togglePassword =
-    document.getElementById("togglePassword");
+const togglePassword = document.getElementById("togglePassword");
 
-const toggleConfirmPassword =
-    document.getElementById("toggleConfirmPassword");
+const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
 
-const registerButton =
-    document.getElementById("registerButton");
+const registerButton = document.getElementById("registerButton");
 
-const registerMessage =
-    document.getElementById("registerMessage");
-
+const registerMessage = document.getElementById("registerMessage");
 
 // Password Visibility
 
 togglePassword.addEventListener("click", () => {
-
-    togglePasswordVisibility(
-        password,
-        togglePassword
-    );
-
+  togglePasswordVisibility(password, togglePassword);
 });
-
 
 toggleConfirmPassword.addEventListener("click", () => {
-
-    togglePasswordVisibility(
-        confirmPassword,
-        toggleConfirmPassword
-    );
-
+  togglePasswordVisibility(confirmPassword, toggleConfirmPassword);
 });
 
-
 function togglePasswordVisibility(input, button) {
+  const isPassword = input.type === "password";
 
-    const isPassword =
-        input.type === "password";
+  input.type = isPassword ? "text" : "password";
 
-    input.type =
-        isPassword ? "text" : "password";
-
-    button.innerHTML =
-        isPassword
-            ? '<i class="fa-solid fa-eye-slash"></i>'
-            : '<i class="fa-solid fa-eye"></i>';
-
+  button.innerHTML = isPassword
+    ? '<i class="fa-solid fa-eye-slash"></i>'
+    : '<i class="fa-solid fa-eye"></i>';
 }
-
 
 // Input Restrictions
 
 phone.addEventListener("input", () => {
-
-    phone.value =
-        phone.value.replace(/\D/g, "").slice(0, 10);
-
+  phone.value = phone.value.replace(/\D/g, "").slice(0, 10);
 });
-
 
 pincode.addEventListener("input", () => {
-
-    pincode.value =
-        pincode.value.replace(/\D/g, "").slice(0, 6);
-
+  pincode.value = pincode.value.replace(/\D/g, "").slice(0, 6);
 });
-
 
 age.addEventListener("input", () => {
-
-    age.value =
-        age.value.replace(/\D/g, "").slice(0, 3);
-
+  age.value = age.value.replace(/\D/g, "").slice(0, 3);
 });
-
 
 // Form Submission
 
 registerForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
 
-    event.preventDefault();
+  clearErrors();
 
-    clearErrors();
+  if (!validateForm()) {
+    return;
+  }
 
-    if (!validateForm()) {
-        return;
+  const formData = {
+    fullName: fullName.value.trim(),
+
+    age: Number(age.value),
+
+    gender: gender.value.toUpperCase(),
+
+    email: email.value.trim(),
+
+    phone: phone.value.trim(),
+
+    addressLine1: addressLine1.value.trim(),
+
+    addressLine2: addressLine2.value.trim() || null,
+
+    landmark: landmark.value.trim() || null,
+
+    city: city.value.trim(),
+
+    state: state.value,
+
+    pinCode: pincode.value.trim(),
+
+    password: password.value,
+
+    confirmPassword: confirmPassword.value,
+
+    termsAccepted: terms.checked,
+  };
+
+  // Loading State
+
+  setLoading(true);
+
+  try {
+    const response = await fetch("http://localhost:8080/api/user/register", {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify(formData),
+    });
+
+    const result = await readResponse(response);
+
+    if (!response.ok) {
+      showMessage(getBackendError(result), "error");
+
+      return;
     }
 
+    // Success
 
-    const formData = {
+    registerForm.reset();
 
-        fullName:
-            fullName.value.trim(),
+    showSuccess();
+  } catch (error) {
+    console.error("Registration error:", error);
 
-        age:
-            Number(age.value),
-
-        gender:
-            gender.value.toUpperCase(),
-
-        email:
-            email.value.trim(),
-
-        phone:
-            phone.value.trim(),
-
-        addressLine1:
-            addressLine1.value.trim(),
-
-        addressLine2:
-            addressLine2.value.trim() || null,
-
-        landmark:
-            landmark.value.trim() || null,
-
-        city:
-            city.value.trim(),
-
-        state:
-            state.value,
-
-        pinCode:
-            pincode.value.trim(),
-
-        password:
-            password.value,
-
-        confirmPassword:
-            confirmPassword.value,
-
-        termsAccepted:
-            terms.checked
-    };
-
-
-    // Loading State
-
-    setLoading(true);
-
-
-    try {
-
-        const response = await fetch(
-            "http://localhost:8080/api/user/register",
-            {
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify(formData)
-            }
-        );
-
-
-        const result =
-            await readResponse(response);
-
-
-        if (!response.ok) {
-
-            showMessage(
-                getBackendError(result),
-                "error"
-            );
-
-            return;
-        }
-
-
-        // Success
-
-        registerForm.reset();
-
-        showSuccess();
-
-
-    } catch (error) {
-
-        console.error(
-            "Registration error:",
-            error
-        );
-
-        showMessage(
-            "Unable to connect to the server. Please make sure the backend is running.",
-            "error"
-        );
-
-    } finally {
-
-        setLoading(false);
-
-    }
-
+    showMessage(
+      "Unable to connect to the server. Please make sure the backend is running.",
+      "error",
+    );
+  } finally {
+    setLoading(false);
+  }
 });
-
 
 // Validation
 
 function validateForm() {
+  let valid = true;
 
-    let valid = true;
+  // Full Name
 
+  if (!fullName.value.trim()) {
+    showError(fullName, "fullNameError", "Please enter your full name.");
 
-    // Full Name
+    valid = false;
+  }
 
-    if (!fullName.value.trim()) {
+  // Age
 
-        showError(
-            fullName,
-            "fullNameError",
-            "Please enter your full name."
-        );
+  const ageValue = Number(age.value);
 
-        valid = false;
+  if (!age.value) {
+    showError(age, "ageError", "Please enter your age.");
 
-    }
+    valid = false;
+  } else if (ageValue < 18 || ageValue > 100) {
+    showError(age, "ageError", "Age must be between 18 and 100.");
 
+    valid = false;
+  }
 
-    // Age
+  // Gender
 
-    const ageValue =
-        Number(age.value);
+  if (!gender.value) {
+    showError(gender, "genderError", "Please select your gender.");
 
-    if (!age.value) {
+    valid = false;
+  }
 
-        showError(
-            age,
-            "ageError",
-            "Please enter your age."
-        );
+  // Email
 
-        valid = false;
+  if (!email.value.trim()) {
+    showError(email, "emailError", "Please enter your email address.");
 
-    } else if (
-        ageValue < 18 ||
-        ageValue > 100
-    ) {
+    valid = false;
+  } else if (!isValidEmail(email.value.trim())) {
+    showError(email, "emailError", "Please enter a valid email address.");
 
-        showError(
-            age,
-            "ageError",
-            "Age must be between 18 and 100."
-        );
+    valid = false;
+  }
 
-        valid = false;
+  // Phone
 
-    }
+  if (!phone.value.trim()) {
+    showError(phone, "phoneError", "Please enter your phone number.");
 
+    valid = false;
+  } else if (!/^[6-9]\d{9}$/.test(phone.value.trim())) {
+    showError(
+      phone,
+      "phoneError",
+      "Please enter a valid 10-digit mobile number.",
+    );
 
-    // Gender
+    valid = false;
+  }
 
-    if (!gender.value) {
+  // Address
 
-        showError(
-            gender,
-            "genderError",
-            "Please select your gender."
-        );
+  if (!addressLine1.value.trim()) {
+    showError(addressLine1, "addressLine1Error", "Please enter your address.");
 
-        valid = false;
+    valid = false;
+  }
 
-    }
+  // City
 
+  if (!city.value.trim()) {
+    showError(city, "cityError", "Please enter your city.");
 
-    // Email
+    valid = false;
+  }
 
-    if (!email.value.trim()) {
+  // State
 
-        showError(
-            email,
-            "emailError",
-            "Please enter your email address."
-        );
+  if (!state.value) {
+    showError(state, "stateError", "Please select your state.");
 
-        valid = false;
+    valid = false;
+  }
 
-    } else if (
-        !isValidEmail(email.value.trim())
-    ) {
+  // PIN
 
-        showError(
-            email,
-            "emailError",
-            "Please enter a valid email address."
-        );
+  if (!pincode.value.trim()) {
+    showError(pincode, "pincodeError", "Please enter your PIN code.");
 
-        valid = false;
+    valid = false;
+  } else if (!/^\d{6}$/.test(pincode.value.trim())) {
+    showError(
+      pincode,
+      "pincodeError",
+      "Please enter a valid 6-digit PIN code.",
+    );
 
-    }
+    valid = false;
+  }
 
+  // Password
 
-    // Phone
+  if (!password.value) {
+    showError(password, "passwordError", "Please create a password.");
 
-    if (!phone.value.trim()) {
+    valid = false;
+  } else if (password.value.length < 8) {
+    showError(
+      password,
+      "passwordError",
+      "Password must contain at least 8 characters.",
+    );
 
-        showError(
-            phone,
-            "phoneError",
-            "Please enter your phone number."
-        );
+    valid = false;
+  }
 
-        valid = false;
+  // Confirm Password
 
-    } else if (
-        !/^[6-9]\d{9}$/.test(
-            phone.value.trim()
-        )
-    ) {
+  if (!confirmPassword.value) {
+    showError(
+      confirmPassword,
+      "confirmPasswordError",
+      "Please confirm your password.",
+    );
 
-        showError(
-            phone,
-            "phoneError",
-            "Please enter a valid 10-digit mobile number."
-        );
+    valid = false;
+  } else if (password.value !== confirmPassword.value) {
+    showError(
+      confirmPassword,
+      "confirmPasswordError",
+      "Passwords do not match.",
+    );
 
-        valid = false;
+    valid = false;
+  }
 
-    }
+  // Terms
 
+  if (!terms.checked) {
+    const error = document.getElementById("termsError");
 
-    // Address
+    error.textContent = "Please accept the Terms & Conditions to continue.";
 
-    if (!addressLine1.value.trim()) {
+    error.classList.remove("hidden");
 
-        showError(
-            addressLine1,
-            "addressLine1Error",
-            "Please enter your address."
-        );
+    valid = false;
+  }
 
-        valid = false;
-
-    }
-
-
-    // City
-
-    if (!city.value.trim()) {
-
-        showError(
-            city,
-            "cityError",
-            "Please enter your city."
-        );
-
-        valid = false;
-
-    }
-
-
-    // State
-
-    if (!state.value) {
-
-        showError(
-            state,
-            "stateError",
-            "Please select your state."
-        );
-
-        valid = false;
-
-    }
-
-
-    // PIN
-
-    if (!pincode.value.trim()) {
-
-        showError(
-            pincode,
-            "pincodeError",
-            "Please enter your PIN code."
-        );
-
-        valid = false;
-
-    } else if (
-        !/^\d{6}$/.test(
-            pincode.value.trim()
-        )
-    ) {
-
-        showError(
-            pincode,
-            "pincodeError",
-            "Please enter a valid 6-digit PIN code."
-        );
-
-        valid = false;
-
-    }
-
-
-    // Password
-
-    if (!password.value) {
-
-        showError(
-            password,
-            "passwordError",
-            "Please create a password."
-        );
-
-        valid = false;
-
-    } else if (
-        password.value.length < 8
-    ) {
-
-        showError(
-            password,
-            "passwordError",
-            "Password must contain at least 8 characters."
-        );
-
-        valid = false;
-
-    }
-
-
-    // Confirm Password
-
-    if (!confirmPassword.value) {
-
-        showError(
-            confirmPassword,
-            "confirmPasswordError",
-            "Please confirm your password."
-        );
-
-        valid = false;
-
-    } else if (
-        password.value !==
-        confirmPassword.value
-    ) {
-
-        showError(
-            confirmPassword,
-            "confirmPasswordError",
-            "Passwords do not match."
-        );
-
-        valid = false;
-
-    }
-
-
-    // Terms
-
-    if (!terms.checked) {
-
-        const error =
-            document.getElementById("termsError");
-
-        error.textContent =
-            "Please accept the Terms & Conditions to continue.";
-
-        error.classList.remove("hidden");
-
-        valid = false;
-
-    }
-
-
-    return valid;
-
+  return valid;
 }
-
 
 // Loading
 
 function setLoading(loading) {
+  registerButton.disabled = loading;
 
-    registerButton.disabled = loading;
-
-
-    if (loading) {
-
-        registerButton.innerHTML = `
+  if (loading) {
+    registerButton.innerHTML = `
             <i class="fa-solid fa-spinner fa-spin"></i>
             <span>Creating account...</span>
         `;
-
-    } else {
-
-        registerButton.innerHTML = `
+  } else {
+    registerButton.innerHTML = `
             <i class="fa-solid fa-user-plus"></i>
             <span>Create Account</span>
         `;
-
-    }
-
+  }
 }
-
 
 // Success Message
 
 function showSuccess() {
+  let countdown = 7;
 
-    let countdown = 7;
+  registerMessage.className =
+    "mt-6 rounded-lg border border-green-500/30 " +
+    "bg-green-500/10 px-4 py-3 text-sm text-green-400";
 
-
-    registerMessage.className =
-        "mt-6 rounded-lg border border-green-500/30 " +
-        "bg-green-500/10 px-4 py-3 text-sm text-green-400";
-
-
-    registerMessage.innerHTML = `
+  registerMessage.innerHTML = `
         <div class="text-center">
 
             <p class="font-medium">
@@ -564,152 +355,79 @@ function showSuccess() {
         </div>
     `;
 
+  const countdownElement = document.getElementById("countdown");
 
-    const countdownElement =
-        document.getElementById("countdown");
+  const countdownTimer = setInterval(() => {
+    countdown--;
 
+    countdownElement.textContent = countdown;
 
-    const countdownTimer =
-        setInterval(() => {
+    if (countdown <= 0) {
+      clearInterval(countdownTimer);
 
-            countdown--;
-
-            countdownElement.textContent =
-                countdown;
-
-
-            if (countdown <= 0) {
-
-                clearInterval(countdownTimer);
-
-                window.location.href =
-                    "../HTML/login.html";
-
-            }
-
-        }, 1000);
-
+      window.location.href = "../HTML/login.html";
+    }
+  }, 1000);
 }
-
 
 // Error / Message Helpers
 
-function showError(
-    input,
-    errorId,
-    message
-) {
+function showError(input, errorId, message) {
+  input.classList.add("input-error");
 
-    input.classList.add("input-error");
+  const error = document.getElementById(errorId);
 
-    const error =
-        document.getElementById(errorId);
+  error.textContent = message;
 
-    error.textContent =
-        message;
-
-    error.classList.remove("hidden");
-
+  error.classList.remove("hidden");
 }
-
 
 function clearErrors() {
+  registerForm.querySelectorAll(".form-input").forEach((input) => {
+    input.classList.remove("input-error");
+  });
 
-    registerForm
-        .querySelectorAll(".form-input")
-        .forEach(input => {
+  registerForm.querySelectorAll(".error-message").forEach((error) => {
+    error.classList.add("hidden");
 
-            input.classList.remove(
-                "input-error"
-            );
+    error.textContent = "";
+  });
 
-        });
+  registerMessage.classList.add("hidden");
 
-
-    registerForm
-        .querySelectorAll(".error-message")
-        .forEach(error => {
-
-            error.classList.add("hidden");
-
-            error.textContent = "";
-
-        });
-
-
-    registerMessage.classList.add("hidden");
-
-    registerMessage.textContent = "";
-
+  registerMessage.textContent = "";
 }
 
+function showMessage(message, type) {
+  if (type === "error") {
+    registerMessage.className =
+      "mt-6 rounded-lg border border-red-500/30 " +
+      "bg-red-500/10 px-4 py-3 text-sm text-red-400";
+  }
 
-function showMessage(
-    message,
-    type
-) {
-
-    if (type === "error") {
-
-        registerMessage.className =
-            "mt-6 rounded-lg border border-red-500/30 " +
-            "bg-red-500/10 px-4 py-3 text-sm text-red-400";
-
-    }
-
-    registerMessage.textContent =
-        message;
-
+  registerMessage.textContent = message;
 }
-
 
 async function readResponse(response) {
+  const contentType = response.headers.get("content-type");
 
-    const contentType =
-        response.headers.get("content-type");
+  if (contentType && contentType.includes("application/json")) {
+    return await response.json();
+  }
 
-
-    if (
-        contentType &&
-        contentType.includes("application/json")
-    ) {
-
-        return await response.json();
-
-    }
-
-
-    return await response.text();
-
+  return await response.text();
 }
-
 
 function getBackendError(result) {
-
-    if (
-        typeof result === "object" &&
-        result !== null
-    ) {
-
-        return (
-            result.error ||
-            result.message ||
-            "Registration failed. Please try again."
-        );
-
-    }
-
-
+  if (typeof result === "object" && result !== null) {
     return (
-        result ||
-        "Registration failed. Please try again."
+      result.error || result.message || "Registration failed. Please try again."
     );
+  }
 
+  return result || "Registration failed. Please try again.";
 }
 
-
 function isValidEmail(value) {
-
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }

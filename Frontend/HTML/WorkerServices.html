@@ -1,86 +1,70 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>My Services - ServiceHub</title>
 
-    <link rel="stylesheet" href="../CSS/output.css">
-    <link rel="stylesheet" href="../CSS/WorkerDashboard.css">
+    <link rel="stylesheet" href="../CSS/output.css" />
+    <link rel="stylesheet" href="../CSS/WorkerDashboard.css" />
 
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
 
-    <link rel="icon"
-          type="image/png"
-          sizes="32x32"
-          href="../Images/favicon-32x32.png?v=3">
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../Images/favicon-32x32.png?v=3"
+    />
 
-    <link rel="icon"
-          type="image/png"
-          sizes="16x16"
-          href="../Images/favicon-16x16.png?v=3">
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="../Images/favicon-16x16.png?v=3"
+    />
+  </head>
 
-</head>
-
-
-<body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col">
-
-
+  <body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col">
     <!-- Header -->
 
     <div id="workerHeader"></div>
 
-
     <!-- Main Content -->
 
     <main class="max-w-7xl mx-auto px-6 py-10 w-full flex-1">
+      <!-- Services -->
 
-        <!-- Services -->
+      <section class="mb-10">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h3 class="text-2xl font-bold">Your Services</h3>
 
-        <section class="mb-10">
+            <p class="text-sm text-gray-400 mt-1">
+              Services available for booking
+            </p>
+          </div>
+        </div>
 
-            <div class="flex items-center justify-between mb-6">
+        <!-- Service Container -->
 
-                <div>
-
-                    <h3 class="text-2xl font-bold">
-                        Your Services
-                    </h3>
-
-                    <p class="text-sm text-gray-400 mt-1">
-                        Services available for booking
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <!-- Service Container -->
-
-            <div id="myServicesContainer"
-                 class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            </div>
-
-        </section>
-
-
+        <div
+          id="myServicesContainer"
+          class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+        ></div>
+      </section>
     </main>
 
-
     <div id="serviceHubFooter"></div>
-
 
     <!-- Worker Header Component -->
 
     <script src="../JS/components/WorkerHeader.js"></script>
     <script src="../JS/components/footer.js"></script>
     <script src="../JS/WorkerServices.js"></script>
-
-</body>
-
+  </body>
 </html>

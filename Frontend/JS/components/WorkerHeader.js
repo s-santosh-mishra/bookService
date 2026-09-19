@@ -1,5 +1,5 @@
 /*   ServiceHub Worker Header
-*/
+ */
 
 const workerHeader = `
 <header class="sticky top-0 z-50 bg-gray-950/90 backdrop-blur-md border-b border-gray-800">
@@ -149,145 +149,84 @@ const workerHeader = `
 </header>
 `;
 
-
-
 /*   Insert Header
-*/
+ */
 
-const workerHeaderContainer =
-    document.getElementById("workerHeader");
+const workerHeaderContainer = document.getElementById("workerHeader");
 
 if (workerHeaderContainer) {
-
-    workerHeaderContainer.innerHTML =
-        workerHeader;
-
+  workerHeaderContainer.innerHTML = workerHeader;
 }
-
-
 
 /*   Highlight Current Page
-*/
+ */
 
-const currentWorkerPage =
-    window.location.pathname.split("/").pop();
+const currentWorkerPage = window.location.pathname.split("/").pop();
 
 document
-    .querySelectorAll(".worker-nav-btn, .worker-mobile-nav-btn")
-    .forEach(link => {
+  .querySelectorAll(".worker-nav-btn, .worker-mobile-nav-btn")
+  .forEach((link) => {
+    const linkPage = link.getAttribute("href");
 
-        const linkPage =
-            link.getAttribute("href");
-
-        if (linkPage === currentWorkerPage) {
-
-            link.classList.add("active");
-
-        }
-
-    });
-
-
+    if (linkPage === currentWorkerPage) {
+      link.classList.add("active");
+    }
+  });
 
 /*   Mobile Menu
-*/
+ */
 
-const workerMobileMenuButton =
-    document.getElementById("workerMobileMenuButton");
+const workerMobileMenuButton = document.getElementById(
+  "workerMobileMenuButton",
+);
 
-const workerMobileMenu =
-    document.getElementById("workerMobileMenu");
-
+const workerMobileMenu = document.getElementById("workerMobileMenu");
 
 if (workerMobileMenuButton && workerMobileMenu) {
+  workerMobileMenuButton.addEventListener("click", () => {
+    const isOpen = workerMobileMenu.classList.contains("max-h-96");
 
-    workerMobileMenuButton.addEventListener("click", () => {
+    if (isOpen) {
+      workerMobileMenu.classList.remove("max-h-96", "opacity-100");
 
-        const isOpen =
-            workerMobileMenu.classList.contains("max-h-96");
+      workerMobileMenu.classList.add("max-h-0", "opacity-0");
+    } else {
+      workerMobileMenu.classList.remove("max-h-0", "opacity-0");
 
-
-        if (isOpen) {
-
-            workerMobileMenu.classList.remove(
-                "max-h-96",
-                "opacity-100"
-            );
-
-            workerMobileMenu.classList.add(
-                "max-h-0",
-                "opacity-0"
-            );
-
-        } else {
-
-            workerMobileMenu.classList.remove(
-                "max-h-0",
-                "opacity-0"
-            );
-
-            workerMobileMenu.classList.add(
-                "max-h-96",
-                "opacity-100"
-            );
-
-        }
-
-    });
-
+      workerMobileMenu.classList.add("max-h-96", "opacity-100");
+    }
+  });
 }
-
-
 
 /*   Worker Logout
-*/
+ */
 
 function workerLogout() {
+  const confirmed = confirm("Are you sure you want to log out?");
 
-    const confirmed =
-        confirm("Are you sure you want to log out?");
+  if (!confirmed) {
+    return;
+  }
 
-    if (!confirmed) {
-        return;
-    }
+  localStorage.removeItem("servicehub_access_token");
+  localStorage.removeItem("servicehub_user_id");
+  localStorage.removeItem("servicehub_user_email");
+  localStorage.removeItem("servicehub_user_role");
+  localStorage.removeItem("servicehub_user_name");
 
-
-    localStorage.removeItem("servicehub_access_token");
-    localStorage.removeItem("servicehub_user_id");
-    localStorage.removeItem("servicehub_user_email");
-    localStorage.removeItem("servicehub_user_role");
-    localStorage.removeItem("servicehub_user_name");
-
-
-    window.location.href =
-        "login.html";
-
+  window.location.href = "login.html";
 }
 
+const workerLogoutButton = document.getElementById("workerLogoutButton");
 
-
-const workerLogoutButton =
-    document.getElementById("workerLogoutButton");
-
-const workerMobileLogoutButton =
-    document.getElementById("workerMobileLogoutButton");
-
+const workerMobileLogoutButton = document.getElementById(
+  "workerMobileLogoutButton",
+);
 
 if (workerLogoutButton) {
-
-    workerLogoutButton.addEventListener(
-        "click",
-        workerLogout
-    );
-
+  workerLogoutButton.addEventListener("click", workerLogout);
 }
 
-
 if (workerMobileLogoutButton) {
-
-    workerMobileLogoutButton.addEventListener(
-        "click",
-        workerLogout
-    );
-
+  workerMobileLogoutButton.addEventListener("click", workerLogout);
 }

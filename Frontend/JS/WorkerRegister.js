@@ -2,1137 +2,637 @@
 
 const API_BASE = "http://localhost:8080";
 
-const registerForm =
-    document.getElementById("workerRegisterForm");
+const registerForm = document.getElementById("workerRegisterForm");
 
-const fullName =
-    document.getElementById("fullName");
+const fullName = document.getElementById("fullName");
 
-const age =
-    document.getElementById("age");
+const age = document.getElementById("age");
 
-const gender =
-    document.getElementById("gender");
+const gender = document.getElementById("gender");
 
-const email =
-    document.getElementById("email");
+const email = document.getElementById("email");
 
-const phone =
-    document.getElementById("phone");
+const phone = document.getElementById("phone");
 
-const addressLine1 =
-    document.getElementById("addressLine1");
+const addressLine1 = document.getElementById("addressLine1");
 
-const addressLine2 =
-    document.getElementById("addressLine2");
+const addressLine2 = document.getElementById("addressLine2");
 
-const landmark =
-    document.getElementById("landmark");
+const landmark = document.getElementById("landmark");
 
-const city =
-    document.getElementById("city");
+const city = document.getElementById("city");
 
-const state =
-    document.getElementById("state");
+const state = document.getElementById("state");
 
-const pincode =
-    document.getElementById("pincode");
+const pincode = document.getElementById("pincode");
 
-const experienceYears =
-    document.getElementById("experienceYears");
+const experienceYears = document.getElementById("experienceYears");
 
-const qualification =
-    document.getElementById("qualification");
+const qualification = document.getElementById("qualification");
 
-const bio =
-    document.getElementById("bio");
+const bio = document.getElementById("bio");
 
-const password =
-    document.getElementById("password");
+const password = document.getElementById("password");
 
-const confirmPassword =
-    document.getElementById("confirmPassword");
+const confirmPassword = document.getElementById("confirmPassword");
 
-const terms =
-    document.getElementById("terms");
+const terms = document.getElementById("terms");
 
-const togglePassword =
-    document.getElementById("togglePassword");
+const togglePassword = document.getElementById("togglePassword");
 
-const toggleConfirmPassword =
-    document.getElementById("toggleConfirmPassword");
+const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
 
-const registerButton =
-    document.getElementById("registerButton");
+const registerButton = document.getElementById("registerButton");
 
-const registerMessage =
-    document.getElementById("registerMessage");
+const registerMessage = document.getElementById("registerMessage");
 
-const categoriesContainer =
-    document.getElementById("categoriesContainer");
+const categoriesContainer = document.getElementById("categoriesContainer");
 
-const categoryLimitMessage =
-    document.getElementById("categoryLimitMessage");
+const categoryLimitMessage = document.getElementById("categoryLimitMessage");
 
-const servicesError =
-    document.getElementById("servicesError");
+const servicesError = document.getElementById("servicesError");
 
 let categories = [];
-
 
 // Load Categories
 
 async function loadCategories() {
+  try {
+    const response = await fetch(`${API_BASE}/api/categories`);
 
-    try {
+    if (!response.ok) {
+      throw new Error("Unable to load services.");
+    }
 
-        const response = await fetch(
-            `${API_BASE}/api/categories`
-        );
+    categories = await response.json();
 
-        if (!response.ok) {
-            throw new Error(
-                "Unable to load services."
-            );
-        }
+    renderCategories();
+  } catch (error) {
+    console.error("Category loading error:", error);
 
-        categories = await response.json();
-
-        renderCategories();
-
-    } catch (error) {
-
-        console.error(
-            "Category loading error:",
-            error
-        );
-
-        categoriesContainer.innerHTML = `
+    categoriesContainer.innerHTML = `
             <p class="text-sm text-red-400">
                 Unable to load services.
                 Please refresh the page.
             </p>
         `;
-    }
+  }
 }
-
 
 // Render Categories
 
 function renderCategories() {
+  categoriesContainer.innerHTML = "";
 
-    categoriesContainer.innerHTML = "";
+  categories.forEach((category) => {
+    const categoryCard = document.createElement("div");
 
-    categories.forEach(category => {
+    categoryCard.className =
+      "border border-white/10 rounded-xl " + "bg-gray-950/60 overflow-hidden";
 
-        const categoryCard =
-            document.createElement("div");
+    // Category Header
 
-        categoryCard.className =
-            "border border-white/10 rounded-xl " +
-            "bg-gray-950/60 overflow-hidden";
+    const categoryHeader = document.createElement("div");
 
+    categoryHeader.className =
+      "flex items-center gap-3 px-5 py-4 " + "border-b border-white/10";
 
-        // Category Header
+    const categoryCheckbox = document.createElement("input");
 
-        const categoryHeader =
-            document.createElement("div");
+    categoryCheckbox.type = "checkbox";
 
-        categoryHeader.className =
-            "flex items-center gap-3 px-5 py-4 " +
-            "border-b border-white/10";
+    categoryCheckbox.className = "category-checkbox h-4 w-4 accent-purple-500";
 
+    categoryCheckbox.dataset.categoryId = category.categoryId;
 
-        const categoryCheckbox =
-            document.createElement("input");
+    const categoryLabel = document.createElement("label");
 
-        categoryCheckbox.type = "checkbox";
+    categoryLabel.className = "text-base font-semibold text-white";
 
-        categoryCheckbox.className =
-            "category-checkbox h-4 w-4 accent-purple-500";
+    categoryLabel.textContent = category.categoryName;
 
-        categoryCheckbox.dataset.categoryId =
-            category.categoryId;
+    categoryHeader.appendChild(categoryCheckbox);
 
+    categoryHeader.appendChild(categoryLabel);
 
-        const categoryLabel =
-            document.createElement("label");
+    // Services
 
-        categoryLabel.className =
-            "text-base font-semibold text-white";
+    const servicesContainer = document.createElement("div");
 
-        categoryLabel.textContent =
-            category.categoryName;
+    servicesContainer.className =
+      "px-5 py-4 grid grid-cols-1 md:grid-cols-2 gap-3";
 
+    category.services.forEach((service) => {
+      const serviceLabel = document.createElement("label");
 
-        categoryHeader.appendChild(
-            categoryCheckbox
-        );
+      serviceLabel.className =
+        "flex items-center gap-3 p-3 rounded-lg " +
+        "border border-white/5 bg-gray-900/60 " +
+        "hover:border-purple-500/40 transition cursor-pointer";
 
-        categoryHeader.appendChild(
-            categoryLabel
-        );
+      const serviceCheckbox = document.createElement("input");
 
+      serviceCheckbox.type = "checkbox";
 
-        // Services
+      serviceCheckbox.className = "service-checkbox h-4 w-4 accent-purple-500";
 
-        const servicesContainer =
-            document.createElement("div");
+      serviceCheckbox.dataset.categoryId = category.categoryId;
 
-        servicesContainer.className =
-            "px-5 py-4 grid grid-cols-1 md:grid-cols-2 gap-3";
+      serviceCheckbox.dataset.serviceId = service.serviceId;
 
+      const serviceText = document.createElement("span");
 
-        category.services.forEach(service => {
+      serviceText.className = "text-sm text-gray-300";
 
-            const serviceLabel =
-                document.createElement("label");
+      serviceText.textContent = service.serviceName;
 
-            serviceLabel.className =
-                "flex items-center gap-3 p-3 rounded-lg " +
-                "border border-white/5 bg-gray-900/60 " +
-                "hover:border-purple-500/40 transition cursor-pointer";
+      serviceLabel.appendChild(serviceCheckbox);
 
+      serviceLabel.appendChild(serviceText);
 
-            const serviceCheckbox =
-                document.createElement("input");
-
-            serviceCheckbox.type = "checkbox";
-
-            serviceCheckbox.className =
-                "service-checkbox h-4 w-4 accent-purple-500";
-
-            serviceCheckbox.dataset.categoryId =
-                category.categoryId;
-
-            serviceCheckbox.dataset.serviceId =
-                service.serviceId;
-
-
-            const serviceText =
-                document.createElement("span");
-
-            serviceText.className =
-                "text-sm text-gray-300";
-
-            serviceText.textContent =
-                service.serviceName;
-
-
-            serviceLabel.appendChild(
-                serviceCheckbox
-            );
-
-            serviceLabel.appendChild(
-                serviceText
-            );
-
-            servicesContainer.appendChild(
-                serviceLabel
-            );
-
-        });
-
-
-        categoryCard.appendChild(
-            categoryHeader
-        );
-
-        categoryCard.appendChild(
-            servicesContainer
-        );
-
-        categoriesContainer.appendChild(
-            categoryCard
-        );
-
+      servicesContainer.appendChild(serviceLabel);
     });
 
+    categoryCard.appendChild(categoryHeader);
 
-    addServiceListeners();
+    categoryCard.appendChild(servicesContainer);
 
-    updateCategoryLimit();
+    categoriesContainer.appendChild(categoryCard);
+  });
 
+  addServiceListeners();
+
+  updateCategoryLimit();
 }
-
 
 // Service Listeners
 
 function addServiceListeners() {
+  document.querySelectorAll(".service-checkbox").forEach((checkbox) => {
+    checkbox.addEventListener("change", () => {
+      updateCategoryState(checkbox.dataset.categoryId);
+    });
+  });
 
-    document
-        .querySelectorAll(".service-checkbox")
-        .forEach(checkbox => {
+  document.querySelectorAll(".category-checkbox").forEach((checkbox) => {
+    checkbox.addEventListener("change", () => {
+      const categoryId = checkbox.dataset.categoryId;
 
-            checkbox.addEventListener(
-                "change",
-                () => {
+      /*
+       * If a category is manually
+       * unchecked, remove all its services.
+       */
 
-                    updateCategoryState(
-                        checkbox.dataset.categoryId
-                    );
+      if (!checkbox.checked) {
+        document
+          .querySelectorAll(
+            `.service-checkbox[data-category-id="${categoryId}"]`,
+          )
+          .forEach((service) => {
+            service.checked = false;
+          });
+      }
 
-                }
-            );
-
-        });
-
-
-    document
-        .querySelectorAll(".category-checkbox")
-        .forEach(checkbox => {
-
-            checkbox.addEventListener(
-                "change",
-                () => {
-
-                    const categoryId =
-                        checkbox.dataset.categoryId;
-
-
-                    /*
-                     * If a category is manually
-                     * unchecked, remove all its services.
-                     */
-
-                    if (!checkbox.checked) {
-
-                        document
-                            .querySelectorAll(
-                                `.service-checkbox[data-category-id="${categoryId}"]`
-                            )
-                            .forEach(service => {
-
-                                service.checked = false;
-
-                            });
-
-                    }
-
-
-                    updateCategoryState(
-                        categoryId
-                    );
-
-                }
-            );
-
-        });
-
+      updateCategoryState(categoryId);
+    });
+  });
 }
-
 
 // Update Category State
 
 function updateCategoryState(categoryId) {
+  const categoryCheckbox = document.querySelector(
+    `.category-checkbox[data-category-id="${categoryId}"]`,
+  );
 
-    const categoryCheckbox =
-        document.querySelector(
-            `.category-checkbox[data-category-id="${categoryId}"]`
-        );
+  const serviceCheckboxes = document.querySelectorAll(
+    `.service-checkbox[data-category-id="${categoryId}"]`,
+  );
 
+  const hasSelectedService = [...serviceCheckboxes].some(
+    (checkbox) => checkbox.checked,
+  );
 
-    const serviceCheckboxes =
-        document.querySelectorAll(
-            `.service-checkbox[data-category-id="${categoryId}"]`
-        );
+  categoryCheckbox.checked = hasSelectedService;
 
-
-    const hasSelectedService =
-        [...serviceCheckboxes].some(
-            checkbox => checkbox.checked
-        );
-
-
-    categoryCheckbox.checked =
-        hasSelectedService;
-
-
-    updateCategoryLimit();
-
+  updateCategoryLimit();
 }
-
 
 // Get Selected Categories
 
 function getSelectedCategoryIds() {
+  const selectedCategories = new Set();
 
-    const selectedCategories =
-        new Set();
+  document.querySelectorAll(".service-checkbox:checked").forEach((checkbox) => {
+    selectedCategories.add(checkbox.dataset.categoryId);
+  });
 
-
-    document
-        .querySelectorAll(
-            ".service-checkbox:checked"
-        )
-        .forEach(checkbox => {
-
-            selectedCategories.add(
-                checkbox.dataset.categoryId
-            );
-
-        });
-
-
-    return selectedCategories;
-
+  return selectedCategories;
 }
-
 
 // Maximum 3 Categories
 
 function updateCategoryLimit() {
+  const selectedCategories = getSelectedCategoryIds();
 
-    const selectedCategories =
-        getSelectedCategoryIds();
+  const count = selectedCategories.size;
 
-    const count =
-        selectedCategories.size;
+  if (count >= 3) {
+    categoryLimitMessage.classList.remove("hidden");
+  } else {
+    categoryLimitMessage.classList.add("hidden");
+  }
 
+  /*
+   * Selected categories remain enabled.
+   * Other categories become disabled.
+   */
 
-    if (count >= 3) {
+  document.querySelectorAll(".category-checkbox").forEach((checkbox) => {
+    const categoryId = checkbox.dataset.categoryId;
 
-        categoryLimitMessage.classList.remove(
-            "hidden"
-        );
+    checkbox.disabled = count >= 3 && !selectedCategories.has(categoryId);
+  });
 
-    } else {
+  /*
+   * Services in selected categories
+   * remain usable.
+   */
 
-        categoryLimitMessage.classList.add(
-            "hidden"
-        );
+  document.querySelectorAll(".service-checkbox").forEach((checkbox) => {
+    const categoryId = checkbox.dataset.categoryId;
 
-    }
-
-
-    /*
-     * Selected categories remain enabled.
-     * Other categories become disabled.
-     */
-
-    document
-        .querySelectorAll(
-            ".category-checkbox"
-        )
-        .forEach(checkbox => {
-
-            const categoryId =
-                checkbox.dataset.categoryId;
-
-
-            checkbox.disabled =
-                count >= 3 &&
-                !selectedCategories.has(
-                    categoryId
-                );
-
-        });
-
-
-    /*
-     * Services in selected categories
-     * remain usable.
-     */
-
-    document
-        .querySelectorAll(
-            ".service-checkbox"
-        )
-        .forEach(checkbox => {
-
-            const categoryId =
-                checkbox.dataset.categoryId;
-
-
-            checkbox.disabled =
-                count >= 3 &&
-                !selectedCategories.has(
-                    categoryId
-                );
-
-        });
-
+    checkbox.disabled = count >= 3 && !selectedCategories.has(categoryId);
+  });
 }
-
 
 // Password Visibility
 
-togglePassword.addEventListener(
-    "click",
-    () => {
+togglePassword.addEventListener("click", () => {
+  togglePasswordVisibility(password, togglePassword);
+});
 
-        togglePasswordVisibility(
-            password,
-            togglePassword
-        );
+toggleConfirmPassword.addEventListener("click", () => {
+  togglePasswordVisibility(confirmPassword, toggleConfirmPassword);
+});
 
-    }
-);
+function togglePasswordVisibility(input, button) {
+  const isPassword = input.type === "password";
 
+  input.type = isPassword ? "text" : "password";
 
-toggleConfirmPassword.addEventListener(
-    "click",
-    () => {
-
-        togglePasswordVisibility(
-            confirmPassword,
-            toggleConfirmPassword
-        );
-
-    }
-);
-
-
-function togglePasswordVisibility(
-    input,
-    button
-) {
-
-    const isPassword =
-        input.type === "password";
-
-
-    input.type =
-        isPassword
-            ? "text"
-            : "password";
-
-
-    button.innerHTML =
-        isPassword
-            ? '<i class="fa-solid fa-eye-slash"></i>'
-            : '<i class="fa-solid fa-eye"></i>';
-
+  button.innerHTML = isPassword
+    ? '<i class="fa-solid fa-eye-slash"></i>'
+    : '<i class="fa-solid fa-eye"></i>';
 }
-
 
 // Input Restrictions
 
-phone.addEventListener(
-    "input",
-    () => {
+phone.addEventListener("input", () => {
+  phone.value = phone.value.replace(/\D/g, "").slice(0, 10);
+});
 
-        phone.value =
-            phone.value
-                .replace(/\D/g, "")
-                .slice(0, 10);
+pincode.addEventListener("input", () => {
+  pincode.value = pincode.value.replace(/\D/g, "").slice(0, 6);
+});
 
-    }
-);
+age.addEventListener("input", () => {
+  age.value = age.value.replace(/\D/g, "").slice(0, 3);
+});
 
-
-pincode.addEventListener(
-    "input",
-    () => {
-
-        pincode.value =
-            pincode.value
-                .replace(/\D/g, "")
-                .slice(0, 6);
-
-    }
-);
-
-
-age.addEventListener(
-    "input",
-    () => {
-
-        age.value =
-            age.value
-                .replace(/\D/g, "")
-                .slice(0, 3);
-
-    }
-);
-
-
-experienceYears.addEventListener(
-    "input",
-    () => {
-
-        experienceYears.value =
-            experienceYears.value
-                .replace(/\D/g, "")
-                .slice(0, 2);
-
-    }
-);
-
+experienceYears.addEventListener("input", () => {
+  experienceYears.value = experienceYears.value.replace(/\D/g, "").slice(0, 2);
+});
 
 // Form Submission
 
-registerForm.addEventListener(
-    "submit",
-    async event => {
+registerForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
 
-        event.preventDefault();
+  clearErrors();
 
-        clearErrors();
+  if (!validateForm()) {
+    return;
+  }
 
+  const selectedServiceIds = [
+    ...document.querySelectorAll(".service-checkbox:checked"),
+  ].map((checkbox) => checkbox.dataset.serviceId);
 
-        if (!validateForm()) {
-            return;
-        }
+  // At least one service
 
+  if (selectedServiceIds.length === 0) {
+    showServiceError("Please select at least one service.");
 
-        const selectedServiceIds =
-            [...document.querySelectorAll(
-                ".service-checkbox:checked"
-            )].map(
-                checkbox =>
-                    checkbox.dataset.serviceId
-            );
+    return;
+  }
 
+  const selectedCategoryIds = getSelectedCategoryIds();
 
-        // At least one service
+  if (selectedCategoryIds.size > 3) {
+    showServiceError("You can select services from a maximum of 3 categories.");
 
-        if (selectedServiceIds.length === 0) {
+    return;
+  }
 
-            showServiceError(
-                "Please select at least one service."
-            );
+  // Request Data
 
-            return;
+  const formData = {
+    fullName: fullName.value.trim(),
 
-        }
+    age: Number(age.value),
 
+    gender: gender.value.toUpperCase(),
 
-        const selectedCategoryIds =
-            getSelectedCategoryIds();
+    email: email.value.trim(),
 
+    phone: phone.value.trim(),
 
-        if (selectedCategoryIds.size > 3) {
+    addressLine1: addressLine1.value.trim(),
 
-            showServiceError(
-                "You can select services from a maximum of 3 categories."
-            );
+    addressLine2: addressLine2.value.trim() || null,
 
-            return;
+    landmark: landmark.value.trim() || null,
 
-        }
+    city: city.value.trim(),
 
+    state: state.value,
 
-        // Request Data
+    pinCode: pincode.value.trim(),
 
-        const formData = {
+    password: password.value,
 
-            fullName:
-                fullName.value.trim(),
+    confirmPassword: confirmPassword.value,
 
-            age:
-                Number(age.value),
+    experienceYears: Number(experienceYears.value),
 
-            gender:
-                gender.value.toUpperCase(),
+    qualification: qualification.value.trim(),
 
-            email:
-                email.value.trim(),
+    bio: bio.value.trim() || null,
 
-            phone:
-                phone.value.trim(),
+    serviceIds: selectedServiceIds,
 
-            addressLine1:
-                addressLine1.value.trim(),
+    termsAccepted: terms.checked,
+  };
 
-            addressLine2:
-                addressLine2.value.trim() || null,
+  // Loading
 
-            landmark:
-                landmark.value.trim() || null,
+  setLoading(true);
 
-            city:
-                city.value.trim(),
+  try {
+    const response = await fetch(`${API_BASE}/api/worker/register`, {
+      method: "POST",
 
-            state:
-                state.value,
+      headers: {
+        "Content-Type": "application/json",
+      },
 
-            pinCode:
-                pincode.value.trim(),
+      body: JSON.stringify(formData),
+    });
 
-            password:
-                password.value,
+    const result = await readResponse(response);
 
-            confirmPassword:
-                confirmPassword.value,
+    if (!response.ok) {
+      showMessage(getBackendError(result), "error");
 
-            experienceYears:
-                Number(
-                    experienceYears.value
-                ),
-
-            qualification:
-                qualification.value.trim(),
-
-            bio:
-                bio.value.trim() || null,
-
-            serviceIds:
-                selectedServiceIds,
-
-            termsAccepted:
-                terms.checked
-
-        };
-
-
-        // Loading
-
-        setLoading(true);
-
-
-        try {
-
-            const response =
-                await fetch(
-                    `${API_BASE}/api/worker/register`,
-                    {
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body:
-                            JSON.stringify(
-                                formData
-                            )
-                    }
-                );
-
-
-            const result =
-                await readResponse(
-                    response
-                );
-
-
-            if (!response.ok) {
-
-                showMessage(
-                    getBackendError(result),
-                    "error"
-                );
-
-                return;
-
-            }
-
-
-            // Success
-
-            registerForm.reset();
-
-
-            document
-                .querySelectorAll(
-                    ".category-checkbox"
-                )
-                .forEach(checkbox => {
-
-                    checkbox.checked = false;
-                    checkbox.disabled = false;
-
-                });
-
-
-            document
-                .querySelectorAll(
-                    ".service-checkbox"
-                )
-                .forEach(checkbox => {
-
-                    checkbox.checked = false;
-                    checkbox.disabled = false;
-
-                });
-
-
-            categoryLimitMessage.classList.add(
-                "hidden"
-            );
-
-
-            showSuccess();
-
-
-        } catch (error) {
-
-            console.error(
-                "Worker registration error:",
-                error
-            );
-
-
-            showMessage(
-                "Unable to connect to the server. Please make sure the backend is running.",
-                "error"
-            );
-
-
-        } finally {
-
-            setLoading(false);
-
-        }
-
+      return;
     }
-);
 
+    // Success
+
+    registerForm.reset();
+
+    document.querySelectorAll(".category-checkbox").forEach((checkbox) => {
+      checkbox.checked = false;
+      checkbox.disabled = false;
+    });
+
+    document.querySelectorAll(".service-checkbox").forEach((checkbox) => {
+      checkbox.checked = false;
+      checkbox.disabled = false;
+    });
+
+    categoryLimitMessage.classList.add("hidden");
+
+    showSuccess();
+  } catch (error) {
+    console.error("Worker registration error:", error);
+
+    showMessage(
+      "Unable to connect to the server. Please make sure the backend is running.",
+      "error",
+    );
+  } finally {
+    setLoading(false);
+  }
+});
 
 // Validation
 
 function validateForm() {
+  let valid = true;
 
-    let valid = true;
+  // Full Name
 
+  if (!fullName.value.trim()) {
+    showError(fullName, "fullNameError", "Please enter your full name.");
 
-    // Full Name
+    valid = false;
+  }
 
-    if (!fullName.value.trim()) {
+  // Age
 
-        showError(
-            fullName,
-            "fullNameError",
-            "Please enter your full name."
-        );
+  const ageValue = Number(age.value);
 
-        valid = false;
+  if (!age.value) {
+    showError(age, "ageError", "Please enter your age.");
 
-    }
+    valid = false;
+  } else if (ageValue < 18 || ageValue > 100) {
+    showError(age, "ageError", "Age must be between 18 and 100.");
 
+    valid = false;
+  }
 
-    // Age
+  // Gender
 
-    const ageValue =
-        Number(age.value);
+  if (!gender.value) {
+    showError(gender, "genderError", "Please select your gender.");
 
+    valid = false;
+  }
 
-    if (!age.value) {
+  // Email
 
-        showError(
-            age,
-            "ageError",
-            "Please enter your age."
-        );
+  if (!email.value.trim()) {
+    showError(email, "emailError", "Please enter your email address.");
 
-        valid = false;
+    valid = false;
+  } else if (!isValidEmail(email.value.trim())) {
+    showError(email, "emailError", "Please enter a valid email address.");
 
-    } else if (
-        ageValue < 18 ||
-        ageValue > 100
-    ) {
+    valid = false;
+  }
 
-        showError(
-            age,
-            "ageError",
-            "Age must be between 18 and 100."
-        );
+  // Phone
 
-        valid = false;
+  if (!phone.value.trim()) {
+    showError(phone, "phoneError", "Please enter your phone number.");
 
-    }
+    valid = false;
+  } else if (!/^[6-9]\d{9}$/.test(phone.value.trim())) {
+    showError(
+      phone,
+      "phoneError",
+      "Please enter a valid 10-digit mobile number.",
+    );
 
+    valid = false;
+  }
 
-    // Gender
+  // Address
 
-    if (!gender.value) {
+  if (!addressLine1.value.trim()) {
+    showError(addressLine1, "addressLine1Error", "Please enter your address.");
 
-        showError(
-            gender,
-            "genderError",
-            "Please select your gender."
-        );
+    valid = false;
+  }
 
-        valid = false;
+  // City
 
-    }
+  if (!city.value.trim()) {
+    showError(city, "cityError", "Please enter your city.");
 
+    valid = false;
+  }
 
-    // Email
+  // State
 
-    if (!email.value.trim()) {
+  if (!state.value) {
+    showError(state, "stateError", "Please select your state.");
 
-        showError(
-            email,
-            "emailError",
-            "Please enter your email address."
-        );
+    valid = false;
+  }
 
-        valid = false;
+  // PIN
 
-    } else if (
-        !isValidEmail(
-            email.value.trim()
-        )
-    ) {
+  if (!pincode.value.trim()) {
+    showError(pincode, "pincodeError", "Please enter your PIN code.");
 
-        showError(
-            email,
-            "emailError",
-            "Please enter a valid email address."
-        );
+    valid = false;
+  } else if (!/^\d{6}$/.test(pincode.value.trim())) {
+    showError(
+      pincode,
+      "pincodeError",
+      "Please enter a valid 6-digit PIN code.",
+    );
 
-        valid = false;
+    valid = false;
+  }
 
-    }
+  // Experience
 
+  if (!experienceYears.value) {
+    showError(
+      experienceYears,
+      "experienceYearsError",
+      "Please enter your years of experience.",
+    );
 
-    // Phone
+    valid = false;
+  }
 
-    if (!phone.value.trim()) {
+  // Qualification
 
-        showError(
-            phone,
-            "phoneError",
-            "Please enter your phone number."
-        );
+  if (!qualification.value.trim()) {
+    showError(
+      qualification,
+      "qualificationError",
+      "Please enter your qualification.",
+    );
 
-        valid = false;
+    valid = false;
+  }
 
-    } else if (
-        !/^[6-9]\d{9}$/.test(
-            phone.value.trim()
-        )
-    ) {
+  // Password
 
-        showError(
-            phone,
-            "phoneError",
-            "Please enter a valid 10-digit mobile number."
-        );
+  if (!password.value) {
+    showError(password, "passwordError", "Please create a password.");
 
-        valid = false;
+    valid = false;
+  } else if (password.value.length < 8) {
+    showError(
+      password,
+      "passwordError",
+      "Password must contain at least 8 characters.",
+    );
 
-    }
+    valid = false;
+  }
 
+  // Confirm Password
 
-    // Address
+  if (!confirmPassword.value) {
+    showError(
+      confirmPassword,
+      "confirmPasswordError",
+      "Please confirm your password.",
+    );
 
-    if (!addressLine1.value.trim()) {
+    valid = false;
+  } else if (password.value !== confirmPassword.value) {
+    showError(
+      confirmPassword,
+      "confirmPasswordError",
+      "Passwords do not match.",
+    );
 
-        showError(
-            addressLine1,
-            "addressLine1Error",
-            "Please enter your address."
-        );
+    valid = false;
+  }
 
-        valid = false;
+  // Terms
 
-    }
+  if (!terms.checked) {
+    const error = document.getElementById("termsError");
 
+    error.textContent = "Please accept the Terms & Conditions to continue.";
 
-    // City
+    error.classList.remove("hidden");
 
-    if (!city.value.trim()) {
+    valid = false;
+  }
 
-        showError(
-            city,
-            "cityError",
-            "Please enter your city."
-        );
-
-        valid = false;
-
-    }
-
-
-    // State
-
-    if (!state.value) {
-
-        showError(
-            state,
-            "stateError",
-            "Please select your state."
-        );
-
-        valid = false;
-
-    }
-
-
-    // PIN
-
-    if (!pincode.value.trim()) {
-
-        showError(
-            pincode,
-            "pincodeError",
-            "Please enter your PIN code."
-        );
-
-        valid = false;
-
-    } else if (
-        !/^\d{6}$/.test(
-            pincode.value.trim()
-        )
-    ) {
-
-        showError(
-            pincode,
-            "pincodeError",
-            "Please enter a valid 6-digit PIN code."
-        );
-
-        valid = false;
-
-    }
-
-
-    // Experience
-
-    if (!experienceYears.value) {
-
-        showError(
-            experienceYears,
-            "experienceYearsError",
-            "Please enter your years of experience."
-        );
-
-        valid = false;
-
-    }
-
-
-    // Qualification
-
-    if (!qualification.value.trim()) {
-
-        showError(
-            qualification,
-            "qualificationError",
-            "Please enter your qualification."
-        );
-
-        valid = false;
-
-    }
-
-
-    // Password
-
-    if (!password.value) {
-
-        showError(
-            password,
-            "passwordError",
-            "Please create a password."
-        );
-
-        valid = false;
-
-    } else if (
-        password.value.length < 8
-    ) {
-
-        showError(
-            password,
-            "passwordError",
-            "Password must contain at least 8 characters."
-        );
-
-        valid = false;
-
-    }
-
-
-    // Confirm Password
-
-    if (!confirmPassword.value) {
-
-        showError(
-            confirmPassword,
-            "confirmPasswordError",
-            "Please confirm your password."
-        );
-
-        valid = false;
-
-    } else if (
-        password.value !==
-        confirmPassword.value
-    ) {
-
-        showError(
-            confirmPassword,
-            "confirmPasswordError",
-            "Passwords do not match."
-        );
-
-        valid = false;
-
-    }
-
-
-    // Terms
-
-    if (!terms.checked) {
-
-        const error =
-            document.getElementById(
-                "termsError"
-            );
-
-        error.textContent =
-            "Please accept the Terms & Conditions to continue.";
-
-        error.classList.remove(
-            "hidden"
-        );
-
-        valid = false;
-
-    }
-
-
-    return valid;
-
+  return valid;
 }
-
 
 // Loading State
 
 function setLoading(loading) {
+  registerButton.disabled = loading;
 
-    registerButton.disabled =
-        loading;
-
-
-    if (loading) {
-
-        registerButton.innerHTML = `
+  if (loading) {
+    registerButton.innerHTML = `
             <i class="fa-solid fa-spinner fa-spin"></i>
             <span>Submitting registration...</span>
         `;
-
-    } else {
-
-        registerButton.innerHTML = `
+  } else {
+    registerButton.innerHTML = `
             <i class="fa-solid fa-user-plus"></i>
             <span>Submit Registration</span>
         `;
-
-    }
-
+  }
 }
-
 
 // Success
 
 function showSuccess() {
+  let countdown = 7;
 
-    let countdown = 7;
+  registerMessage.className =
+    "mt-6 rounded-lg border border-green-500/30 " +
+    "bg-green-500/10 px-4 py-3 text-sm text-green-400";
 
-
-    registerMessage.className =
-        "mt-6 rounded-lg border border-green-500/30 " +
-        "bg-green-500/10 px-4 py-3 text-sm text-green-400";
-
-
-    registerMessage.innerHTML = `
+  registerMessage.innerHTML = `
         <div class="text-center">
 
             <p class="font-medium">
@@ -1160,198 +660,88 @@ function showSuccess() {
         </div>
     `;
 
+  const countdownElement = document.getElementById("countdown");
 
-    const countdownElement =
-        document.getElementById(
-            "countdown"
-        );
+  const countdownTimer = setInterval(() => {
+    countdown--;
 
+    countdownElement.textContent = countdown;
 
-    const countdownTimer =
-        setInterval(() => {
+    if (countdown <= 0) {
+      clearInterval(countdownTimer);
 
-            countdown--;
-
-            countdownElement.textContent =
-                countdown;
-
-
-            if (countdown <= 0) {
-
-                clearInterval(
-                    countdownTimer
-                );
-
-                window.location.href =
-                    "../HTML/login.html";
-
-            }
-
-        }, 1000);
-
+      window.location.href = "../HTML/login.html";
+    }
+  }, 1000);
 }
-
 
 // Error Helpers
 
-function showError(
-    input,
-    errorId,
-    message
-) {
+function showError(input, errorId, message) {
+  input.classList.add("input-error");
 
-    input.classList.add(
-        "input-error"
-    );
+  const error = document.getElementById(errorId);
 
+  error.textContent = message;
 
-    const error =
-        document.getElementById(
-            errorId
-        );
-
-
-    error.textContent =
-        message;
-
-
-    error.classList.remove(
-        "hidden"
-    );
-
+  error.classList.remove("hidden");
 }
-
 
 function showServiceError(message) {
+  servicesError.textContent = message;
 
-    servicesError.textContent =
-        message;
-
-    servicesError.classList.remove(
-        "hidden"
-    );
-
+  servicesError.classList.remove("hidden");
 }
-
 
 function clearErrors() {
+  registerForm.querySelectorAll(".form-input").forEach((input) => {
+    input.classList.remove("input-error");
+  });
 
-    registerForm
-        .querySelectorAll(
-            ".form-input"
-        )
-        .forEach(input => {
+  registerForm.querySelectorAll(".error-message").forEach((error) => {
+    error.classList.add("hidden");
 
-            input.classList.remove(
-                "input-error"
-            );
+    error.textContent = "";
+  });
 
-        });
+  registerMessage.classList.add("hidden");
 
-
-    registerForm
-        .querySelectorAll(
-            ".error-message"
-        )
-        .forEach(error => {
-
-            error.classList.add(
-                "hidden"
-            );
-
-            error.textContent =
-                "";
-
-        });
-
-
-    registerMessage.classList.add(
-        "hidden"
-    );
-
-    registerMessage.textContent =
-        "";
-
+  registerMessage.textContent = "";
 }
 
+function showMessage(message, type) {
+  if (type === "error") {
+    registerMessage.className =
+      "mt-6 rounded-lg border border-red-500/30 " +
+      "bg-red-500/10 px-4 py-3 text-sm text-red-400";
+  }
 
-function showMessage(
-    message,
-    type
-) {
-
-    if (type === "error") {
-
-        registerMessage.className =
-            "mt-6 rounded-lg border border-red-500/30 " +
-            "bg-red-500/10 px-4 py-3 text-sm text-red-400";
-
-    }
-
-
-    registerMessage.textContent =
-        message;
-
+  registerMessage.textContent = message;
 }
-
 
 async function readResponse(response) {
+  const contentType = response.headers.get("content-type");
 
-    const contentType =
-        response.headers.get(
-            "content-type"
-        );
+  if (contentType && contentType.includes("application/json")) {
+    return await response.json();
+  }
 
-
-    if (
-        contentType &&
-        contentType.includes(
-            "application/json"
-        )
-    ) {
-
-        return await response.json();
-
-    }
-
-
-    return await response.text();
-
+  return await response.text();
 }
-
 
 function getBackendError(result) {
-
-    if (
-        typeof result === "object" &&
-        result !== null
-    ) {
-
-        return (
-            result.error ||
-            result.message ||
-            "Registration failed. Please try again."
-        );
-
-    }
-
-
+  if (typeof result === "object" && result !== null) {
     return (
-        result ||
-        "Registration failed. Please try again."
+      result.error || result.message || "Registration failed. Please try again."
     );
+  }
 
+  return result || "Registration failed. Please try again.";
 }
-
 
 function isValidEmail(value) {
-
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-        value
-    );
-
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
-
 
 // Initialize
 

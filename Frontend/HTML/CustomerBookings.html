@@ -1,133 +1,124 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
 
-<head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>My Bookings - ServiceHub</title>
 
-    <link rel="stylesheet" href="../CSS/output.css">
+    <link rel="stylesheet" href="../CSS/output.css" />
 
-    <link rel="stylesheet" href="../CSS/CustomerDashboard.css">
+    <link rel="stylesheet" href="../CSS/CustomerDashboard.css" />
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
 
-    <link rel="icon" type="image/png" sizes="32x32" href="../Images/favicon-32x32.png?v=3">
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../Images/favicon-32x32.png?v=3"
+    />
 
-    <link rel="icon" type="image/png" sizes="16x16" href="../Images/favicon-16x16.png?v=3">
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="../Images/favicon-16x16.png?v=3"
+    />
+  </head>
 
-</head>
-
-
-<body class="bg-gray-950 text-white min-h-screen">
-
-
+  <body class="bg-gray-950 text-white min-h-screen">
     <!-- Customer Header -->
 
     <div id="customerHeader"></div>
 
-
     <!-- Main Content -->
 
     <main class="max-w-7xl mx-auto px-6 py-10">
+      <!-- Page Heading -->
 
+      <section class="mb-10">
+        <h1 class="text-3xl md:text-4xl font-bold mb-3">My Bookings</h1>
 
-        <!-- Page Heading -->
+        <p class="text-gray-400">
+          View your service requests and their current status.
+        </p>
+      </section>
 
-        <section class="mb-10">
+      <!-- Loading -->
 
-            <h1 class="text-3xl md:text-4xl font-bold mb-3">
-                My Bookings
-            </h1>
+      <div id="bookings-loading" class="flex justify-center items-center py-20">
+        <div class="text-center">
+          <i
+            class="fa-solid fa-spinner fa-spin text-3xl text-gray-400 mb-4"
+          ></i>
 
-            <p class="text-gray-400">
-                View your service requests and their current status.
-            </p>
+          <p class="text-gray-400">Loading your bookings...</p>
+        </div>
+      </div>
 
-        </section>
+      <!-- Error -->
 
+      <div
+        id="bookings-error"
+        class="hidden bg-red-950/40 border border-red-800 rounded-xl p-6 text-center"
+      >
+        <i
+          class="fa-solid fa-circle-exclamation text-red-400 text-3xl mb-4"
+        ></i>
 
-        <!-- Loading -->
+        <h2 class="text-lg font-semibold mb-2">Unable to load bookings</h2>
 
-        <div id="bookings-loading" class="flex justify-center items-center py-20">
+        <p id="bookings-error-message" class="text-gray-400 mb-5">
+          Something went wrong while loading your bookings.
+        </p>
 
-            <div class="text-center">
+        <button
+          id="retry-bookings-button"
+          class="px-5 py-2.5 rounded-lg bg-white text-gray-900 font-medium hover:bg-gray-200 transition"
+        >
+          Try Again
+        </button>
+      </div>
 
-                <i class="fa-solid fa-spinner fa-spin text-3xl text-gray-400 mb-4"></i>
+      <!-- Empty State -->
 
-                <p class="text-gray-400">
-                    Loading your bookings...
-                </p>
-
-            </div>
-
+      <div
+        id="no-bookings"
+        class="hidden border border-gray-800 rounded-2xl p-10 text-center"
+      >
+        <div
+          class="w-16 h-16 mx-auto mb-5 rounded-full bg-gray-900 flex items-center justify-center"
+        >
+          <i class="fa-solid fa-calendar-check text-2xl text-gray-500"></i>
         </div>
 
+        <h2 class="text-xl font-semibold mb-2">No bookings yet</h2>
 
-        <!-- Error -->
+        <p class="text-gray-400 mb-6">
+          You haven't requested any services yet.
+        </p>
 
-        <div id="bookings-error" class="hidden bg-red-950/40 border border-red-800 rounded-xl p-6 text-center">
+        <a
+          href="CustomerDashboard.html"
+          class="inline-block px-5 py-2.5 rounded-lg bg-white text-gray-900 font-medium hover:bg-gray-200 transition"
+        >
+          Browse Services
+        </a>
+      </div>
 
-            <i class="fa-solid fa-circle-exclamation text-red-400 text-3xl mb-4"></i>
+      <!-- Bookings -->
 
-            <h2 class="text-lg font-semibold mb-2">
-                Unable to load bookings
-            </h2>
-
-            <p id="bookings-error-message" class="text-gray-400 mb-5">
-                Something went wrong while loading your bookings.
-            </p>
-
-            <button id="retry-bookings-button"
-                class="px-5 py-2.5 rounded-lg bg-white text-gray-900 font-medium hover:bg-gray-200 transition">
-                Try Again
-            </button>
-
-        </div>
-
-
-        <!-- Empty State -->
-
-        <div id="no-bookings" class="hidden border border-gray-800 rounded-2xl p-10 text-center">
-
-            <div class="w-16 h-16 mx-auto mb-5 rounded-full bg-gray-900 flex items-center justify-center">
-
-                <i class="fa-solid fa-calendar-check text-2xl text-gray-500"></i>
-
-            </div>
-
-            <h2 class="text-xl font-semibold mb-2">
-                No bookings yet
-            </h2>
-
-            <p class="text-gray-400 mb-6">
-                You haven't requested any services yet.
-            </p>
-
-            <a href="CustomerDashboard.html"
-                class="inline-block px-5 py-2.5 rounded-lg bg-white text-gray-900 font-medium hover:bg-gray-200 transition">
-                Browse Services
-            </a>
-
-        </div>
-
-
-        <!-- Bookings -->
-
-        <section id="bookings-container" class="hidden space-y-5">
-        </section>
-
-
+      <section id="bookings-container" class="hidden space-y-5"></section>
     </main>
-
 
     <!-- Footer -->
 
     <div id="customer-footer"></div>
-
 
     <!-- Components -->
 
@@ -135,11 +126,8 @@
 
     <script src="../JS/components/Footer.js"></script>
 
-
     <!-- Page JavaScript -->
 
     <script src="../JS/CustomerBookings.js"></script>
-
-</body>
-
+  </body>
 </html>

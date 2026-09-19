@@ -17,6 +17,8 @@ public class BookingDto {
 
     private LocalDateTime workerCancelledAt;
 
+    private LocalDateTime workerCompletedAt;
+
     private String workerCancellationReason;
 
     private String workerCancellationMessage;
@@ -152,6 +154,14 @@ public class BookingDto {
 
     public void setWorkerCancelledAt(LocalDateTime v) {
         workerCancelledAt = v;
+    }
+
+    public LocalDateTime getWorkerCompletedAt() {
+        return workerCompletedAt;
+    }
+
+    public void setWorkerCompletedAt(LocalDateTime workerCompletedAt) {
+        this.workerCompletedAt = workerCompletedAt;
     }
 
     public String getWorkerCancellationReason() {

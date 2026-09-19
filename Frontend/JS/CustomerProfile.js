@@ -4,692 +4,419 @@ const USER_NAME_KEY = "servicehub_user_name";
 
 const API_BASE_URL = "http://localhost:8080";
 
-
 // EDITABLE FIELDS
 
 const editableFields = [
-    "fullName",
-    "age",
-    "gender",
-    "phone",
-    "addressLine1",
-    "addressLine2",
-    "landmark",
-    "city",
-    "state",
-    "pinCode"
+  "fullName",
+  "age",
+  "gender",
+  "phone",
+  "addressLine1",
+  "addressLine2",
+  "landmark",
+  "city",
+  "state",
+  "pinCode",
 ];
-
 
 // STATE
 
 let isEditMode = false;
 let originalProfile = null;
 
-
 // DOM
 
-const profileForm =
-    document.getElementById("profileForm");
+const profileForm = document.getElementById("profileForm");
 
-const editProfileBtn =
-    document.getElementById("editProfileBtn");
+const editProfileBtn = document.getElementById("editProfileBtn");
 
-const cancelBtn =
-    document.getElementById("cancelBtn");
+const cancelBtn = document.getElementById("cancelBtn");
 
-const formActions =
-    document.getElementById("formActions");
+const formActions = document.getElementById("formActions");
 
-const profileMessage =
-    document.getElementById("profileMessage");
-
+const profileMessage = document.getElementById("profileMessage");
 
 // AUTH GUARD
 
 function checkAuthentication() {
+  const token = localStorage.getItem(ACCESS_TOKEN_KEY);
 
-    const token =
-        localStorage.getItem(ACCESS_TOKEN_KEY);
+  const role = localStorage.getItem(ROLE_KEY);
 
-    const role =
-        localStorage.getItem(ROLE_KEY);
+  if (!token || role !== "USER") {
+    window.location.href = "../HTML/login.html";
 
-    if (!token || role !== "USER") {
+    return false;
+  }
 
-        window.location.href =
-            "../HTML/login.html";
-
-        return false;
-    }
-
-    return true;
+  return true;
 }
-
 
 // MESSAGE
 
 function showMessage(message, type = "success") {
+  if (!profileMessage) return;
 
-    if (!profileMessage) return;
+  profileMessage.textContent = message;
 
+  profileMessage.classList.remove(
+    "hidden",
+    "bg-green-900/30",
+    "text-green-400",
+    "border-green-700/30",
+    "bg-red-900/30",
+    "text-red-400",
+    "border-red-700/30",
+  );
 
-    profileMessage.textContent = message;
-
-
-    profileMessage.classList.remove(
-        "hidden",
-        "bg-green-900/30",
-        "text-green-400",
-        "border-green-700/30",
-        "bg-red-900/30",
-        "text-red-400",
-        "border-red-700/30"
+  if (type === "success") {
+    profileMessage.classList.add(
+      "bg-green-900/30",
+      "text-green-400",
+      "border",
+      "border-green-700/30",
     );
+  } else {
+    profileMessage.classList.add(
+      "bg-red-900/30",
+      "text-red-400",
+      "border",
+      "border-red-700/30",
+    );
+  }
 
+  profileMessage.classList.remove("hidden");
 
-    if (type === "success") {
-
-        profileMessage.classList.add(
-            "bg-green-900/30",
-            "text-green-400",
-            "border",
-            "border-green-700/30"
-        );
-
-    } else {
-
-        profileMessage.classList.add(
-            "bg-red-900/30",
-            "text-red-400",
-            "border",
-            "border-red-700/30"
-        );
-    }
-
-
-    profileMessage.classList.remove("hidden");
-
-
-    setTimeout(() => {
-
-        profileMessage.classList.add("hidden");
-
-    }, 4000);
+  setTimeout(() => {
+    profileMessage.classList.add("hidden");
+  }, 4000);
 }
-
 
 // API REQUEST
 
 async function customerApiRequest(url, options = {}) {
+  const token = localStorage.getItem(ACCESS_TOKEN_KEY);
 
-    const token =
-        localStorage.getItem(ACCESS_TOKEN_KEY);
+  const response = await fetch(`${API_BASE_URL}${url}`, {
+    ...options,
 
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
-    const response = await fetch(
-        `${API_BASE_URL}${url}`,
-        {
-            ...options,
+  // Only authentication failure redirects.
+  if (response.status === 401) {
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
 
-            headers: {
-                "Content-Type": "application/json",
-                ...(options.headers || {}),
-                "Authorization": `Bearer ${token}`
-            }
-        }
-    );
+    localStorage.removeItem(ROLE_KEY);
 
+    localStorage.removeItem(USER_NAME_KEY);
 
-    // Only authentication failure redirects.
-    if (response.status === 401) {
+    window.location.href = "../HTML/login.html";
 
-        localStorage.removeItem(
-            ACCESS_TOKEN_KEY
-        );
+    throw new Error("Unauthorized");
+  }
 
-        localStorage.removeItem(
-            ROLE_KEY
-        );
+  const contentType = response.headers.get("content-type") || "";
 
-        localStorage.removeItem(
-            USER_NAME_KEY
-        );
+  let data = null;
 
+  if (contentType.includes("application/json")) {
+    data = await response.json();
+  } else {
+    data = await response.text();
+  }
 
-        window.location.href =
-            "../HTML/login.html";
+  if (!response.ok) {
+    let message = "Something went wrong.";
 
-
-        throw new Error("Unauthorized");
+    if (typeof data === "string" && data.trim()) {
+      message = data;
+    } else if (data?.message) {
+      message = data.message;
+    } else if (data?.error) {
+      message = data.error;
     }
 
+    throw new Error(message);
+  }
 
-    const contentType =
-        response.headers.get("content-type") || "";
-
-
-    let data = null;
-
-
-    if (contentType.includes("application/json")) {
-
-        data = await response.json();
-
-    } else {
-
-        data = await response.text();
-    }
-
-
-    if (!response.ok) {
-
-        let message =
-            "Something went wrong.";
-
-
-        if (
-            typeof data === "string" &&
-            data.trim()
-        ) {
-
-            message = data;
-
-        } else if (data?.message) {
-
-            message = data.message;
-
-        } else if (data?.error) {
-
-            message = data.error;
-        }
-
-
-        throw new Error(message);
-    }
-
-
-    return data;
+  return data;
 }
-
 
 // LOAD PROFILE
 
 async function loadProfile() {
+  try {
+    const profile = await customerApiRequest("/api/customer/profile", {
+      method: "GET",
+    });
 
-    try {
+    originalProfile = JSON.parse(JSON.stringify(profile));
 
-        const profile =
-            await customerApiRequest(
-                "/api/customer/profile",
-                {
-                    method: "GET"
-                }
-            );
+    populateProfile(profile);
 
+    setEditMode(false);
+  } catch (error) {
+    console.error("Failed to load customer profile:", error);
 
-        originalProfile =
-            JSON.parse(
-                JSON.stringify(profile)
-            );
-
-
-        populateProfile(profile);
-
-        setEditMode(false);
-
-
-    } catch (error) {
-
-        console.error(
-            "Failed to load customer profile:",
-            error
-        );
-
-
-        if (error.message !== "Unauthorized") {
-
-            showMessage(
-                error.message ||
-                "Failed to load profile.",
-                "error"
-            );
-        }
+    if (error.message !== "Unauthorized") {
+      showMessage(error.message || "Failed to load profile.", "error");
     }
+  }
 }
-
 
 // POPULATE PROFILE
 
 function populateProfile(profile) {
+  setValue("fullName", profile.fullName);
+  setValue("email", profile.email);
+  setValue("age", profile.age);
+  setValue("gender", profile.gender);
+  setValue("phone", profile.phone);
 
-    setValue("fullName", profile.fullName);
-    setValue("email", profile.email);
-    setValue("age", profile.age);
-    setValue("gender", profile.gender);
-    setValue("phone", profile.phone);
+  setValue("addressLine1", profile.addressLine1);
 
-    setValue(
-        "addressLine1",
-        profile.addressLine1
-    );
+  setValue("addressLine2", profile.addressLine2);
 
-    setValue(
-        "addressLine2",
-        profile.addressLine2
-    );
+  setValue("landmark", profile.landmark);
 
-    setValue(
-        "landmark",
-        profile.landmark
-    );
+  setValue("city", profile.city);
 
-    setValue(
-        "city",
-        profile.city
-    );
+  setValue("state", profile.state);
 
-    setValue(
-        "state",
-        profile.state
-    );
+  setValue("pinCode", profile.pinCode);
 
-    setValue(
-        "pinCode",
-        profile.pinCode
-    );
+  // Hide empty optional fields
+  // when not editing.
 
+  updateOptionalFieldVisibility("addressLine2Container", profile.addressLine2);
 
-    // Hide empty optional fields
-    // when not editing.
-
-    updateOptionalFieldVisibility(
-        "addressLine2Container",
-        profile.addressLine2
-    );
-
-    updateOptionalFieldVisibility(
-        "landmarkContainer",
-        profile.landmark
-    );
+  updateOptionalFieldVisibility("landmarkContainer", profile.landmark);
 }
-
 
 // SET VALUE
 
 function setValue(id, value) {
+  const element = document.getElementById(id);
 
-    const element =
-        document.getElementById(id);
+  if (!element) return;
 
-    if (!element) return;
-
-
-    if (
-        element.tagName === "INPUT" ||
-        element.tagName === "SELECT" ||
-        element.tagName === "TEXTAREA"
-    ) {
-
-        element.value =
-            value !== null &&
-            value !== undefined
-                ? value
-                : "";
-
-    } else {
-
-        element.textContent =
-            value !== null &&
-            value !== undefined
-                ? value
-                : "—";
-    }
+  if (
+    element.tagName === "INPUT" ||
+    element.tagName === "SELECT" ||
+    element.tagName === "TEXTAREA"
+  ) {
+    element.value = value !== null && value !== undefined ? value : "";
+  } else {
+    element.textContent = value !== null && value !== undefined ? value : "—";
+  }
 }
-
 
 // OPTIONAL FIELD VISIBILITY
 
-function updateOptionalFieldVisibility(
-    containerId,
-    value
-) {
+function updateOptionalFieldVisibility(containerId, value) {
+  const container = document.getElementById(containerId);
 
-    const container =
-        document.getElementById(containerId);
+  if (!container) return;
 
-    if (!container) return;
+  // Always show while editing.
+  if (isEditMode) {
+    container.classList.remove("hidden");
 
+    return;
+  }
 
-    // Always show while editing.
-    if (isEditMode) {
-
-        container.classList.remove("hidden");
-
-        return;
-    }
-
-
-    // Hide when empty.
-    if (
-        value === null ||
-        value === undefined ||
-        String(value).trim() === ""
-    ) {
-
-        container.classList.add("hidden");
-
-    } else {
-
-        container.classList.remove("hidden");
-    }
+  // Hide when empty.
+  if (value === null || value === undefined || String(value).trim() === "") {
+    container.classList.add("hidden");
+  } else {
+    container.classList.remove("hidden");
+  }
 }
-
 
 // GET FORM DATA
 
 function getFormData() {
+  return {
+    fullName: getStringValue("fullName"),
 
-    return {
+    age: getNumberValue("age"),
 
-        fullName:
-            getStringValue("fullName"),
+    gender: getStringValue("gender"),
 
-        age:
-            getNumberValue("age"),
+    phone: getStringValue("phone"),
 
-        gender:
-            getStringValue("gender"),
+    addressLine1: getStringValue("addressLine1"),
 
-        phone:
-            getStringValue("phone"),
+    addressLine2: getStringValue("addressLine2"),
 
-        addressLine1:
-            getStringValue("addressLine1"),
+    landmark: getStringValue("landmark"),
 
-        addressLine2:
-            getStringValue("addressLine2"),
+    city: getStringValue("city"),
 
-        landmark:
-            getStringValue("landmark"),
+    state: getStringValue("state"),
 
-        city:
-            getStringValue("city"),
-
-        state:
-            getStringValue("state"),
-
-        pinCode:
-            getStringValue("pinCode")
-    };
+    pinCode: getStringValue("pinCode"),
+  };
 }
-
 
 // STRING VALUE
 
 function getStringValue(id) {
+  const element = document.getElementById(id);
 
-    const element =
-        document.getElementById(id);
+  if (!element) return null;
 
-    if (!element) return null;
+  const value = element.value.trim();
 
-
-    const value =
-        element.value.trim();
-
-
-    return value === ""
-        ? null
-        : value;
+  return value === "" ? null : value;
 }
-
 
 // NUMBER VALUE
 
 function getNumberValue(id) {
+  const element = document.getElementById(id);
 
-    const element =
-        document.getElementById(id);
+  if (!element) return null;
 
-    if (!element) return null;
+  const value = element.value.trim();
 
+  if (value === "") {
+    return null;
+  }
 
-    const value =
-        element.value.trim();
-
-
-    if (value === "") {
-        return null;
-    }
-
-
-    return Number(value);
+  return Number(value);
 }
-
 
 // SET EDIT MODE
 
 function setEditMode(editing) {
+  isEditMode = editing;
 
-    isEditMode = editing;
+  // Enable / disable editable fields.
+  editableFields.forEach((id) => {
+    const element = document.getElementById(id);
 
+    if (!element) return;
 
-    // Enable / disable editable fields.
-    editableFields.forEach(id => {
+    if (editing) {
+      element.disabled = false;
 
-        const element =
-            document.getElementById(id);
+      element.classList.add("profile-input-editing");
+    } else {
+      element.disabled = true;
 
-        if (!element) return;
-
-
-        if (editing) {
-
-            element.disabled = false;
-
-            element.classList.add(
-                "profile-input-editing"
-            );
-
-        } else {
-
-            element.disabled = true;
-
-            element.classList.remove(
-                "profile-input-editing"
-            );
-        }
-    });
-
-
-    // Optional fields.
-    if (originalProfile) {
-
-        updateOptionalFieldVisibility(
-            "addressLine2Container",
-            originalProfile.addressLine2
-        );
-
-        updateOptionalFieldVisibility(
-            "landmarkContainer",
-            originalProfile.landmark
-        );
+      element.classList.remove("profile-input-editing");
     }
+  });
 
+  // Optional fields.
+  if (originalProfile) {
+    updateOptionalFieldVisibility(
+      "addressLine2Container",
+      originalProfile.addressLine2,
+    );
 
-    // Edit button.
-    if (editProfileBtn) {
+    updateOptionalFieldVisibility(
+      "landmarkContainer",
+      originalProfile.landmark,
+    );
+  }
 
-        if (editing) {
-
-            editProfileBtn.classList.add(
-                "hidden"
-            );
-
-        } else {
-
-            editProfileBtn.classList.remove(
-                "hidden"
-            );
-        }
+  // Edit button.
+  if (editProfileBtn) {
+    if (editing) {
+      editProfileBtn.classList.add("hidden");
+    } else {
+      editProfileBtn.classList.remove("hidden");
     }
+  }
 
-
-    // Save / Cancel.
-    if (formActions) {
-
-        if (editing) {
-
-            formActions.classList.remove(
-                "hidden"
-            );
-
-        } else {
-
-            formActions.classList.add(
-                "hidden"
-            );
-        }
+  // Save / Cancel.
+  if (formActions) {
+    if (editing) {
+      formActions.classList.remove("hidden");
+    } else {
+      formActions.classList.add("hidden");
     }
+  }
 }
-
 
 // CANCEL EDIT
 
 function cancelEdit() {
+  if (!originalProfile) return;
 
-    if (!originalProfile) return;
+  populateProfile(originalProfile);
 
-
-    populateProfile(
-        originalProfile
-    );
-
-
-    setEditMode(false);
+  setEditMode(false);
 }
-
 
 // SAVE PROFILE
 
 async function saveProfile(event) {
+  event.preventDefault();
 
-    event.preventDefault();
+  if (!isEditMode) {
+    return;
+  }
 
+  const data = getFormData();
 
-    if (!isEditMode) {
-        return;
+  try {
+    const updatedProfile = await customerApiRequest("/api/customer/profile", {
+      method: "PUT",
+
+      body: JSON.stringify(data),
+    });
+
+    originalProfile = JSON.parse(JSON.stringify(updatedProfile));
+
+    // Keep dashboard name synchronized.
+    if (updatedProfile.fullName) {
+      localStorage.setItem(USER_NAME_KEY, updatedProfile.fullName);
     }
 
+    populateProfile(updatedProfile);
 
-    const data =
-        getFormData();
+    setEditMode(false);
 
+    showMessage("Profile updated successfully.", "success");
+  } catch (error) {
+    console.error("Failed to update customer profile:", error);
 
-    try {
-
-        const updatedProfile =
-            await customerApiRequest(
-                "/api/customer/profile",
-                {
-                    method: "PUT",
-
-                    body:
-                        JSON.stringify(data)
-                }
-            );
-
-
-        originalProfile =
-            JSON.parse(
-                JSON.stringify(updatedProfile)
-            );
-
-
-        // Keep dashboard name synchronized.
-        if (updatedProfile.fullName) {
-
-            localStorage.setItem(
-                USER_NAME_KEY,
-                updatedProfile.fullName
-            );
-        }
-
-
-        populateProfile(
-            updatedProfile
-        );
-
-
-        setEditMode(false);
-
-
-        showMessage(
-            "Profile updated successfully.",
-            "success"
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "Failed to update customer profile:",
-            error
-        );
-
-
-        if (error.message !== "Unauthorized") {
-
-            showMessage(
-                error.message ||
-                "Failed to update profile.",
-                "error"
-            );
-        }
+    if (error.message !== "Unauthorized") {
+      showMessage(error.message || "Failed to update profile.", "error");
     }
+  }
 }
-
 
 // EVENT LISTENERS
 
 if (editProfileBtn) {
-
-    editProfileBtn.addEventListener(
-        "click",
-        () => setEditMode(true)
-    );
+  editProfileBtn.addEventListener("click", () => setEditMode(true));
 }
-
 
 if (cancelBtn) {
-
-    cancelBtn.addEventListener(
-        "click",
-        cancelEdit
-    );
+  cancelBtn.addEventListener("click", cancelEdit);
 }
-
 
 if (profileForm) {
-
-    profileForm.addEventListener(
-        "submit",
-        saveProfile
-    );
+  profileForm.addEventListener("submit", saveProfile);
 }
-
 
 // INITIALIZATION
 
 async function initializeProfile() {
+  if (!checkAuthentication()) {
+    return;
+  }
 
-    if (!checkAuthentication()) {
-        return;
-    }
-
-    await loadProfile();
+  await loadProfile();
 }
-
 
 initializeProfile();

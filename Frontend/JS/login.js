@@ -17,269 +17,195 @@ const passwordError = document.getElementById("passwordError");
 const loginMessage = document.getElementById("loginMessage");
 const loginButton = document.getElementById("loginButton");
 
-
 // Current selected role
 let selectedRole = "customer";
 
 // Role Selection
 
 customerRole.addEventListener("click", () => {
+  selectedRole = "customer";
 
-    selectedRole = "customer";
+  customerRole.classList.add("active");
+  workerRole.classList.remove("active");
 
-    customerRole.classList.add("active");
-    workerRole.classList.remove("active");
+  idLabel.textContent = "Email ID";
 
-    idLabel.textContent = "Email ID";
+  userId.placeholder = "Enter your Email ID";
 
-    userId.placeholder = "Enter your Email ID";
-
-    clearValidation();
-
+  clearValidation();
 });
 
-
 workerRole.addEventListener("click", () => {
+  selectedRole = "worker";
 
-    selectedRole = "worker";
+  workerRole.classList.add("active");
+  customerRole.classList.remove("active");
 
-    workerRole.classList.add("active");
-    customerRole.classList.remove("active");
+  idLabel.textContent = "Email ID";
 
-    idLabel.textContent = "Email ID";
+  userId.placeholder = "Enter your Email ID";
 
-    userId.placeholder = "Enter your Email ID";
-
-    clearValidation();
-
+  clearValidation();
 });
 
 //Password Visibility
 
 togglePassword.addEventListener("click", () => {
+  const isPassword = password.type === "password";
 
-    const isPassword =
-        password.type === "password";
+  password.type = isPassword ? "text" : "password";
 
-    password.type =
-        isPassword ? "text" : "password";
-
-
-    togglePassword.innerHTML =
-        isPassword
-            ? '<i class="fa-solid fa-eye-slash"></i>'
-            : '<i class="fa-solid fa-eye"></i>';
-
+  togglePassword.innerHTML = isPassword
+    ? '<i class="fa-solid fa-eye-slash"></i>'
+    : '<i class="fa-solid fa-eye"></i>';
 });
 
 // Login Form
 
 loginForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
 
-    event.preventDefault();
+  clearValidation();
 
-    clearValidation();
+  const idValue = userId.value.trim();
+  const passwordValue = password.value.trim();
 
-    const idValue = userId.value.trim();
-    const passwordValue = password.value.trim();
+  let isValid = true;
 
-    let isValid = true;
+  /* ID validation */
 
+  if (!idValue) {
+    showError(userId, idError, "Email ID is required.");
 
-    /* ID validation */
+    isValid = false;
+  }
 
-    if (!idValue) {
+  /* Password validation */
 
-        showError(
-            userId,
-            idError,
-            "Email ID is required."
-        );
+  if (!passwordValue) {
+    showError(password, passwordError, "Password is required.");
 
-        isValid = false;
-    }
+    isValid = false;
+  }
 
+  if (!isValid) {
+    return;
+  }
 
-    /* Password validation */
+  loginButton.disabled = true;
 
-    if (!passwordValue) {
-
-        showError(
-            password,
-            passwordError,
-            "Password is required."
-        );
-
-        isValid = false;
-    }
-
-
-    if (!isValid) {
-        return;
-    }
-
-
-    loginButton.disabled = true;
-
-    loginButton.innerHTML = `
+  loginButton.innerHTML = `
         <i class="fa-solid fa-spinner fa-spin"></i>
         <span>Signing in...</span>
     `;
 
+  try {
+    const response = await fetch("http://localhost:8080/api/auth/login", {
+      method: "POST",
 
-    try {
+      headers: {
+        "Content-Type": "application/json",
+      },
 
-        const response = await fetch(
-            "http://localhost:8080/api/auth/login",
-            {
-                method: "POST",
+      body: JSON.stringify({
+        email: idValue,
+        password: passwordValue,
+      }),
+    });
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+    let result;
 
-                body: JSON.stringify({
-                    email: idValue,
-                    password: passwordValue
-                })
-            }
-        );
+    const contentType = response.headers.get("content-type");
 
-        let result;
-
-        const contentType = response.headers.get("content-type");
-
-        if (contentType && contentType.includes("application/json")) {
-            result = await response.json();
-        } else {
-            result = await response.text();
-        }
-
-        if (!response.ok) {
-
-            const errorMessage =
-                typeof result === "object" && result !== null
-                    ? result.error ||
-                    result.message ||
-                    "Login failed. Please try again."
-                    : result;
-
-            showMessage(
-                errorMessage,
-                "error"
-            );
-
-            return;
-        }
-
-        const token = result.token;
-        const userId = result.userId;
-        const fullName = result.fullName;
-        const email = result.email;
-        const role = result.role;
-
-        if (!token || !userId || !fullName || !email || !role) {
-
-            showMessage(
-                "Invalid login response from server.",
-                "error"
-            );
-
-            return;
-        }
-
-        localStorage.setItem(
-            "servicehub_access_token",
-            token
-        );
-
-        localStorage.setItem(
-            "servicehub_user_id",
-            userId
-        );
-
-        localStorage.setItem(
-            "servicehub_user_name",
-            fullName
-        );
-
-        localStorage.setItem(
-            "servicehub_user_email",
-            email
-        );
-
-        localStorage.setItem(
-            "servicehub_user_role",
-            role
-        );
-
-        loginForm.reset();
-
-        if (role === "USER" && selectedRole === "customer") {
-
-            window.location.href = "CustomerDashboard.html";
-
-        } else if (role === "WORKER" && selectedRole === "worker") {
-
-            window.location.href = "WorkerDashboard.html";
-
-        } else {
-
-            localStorage.removeItem("servicehub_access_token");
-            localStorage.removeItem("servicehub_user_id");
-            localStorage.removeItem("servicehub_user_name");
-            localStorage.removeItem("servicehub_user_email");
-            localStorage.removeItem("servicehub_user_role");
-
-            showMessage(
-                "Invalid account type for this login.",
-                "error"
-            );
-        }
-
-    } catch (error) {
-        showMessage(
-            "Unable to connect to the server. Please make sure the backend is running.",
-            "error"
-        );
-
-    } finally {
-
-        loginButton.disabled = false;
-
-        loginButton.innerHTML = `
-        <i class="fa-solid fa-right-to-bracket"></i>
-        <span>Login</span>`;
+    if (contentType && contentType.includes("application/json")) {
+      result = await response.json();
+    } else {
+      result = await response.text();
     }
 
-});
+    if (!response.ok) {
+      const errorMessage =
+        typeof result === "object" && result !== null
+          ? result.error || result.message || "Login failed. Please try again."
+          : result;
 
+      showMessage(errorMessage, "error");
+
+      return;
+    }
+
+    const token = result.token;
+    const userId = result.userId;
+    const fullName = result.fullName;
+    const email = result.email;
+    const role = result.role;
+
+    if (!token || !userId || !fullName || !email || !role) {
+      showMessage("Invalid login response from server.", "error");
+
+      return;
+    }
+
+    localStorage.setItem("servicehub_access_token", token);
+
+    localStorage.setItem("servicehub_user_id", userId);
+
+    localStorage.setItem("servicehub_user_name", fullName);
+
+    localStorage.setItem("servicehub_user_email", email);
+
+    localStorage.setItem("servicehub_user_role", role);
+
+    loginForm.reset();
+
+    if (role === "USER" && selectedRole === "customer") {
+      window.location.href = "CustomerDashboard.html";
+    } else if (role === "WORKER" && selectedRole === "worker") {
+      window.location.href = "WorkerDashboard.html";
+    } else {
+      localStorage.removeItem("servicehub_access_token");
+      localStorage.removeItem("servicehub_user_id");
+      localStorage.removeItem("servicehub_user_name");
+      localStorage.removeItem("servicehub_user_email");
+      localStorage.removeItem("servicehub_user_role");
+
+      showMessage("Invalid account type for this login.", "error");
+    }
+  } catch (error) {
+    showMessage(
+      "Unable to connect to the server. Please make sure the backend is running.",
+      "error",
+    );
+  } finally {
+    loginButton.disabled = false;
+
+    loginButton.innerHTML = `
+        <i class="fa-solid fa-right-to-bracket"></i>
+        <span>Login</span>`;
+  }
+});
 
 //Validation Functions
 
 function showError(input, errorElement, message) {
+  input.classList.add("input-error");
 
-    input.classList.add("input-error");
+  errorElement.textContent = message;
 
-    errorElement.textContent = message;
-
-    errorElement.classList.remove("hidden");
-
+  errorElement.classList.remove("hidden");
 }
 
 function clearValidation() {
+  userId.classList.remove("input-error");
+  password.classList.remove("input-error");
 
-    userId.classList.remove("input-error");
-    password.classList.remove("input-error");
+  idError.classList.add("hidden");
+  passwordError.classList.add("hidden");
 
-    idError.classList.add("hidden");
-    passwordError.classList.add("hidden");
-
-    loginMessage.classList.add("hidden");
+  loginMessage.classList.add("hidden");
 }
 
 function showMessage(message, type) {
-    loginMessage.textContent = message;
-    loginMessage.className =
-        `mb-5 rounded-lg border px-4 py-3 text-sm ${type}`;
+  loginMessage.textContent = message;
+  loginMessage.className = `mb-5 rounded-lg border px-4 py-3 text-sm ${type}`;
 }

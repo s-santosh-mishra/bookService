@@ -4,95 +4,64 @@ const ROLE_KEY = "servicehub_user_role";
 
 // Authentication
 function checkWorkerLogin() {
+  const token = localStorage.getItem(ACCESS_TOKEN_KEY);
 
-    const token =
-        localStorage.getItem(ACCESS_TOKEN_KEY);
+  const role = localStorage.getItem(ROLE_KEY);
 
-    const role =
-        localStorage.getItem(ROLE_KEY);
+  if (!token || role !== "WORKER") {
+    window.location.href = "../HTML/login.html";
 
-    if (!token || role !== "WORKER") {
+    return false;
+  }
 
-        window.location.href =
-            "../HTML/login.html";
-
-        return false;
-    }
-
-    return true;
+  return true;
 }
 
 // Load Worker Services
 async function loadWorkerServices() {
+  const workerId = localStorage.getItem(USER_ID_KEY);
 
-    const workerId =
-        localStorage.getItem(USER_ID_KEY);
+  const token = localStorage.getItem(ACCESS_TOKEN_KEY);
 
-    const token =
-        localStorage.getItem(ACCESS_TOKEN_KEY);
+  const container = document.getElementById("myServicesContainer");
 
-    const container =
-        document.getElementById("myServicesContainer");
+  if (!workerId || !token) {
+    return;
+  }
 
+  try {
+    const response = await fetch(
+      `http://localhost:8080/api/worker/services/${workerId}`,
+      {
+        method: "GET",
 
-    if (!workerId || !token) {
-        return;
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    if (response.status === 401 || response.status === 403) {
+      localStorage.removeItem(ACCESS_TOKEN_KEY);
+      localStorage.removeItem(USER_ID_KEY);
+      localStorage.removeItem(ROLE_KEY);
+
+      window.location.href = "../HTML/login.html";
+
+      return;
     }
 
-
-    try {
-
-        const response = await fetch(
-            `http://localhost:8080/api/worker/services/${workerId}`,
-            {
-                method: "GET",
-
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            }
-        );
-
-
-        if (response.status === 401 ||
-            response.status === 403) {
-
-            localStorage.removeItem(ACCESS_TOKEN_KEY);
-            localStorage.removeItem(USER_ID_KEY);
-            localStorage.removeItem(ROLE_KEY);
-
-            window.location.href =
-                "../HTML/login.html";
-
-            return;
-        }
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Failed to load worker services"
-            );
-
-        }
-
-
-        const services =
-            await response.json();
-
-
-        displayWorkerServices(services);
-
+    if (!response.ok) {
+      throw new Error("Failed to load worker services");
     }
 
-    catch (error) {
+    const services = await response.json();
 
-        console.error(
-            "Error loading worker services:",
-            error
-        );
+    displayWorkerServices(services);
+  } catch (error) {
+    console.error("Error loading worker services:", error);
 
-        container.innerHTML = `
+    container.innerHTML = `
 
             <div class="col-span-full
                         bg-gray-900
@@ -120,22 +89,17 @@ async function loadWorkerServices() {
             </div>
 
         `;
-    }
+  }
 }
 
 // Display Services
 function displayWorkerServices(services) {
+  const container = document.getElementById("myServicesContainer");
 
-    const container =
-        document.getElementById("myServicesContainer");
+  container.innerHTML = "";
 
-
-    container.innerHTML = "";
-
-
-    if (!services || services.length === 0) {
-
-        container.innerHTML = `
+  if (!services || services.length === 0) {
+    container.innerHTML = `
 
             <div class="col-span-full
                         bg-gray-900
@@ -164,18 +128,15 @@ function displayWorkerServices(services) {
 
         `;
 
-        return;
-    }
+    return;
+  }
 
+  services.forEach((service) => {
+    const card = document.createElement("div");
 
-    services.forEach(service => {
+    card.className = "worker-service-card";
 
-        const card = document.createElement("div");
-
-        card.className = "worker-service-card";
-
-
-        card.innerHTML = `
+    card.innerHTML = `
 
             <div class="worker-service-icon">
 
@@ -198,15 +159,11 @@ function displayWorkerServices(services) {
 
         `;
 
-
-        container.appendChild(card);
-
-    });
+    container.appendChild(card);
+  });
 }
 
 // Page Initialisation
 if (checkWorkerLogin()) {
-
-    loadWorkerServices();
-
+  loadWorkerServices();
 }

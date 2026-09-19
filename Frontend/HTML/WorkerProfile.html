@@ -1,491 +1,431 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>My Profile - ServiceHub</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
 
-    <link rel="stylesheet" href="../CSS/CustomerDashboard.css">
-    <link rel="stylesheet" href="../CSS/WorkerDashboard.css">
+    <link rel="stylesheet" href="../CSS/CustomerDashboard.css" />
+    <link rel="stylesheet" href="../CSS/WorkerDashboard.css" />
 
-    <link rel="icon" type="image/png" sizes="32x32" href="../Images/favicon-32x32.png?v=3">
-    <link rel="icon" type="image/png" sizes="16x16" href="../Images/favicon-16x16.png?v=3">
-</head>
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../Images/favicon-32x32.png?v=3"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="../Images/favicon-16x16.png?v=3"
+    />
+  </head>
 
-<body class="bg-gray-950 text-white min-h-screen">
-
+  <body class="bg-gray-950 text-white min-h-screen">
     <!-- Worker Header -->
     <header id="workerHeader"></header>
 
-
     <!-- Main Content -->
     <main class="max-w-5xl mx-auto px-6 py-10">
+      <!-- Page Header -->
+      <div class="flex items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 class="text-3xl font-bold">My Profile</h1>
 
-        <!-- Page Header -->
-        <div class="flex items-center justify-between gap-4 mb-8">
+          <p class="text-gray-500 mt-1">
+            Manage your personal and professional information.
+          </p>
+        </div>
 
+        <!-- Edit Button -->
+        <button
+          id="editProfileBtn"
+          type="button"
+          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 transition duration-200 font-medium"
+        >
+          <i class="fa-solid fa-pen"></i>
+          Edit Profile
+        </button>
+      </div>
+
+      <!-- Message -->
+      <div
+        id="profileMessage"
+        class="hidden mb-6 px-4 py-3 rounded-xl text-sm"
+      ></div>
+
+      <!-- Profile Form -->
+      <form id="profileForm">
+        <!-- PERSONAL INFORMATION -->
+
+        <section
+          class="bg-gray-900 border border-gray-800 rounded-2xl p-6 md:p-8 mb-6"
+        >
+          <div class="mb-7">
+            <h2 class="text-xl font-semibold">Personal Information</h2>
+
+            <p class="text-sm text-gray-500 mt-1">
+              Keep your personal information up to date.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+            <!-- Full Name -->
             <div>
-                <h1 class="text-3xl font-bold">
-                    My Profile
-                </h1>
+              <label
+                for="fullName"
+                class="block text-sm font-medium text-gray-300 mb-2"
+              >
+                Full Name
+              </label>
 
-                <p class="text-gray-500 mt-1">
-                    Manage your personal and professional information.
-                </p>
+              <input
+                id="fullName"
+                type="text"
+                class="profile-input w-full"
+                disabled
+              />
             </div>
 
-            <!-- Edit Button -->
-            <button
-                id="editProfileBtn"
-                type="button"
-                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl
-                       bg-purple-600 hover:bg-purple-700
-                       transition duration-200 font-medium">
-
-                <i class="fa-solid fa-pen"></i>
-                Edit Profile
-            </button>
-
-        </div>
-
-
-        <!-- Message -->
-        <div
-            id="profileMessage"
-            class="hidden mb-6 px-4 py-3 rounded-xl text-sm">
-        </div>
-
-
-        <!-- Profile Form -->
-        <form id="profileForm">
-
-
-            <!-- PERSONAL INFORMATION -->
-
-            <section class="bg-gray-900 border border-gray-800 rounded-2xl p-6 md:p-8 mb-6">
-
-                <div class="mb-7">
-                    <h2 class="text-xl font-semibold">
-                        Personal Information
-                    </h2>
-
-                    <p class="text-sm text-gray-500 mt-1">
-                        Keep your personal information up to date.
-                    </p>
-                </div>
-
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-
-
-                    <!-- Full Name -->
-                    <div>
-                        <label
-                            for="fullName"
-                            class="block text-sm font-medium text-gray-300 mb-2">
-                            Full Name
-                        </label>
-
-                        <input
-                            id="fullName"
-                            type="text"
-                            class="profile-input w-full"
-                            disabled>
-                    </div>
-
-
-                    <!-- Email - NOT EDITABLE -->
-                    <div>
-                        <label
-                            class="block text-sm font-medium text-gray-300 mb-2">
-                            Email
-                            <span class="text-gray-500 text-xs">
-                                (Cannot be modified)
-                            </span>
-                        </label>
-
-                        <p
-                            id="email"
-                            class="profile-value py-2">
-                            —
-                        </p>
-                    </div>
-
-
-                    <!-- Age -->
-                    <div>
-                        <label
-                            for="age"
-                            class="block text-sm font-medium text-gray-300 mb-2">
-                            Age
-                        </label>
-
-                        <input
-                            id="age"
-                            type="number"
-                            min="1"
-                            max="120"
-                            class="profile-input w-full"
-                            disabled>
-                    </div>
-
-
-                    <!-- Gender -->
-                    <div>
-                        <label
-                            for="gender"
-                            class="block text-sm font-medium text-gray-300 mb-2">
-                            Gender
-                        </label>
-
-                        <select
-                            id="gender"
-                            class="profile-input w-full"
-                            disabled>
-
-                            <option value="">Select Gender</option>
-                            <option value="MALE">Male</option>
-                            <option value="FEMALE">Female</option>
-                            <option value="OTHER">Other</option>
-
-                        </select>
-                    </div>
-
-
-                    <!-- Phone -->
-                    <div>
-                        <label
-                            for="phone"
-                            class="block text-sm font-medium text-gray-300 mb-2">
-                            Phone
-                        </label>
-
-                        <input
-                            id="phone"
-                            type="text"
-                            class="profile-input w-full"
-                            disabled>
-                    </div>
-
-                </div>
-
-            </section>
-
-
-
-            <!-- ADDRESS -->
-
-            <section class="bg-gray-900 border border-gray-800 rounded-2xl p-6 md:p-8 mb-6">
-
-                <div class="mb-7">
-                    <h2 class="text-xl font-semibold">
-                        Address
-                    </h2>
-                </div>
-
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-
-
-                    <!-- Address Line 1 -->
-                    <div class="md:col-span-2">
-                        <label
-                            for="addressLine1"
-                            class="block text-sm font-medium text-gray-300 mb-2">
-                            Address Line 1
-                        </label>
-
-                        <input
-                            id="addressLine1"
-                            type="text"
-                            class="profile-input w-full"
-                            disabled>
-                    </div>
-
-
-                    <!-- Address Line 2 -->
-                    <div id="addressLine2Container" class="md:col-span-2">
-                        <label
-                            for="addressLine2"
-                            class="block text-sm font-medium text-gray-300 mb-2">
-                            Address Line 2
-                        </label>
-
-                        <input
-                            id="addressLine2"
-                            type="text"
-                            class="profile-input w-full"
-                            disabled>
-                    </div>
-
-
-                    <!-- Landmark -->
-                    <div id="landmarkContainer">
-                        <label
-                            for="landmark"
-                            class="block text-sm font-medium text-gray-300 mb-2">
-                            Landmark
-                        </label>
-
-                        <input
-                            id="landmark"
-                            type="text"
-                            class="profile-input w-full"
-                            disabled>
-                    </div>
-
-
-                    <!-- City -->
-                    <div>
-                        <label
-                            for="city"
-                            class="block text-sm font-medium text-gray-300 mb-2">
-                            City
-                        </label>
-
-                        <input
-                            id="city"
-                            type="text"
-                            class="profile-input w-full"
-                            disabled>
-                    </div>
-
-
-                    <!-- State -->
-                    <div>
-                        <label
-                            for="state"
-                            class="block text-sm font-medium text-gray-300 mb-2">
-                            State
-                        </label>
-
-                        <input
-                            id="state"
-                            type="text"
-                            class="profile-input w-full"
-                            disabled>
-                    </div>
-
-
-                    <!-- PIN Code -->
-                    <div>
-                        <label
-                            for="pinCode"
-                            class="block text-sm font-medium text-gray-300 mb-2">
-                            PIN Code
-                        </label>
-
-                        <input
-                            id="pinCode"
-                            type="text"
-                            class="profile-input w-full"
-                            disabled>
-                    </div>
-
-                </div>
-
-            </section>
-
-
-
-            <!-- PROFESSIONAL INFORMATION -->
-
-            <section class="bg-gray-900 border border-gray-800 rounded-2xl p-6 md:p-8 mb-6">
-
-                <div class="mb-7">
-                    <h2 class="text-xl font-semibold">
-                        Professional Information
-                    </h2>
-
-                    <p class="text-sm text-gray-500 mt-1">
-                        Information related to your professional profile.
-                    </p>
-                </div>
-
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-
-
-                    <!-- Experience -->
-                    <div>
-                        <label
-                            for="experienceYears"
-                            class="block text-sm font-medium text-gray-300 mb-2">
-                            Experience (Years)
-                        </label>
-
-                        <input
-                            id="experienceYears"
-                            type="number"
-                            min="0"
-                            class="profile-input w-full"
-                            disabled>
-                    </div>
-
-
-                    <!-- Qualification -->
-                    <div>
-                        <label
-                            for="qualification"
-                            class="block text-sm font-medium text-gray-300 mb-2">
-                            Qualification
-                        </label>
-
-                        <input
-                            id="qualification"
-                            type="text"
-                            class="profile-input w-full"
-                            disabled>
-                    </div>
-
-
-                    <!-- Bio -->
-                    <div id="bioContainer" class="md:col-span-2">
-
-                        <label
-                            for="bio"
-                            class="block text-sm font-medium text-gray-300 mb-2">
-                            Bio
-                        </label>
-
-                        <textarea
-                            id="bio"
-                            rows="3"
-                            class="profile-input w-full resize-none"
-                            disabled>
-                        </textarea>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-
-            <!-- PROVIDING SERVICES -->
-
-            <section class="bg-gray-900 border border-gray-800 rounded-2xl p-6 md:p-8 mb-6">
-
-                <div class="mb-7">
-                    <h2 class="text-xl font-semibold">
-                        Providing Services
-                    </h2>
-
-                    <p class="text-sm text-gray-500 mt-1">
-                        Services you currently provide.
-                    </p>
-                </div>
-
-
-                <div
-                    id="providingServices"
-                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-
-                    <!-- Services loaded by JavaScript -->
-
-                </div>
-
-            </section>
-
-
-
-            <!-- WORKER STATUS -->
-
-            <section class="bg-gray-900 border border-gray-800 rounded-2xl p-6 md:p-8 mb-6">
-
-                <div class="mb-7">
-                    <h2 class="text-xl font-semibold">
-                        Worker Status
-                    </h2>
-
-                    <p class="text-sm text-gray-500 mt-1">
-                        These statuses are managed by ServiceHub.
-                    </p>
-                </div>
-
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-
-
-                    <!-- Verification -->
-                    <div>
-                        <label
-                            class="block text-sm font-medium text-gray-300 mb-2">
-                            Verification Status
-                        </label>
-
-                        <div id="verificationStatus">
-                            —
-                        </div>
-                    </div>
-
-
-                    <!-- Availability -->
-                    <div>
-                        <label
-                            class="block text-sm font-medium text-gray-300 mb-2">
-                            Availability Status
-                        </label>
-
-                        <div id="availabilityStatus">
-                            —
-                        </div>
-                    </div>
-
-                </div>
-
-            </section>
-
-
-
-            <!-- SAVE / CANCEL -->
-
-            <div
-                id="formActions"
-                class="hidden flex justify-end gap-3">
-
-                <button
-                    id="cancelBtn"
-                    type="button"
-                    class="px-5 py-2.5 rounded-xl border border-gray-700
-                           text-gray-300 hover:bg-gray-800
-                           transition duration-200">
-
-                    Cancel
-
-                </button>
-
-
-                <button
-                    id="saveBtn"
-                    type="submit"
-                    class="inline-flex items-center gap-2 px-5 py-2.5
-                           rounded-xl bg-purple-600 hover:bg-purple-700
-                           transition duration-200 font-medium">
-
-                    <i class="fa-solid fa-check"></i>
-                    Save Changes
-
-                </button>
-
+            <!-- Email - NOT EDITABLE -->
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">
+                Email
+                <span class="text-gray-500 text-xs">
+                  (Cannot be modified)
+                </span>
+              </label>
+
+              <p id="email" class="profile-value py-2">—</p>
             </div>
 
-        </form>
+            <!-- Age -->
+            <div>
+              <label
+                for="age"
+                class="block text-sm font-medium text-gray-300 mb-2"
+              >
+                Age
+              </label>
 
+              <input
+                id="age"
+                type="number"
+                min="1"
+                max="120"
+                class="profile-input w-full"
+                disabled
+              />
+            </div>
+
+            <!-- Gender -->
+            <div>
+              <label
+                for="gender"
+                class="block text-sm font-medium text-gray-300 mb-2"
+              >
+                Gender
+              </label>
+
+              <select id="gender" class="profile-input w-full" disabled>
+                <option value="">Select Gender</option>
+                <option value="MALE">Male</option>
+                <option value="FEMALE">Female</option>
+                <option value="OTHER">Other</option>
+              </select>
+            </div>
+
+            <!-- Phone -->
+            <div>
+              <label
+                for="phone"
+                class="block text-sm font-medium text-gray-300 mb-2"
+              >
+                Phone
+              </label>
+
+              <input
+                id="phone"
+                type="text"
+                class="profile-input w-full"
+                disabled
+              />
+            </div>
+          </div>
+        </section>
+
+        <!-- ADDRESS -->
+
+        <section
+          class="bg-gray-900 border border-gray-800 rounded-2xl p-6 md:p-8 mb-6"
+        >
+          <div class="mb-7">
+            <h2 class="text-xl font-semibold">Address</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+            <!-- Address Line 1 -->
+            <div class="md:col-span-2">
+              <label
+                for="addressLine1"
+                class="block text-sm font-medium text-gray-300 mb-2"
+              >
+                Address Line 1
+              </label>
+
+              <input
+                id="addressLine1"
+                type="text"
+                class="profile-input w-full"
+                disabled
+              />
+            </div>
+
+            <!-- Address Line 2 -->
+            <div id="addressLine2Container" class="md:col-span-2">
+              <label
+                for="addressLine2"
+                class="block text-sm font-medium text-gray-300 mb-2"
+              >
+                Address Line 2
+              </label>
+
+              <input
+                id="addressLine2"
+                type="text"
+                class="profile-input w-full"
+                disabled
+              />
+            </div>
+
+            <!-- Landmark -->
+            <div id="landmarkContainer">
+              <label
+                for="landmark"
+                class="block text-sm font-medium text-gray-300 mb-2"
+              >
+                Landmark
+              </label>
+
+              <input
+                id="landmark"
+                type="text"
+                class="profile-input w-full"
+                disabled
+              />
+            </div>
+
+            <!-- City -->
+            <div>
+              <label
+                for="city"
+                class="block text-sm font-medium text-gray-300 mb-2"
+              >
+                City
+              </label>
+
+              <input
+                id="city"
+                type="text"
+                class="profile-input w-full"
+                disabled
+              />
+            </div>
+
+            <!-- State -->
+            <div>
+              <label
+                for="state"
+                class="block text-sm font-medium text-gray-300 mb-2"
+              >
+                State
+              </label>
+
+              <input
+                id="state"
+                type="text"
+                class="profile-input w-full"
+                disabled
+              />
+            </div>
+
+            <!-- PIN Code -->
+            <div>
+              <label
+                for="pinCode"
+                class="block text-sm font-medium text-gray-300 mb-2"
+              >
+                PIN Code
+              </label>
+
+              <input
+                id="pinCode"
+                type="text"
+                class="profile-input w-full"
+                disabled
+              />
+            </div>
+          </div>
+        </section>
+
+        <!-- PROFESSIONAL INFORMATION -->
+
+        <section
+          class="bg-gray-900 border border-gray-800 rounded-2xl p-6 md:p-8 mb-6"
+        >
+          <div class="mb-7">
+            <h2 class="text-xl font-semibold">Professional Information</h2>
+
+            <p class="text-sm text-gray-500 mt-1">
+              Information related to your professional profile.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+            <!-- Experience -->
+            <div>
+              <label
+                for="experienceYears"
+                class="block text-sm font-medium text-gray-300 mb-2"
+              >
+                Experience (Years)
+              </label>
+
+              <input
+                id="experienceYears"
+                type="number"
+                min="0"
+                class="profile-input w-full"
+                disabled
+              />
+            </div>
+
+            <!-- Qualification -->
+            <div>
+              <label
+                for="qualification"
+                class="block text-sm font-medium text-gray-300 mb-2"
+              >
+                Qualification
+              </label>
+
+              <input
+                id="qualification"
+                type="text"
+                class="profile-input w-full"
+                disabled
+              />
+            </div>
+
+            <!-- Bio -->
+            <div id="bioContainer" class="md:col-span-2">
+              <label
+                for="bio"
+                class="block text-sm font-medium text-gray-300 mb-2"
+              >
+                Bio
+              </label>
+
+              <textarea
+                id="bio"
+                rows="3"
+                class="profile-input w-full resize-none"
+                disabled
+              >
+              </textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- PROVIDING SERVICES -->
+
+        <section
+          class="bg-gray-900 border border-gray-800 rounded-2xl p-6 md:p-8 mb-6"
+        >
+          <div class="mb-7">
+            <h2 class="text-xl font-semibold">Providing Services</h2>
+
+            <p class="text-sm text-gray-500 mt-1">
+              Services you currently provide.
+            </p>
+          </div>
+
+          <div
+            id="providingServices"
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+          >
+            <!-- Services loaded by JavaScript -->
+          </div>
+        </section>
+
+        <!-- WORKER STATUS -->
+
+        <section
+          class="bg-gray-900 border border-gray-800 rounded-2xl p-6 md:p-8 mb-6"
+        >
+          <div class="mb-7">
+            <h2 class="text-xl font-semibold">Worker Status</h2>
+
+            <p class="text-sm text-gray-500 mt-1">
+              These statuses are managed by ServiceHub.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+            <!-- Verification -->
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">
+                Verification Status
+              </label>
+
+              <div id="verificationStatus">—</div>
+            </div>
+
+            <!-- Availability -->
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">
+                Availability Status
+              </label>
+
+              <div id="availabilityStatus">—</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SAVE / CANCEL -->
+
+        <div id="formActions" class="hidden flex justify-end gap-3">
+          <button
+            id="cancelBtn"
+            type="button"
+            class="px-5 py-2.5 rounded-xl border border-gray-700 text-gray-300 hover:bg-gray-800 transition duration-200"
+          >
+            Cancel
+          </button>
+
+          <button
+            id="saveBtn"
+            type="submit"
+            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 transition duration-200 font-medium"
+          >
+            <i class="fa-solid fa-check"></i>
+            Save Changes
+          </button>
+        </div>
+      </form>
     </main>
-
-
 
     <!-- Footer -->
     <footer id="footer"></footer>
-
 
     <!-- Components -->
     <script src="../JS/components/WorkerHeader.js"></script>
@@ -493,6 +433,5 @@
 
     <!-- Page JS -->
     <script src="../JS/WorkerProfile.js"></script>
-
-</body>
+  </body>
 </html>

@@ -1,891 +1,695 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ServiceHub | Trusted Services, Anytime Anywhere</title>
-    <link rel="stylesheet" href="../CSS/output.css">
-    <link rel="stylesheet" href="../CSS/indexCss.css">
+    <link rel="stylesheet" href="../CSS/output.css" />
+    <link rel="stylesheet" href="../CSS/indexCss.css" />
 
-    <link rel="icon" type="image/png" sizes="32x32" href="../Images/favicon-32x32.png?v=3">
-    <link rel="icon" type="image/png" sizes="16x16" href="../Images/favicon-16x16.png?v=3">
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../Images/favicon-32x32.png?v=3"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="../Images/favicon-16x16.png?v=3"
+    />
+  </head>
 
-</head>
-
-<body class="bg-gray-950 text-gray-100">
-
+  <body class="bg-gray-950 text-gray-100">
     <!-- NAVBAR -->
 
-    <header class="sticky top-0 z-50 bg-gray-950/90 backdrop-blur-md border-b border-gray-800">
-        <nav class="max-w-7xl mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
-
-                <!-- Logo + Company -->
-                <a href="#" class="flex items-center gap-3">
-                    <!-- Logo Placeholder -->
-                    <div
-                        class="w-12 h-12 rounded-xl border-2 border-violet-500 flex items-center justify-center overflow-hidden">
-                        <span class="text-purple-400">
-                        <i class="fa-solid fa-screwdriver-wrench text-3xl"></i>
-                        </span>
-                    </div>
-
-                    <!-- Company Name -->
-
-                    <div>
-                        <h1 class="text-xl font-bold tracking-tight">
-                            ServiceHub
-                        </h1>
-                        <p class="text-xs text-gray-400">
-                            Trusted Services, Anytime Anywhere
-                        </p>
-                    </div>
-                </a>
-
-                <!-- Desktop Navigation -->
-
-                <div class="hidden lg:flex items-center gap-3">
-
-                    <a href="#services" class="nav-btn hover:bg-violet-900/40">
-                        Services
-                    </a>
-
-                    <a href="#how-it-works" class="nav-btn hover:bg-violet-900/40">
-                        How It Works
-                    </a>
-
-                    <a href="Company.html" class="nav-btn hover:bg-violet-900/40">
-                        About Us
-                    </a>
-
-                    <a href="login.html" class="nav-btn hover:bg-violet-900/40">
-                        Login
-                    </a>
-
-                    <a href="UserRegistration.html"
-                        class="nav-btn bg-violet-600 text-white border-violet-600 hover:bg-violet-700">
-                        Register
-                    </a>
-
-                </div>
-
-                <!-- Mobile Menu Button -->
-
-                <button id="mobileMenuButton"
-                    class="lg:hidden border border-gray-700 rounded-full px-4 py-2 text-gray-200 hover:bg-gray-800">
-                    ☰
-                </button>
-
+    <header
+      class="sticky top-0 z-50 bg-gray-950/90 backdrop-blur-md border-b border-gray-800"
+    >
+      <nav class="max-w-7xl mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+          <!-- Logo + Company -->
+          <a href="#" class="flex items-center gap-3">
+            <!-- Logo Placeholder -->
+            <div
+              class="w-12 h-12 rounded-xl border-2 border-violet-500 flex items-center justify-center overflow-hidden"
+            >
+              <span class="text-purple-400">
+                <i class="fa-solid fa-screwdriver-wrench text-3xl"></i>
+              </span>
             </div>
 
-            <!-- Mobile Navigation -->
+            <!-- Company Name -->
 
-            <div id="mobileMenu"
-                class="lg:hidden mt-4 pb-3 space-y-2 max-h-0 opacity-0 overflow-hidden transition-all duration-300 ease-in-out">
-                <a href="#services" class="mobile-nav-btn">
-                    Services
-                </a>
-
-                <a href="#how-it-works" class="mobile-nav-btn">
-                    How It Works
-                </a>
-
-                <a href="Company.html" class="mobile-nav-btn">
-                    About Us
-                </a>
-
-                <a href="login.html" class="mobile-nav-btn">
-                    Login
-                </a>
-
-                <a href="UserRegistration.html" class="mobile-nav-btn bg-violet-600 text-white">
-                    Register
-                </a>
+            <div>
+              <h1 class="text-xl font-bold tracking-tight">ServiceHub</h1>
+              <p class="text-xs text-gray-400">
+                Trusted Services, Anytime Anywhere
+              </p>
             </div>
-        </nav>
+          </a>
+
+          <!-- Desktop Navigation -->
+
+          <div class="hidden lg:flex items-center gap-3">
+            <a href="#services" class="nav-btn hover:bg-violet-900/40">
+              Services
+            </a>
+
+            <a href="#how-it-works" class="nav-btn hover:bg-violet-900/40">
+              How It Works
+            </a>
+
+            <a href="Company.html" class="nav-btn hover:bg-violet-900/40">
+              About Us
+            </a>
+
+            <a href="login.html" class="nav-btn hover:bg-violet-900/40">
+              Login
+            </a>
+
+            <a
+              href="UserRegistration.html"
+              class="nav-btn bg-violet-600 text-white border-violet-600 hover:bg-violet-700"
+            >
+              Register
+            </a>
+          </div>
+
+          <!-- Mobile Menu Button -->
+
+          <button
+            id="mobileMenuButton"
+            class="lg:hidden border border-gray-700 rounded-full px-4 py-2 text-gray-200 hover:bg-gray-800"
+          >
+            ☰
+          </button>
+        </div>
+
+        <!-- Mobile Navigation -->
+
+        <div
+          id="mobileMenu"
+          class="lg:hidden mt-4 pb-3 space-y-2 max-h-0 opacity-0 overflow-hidden transition-all duration-300 ease-in-out"
+        >
+          <a href="#services" class="mobile-nav-btn"> Services </a>
+
+          <a href="#how-it-works" class="mobile-nav-btn"> How It Works </a>
+
+          <a href="Company.html" class="mobile-nav-btn"> About Us </a>
+
+          <a href="login.html" class="mobile-nav-btn"> Login </a>
+
+          <a
+            href="UserRegistration.html"
+            class="mobile-nav-btn bg-violet-600 text-white"
+          >
+            Register
+          </a>
+        </div>
+      </nav>
     </header>
 
     <!--  HERO SECTION -->
 
     <main>
-        <section class="relative overflow-hidden bg-linear-to-br from-gray-950 via-gray-900 to-violet-950/50">
-
-            <div class="max-w-7xl mx-auto px-6 py-20 lg:py-12">
-
-                <div class="grid lg:grid-cols-2 gap-16 items-center">
-                    <!-- Hero Text -->
-                    <div>
-                        <span
-                            class="inline-block px-4 py-2 rounded-full border border-violet-800 bg-violet-950/40 text-violet-300 text-sm font-medium mb-6">
-                            Your Trusted Local Service Platform
-                        </span>
-
-                        <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-                            Get the right
-                            <span class="text-violet-400">
-                                professional
-                            </span>
-                            for the job.
-                        </h2>
-
-                        <p class="mt-6 text-lg text-gray-300 max-w-xl">
-                            From electrical repairs to carpentry and plumbing,
-                            ServiceHub connects you with trusted professionals
-                            for your everyday service needs.
-                        </p>
-
-                        <div class="flex flex-wrap gap-4 mt-8">
-
-                            <a href="login.html"
-                                class="px-7 py-3 rounded-full bg-violet-600 text-white font-semibold hover:bg-violet-700 transition">
-                                Book a Service
-                            </a>
-
-                            <a href="WorkerRegister.html"
-                                class="px-7 py-3 rounded-full border border-gray-700 font-semibold text-gray-200 hover:bg-gray-800 transition">
-                                Become a Professional
-                            </a>
-
-                        </div>
-                        
-                    </div>
-
-                    <!-- Hero Image -->
-
-                    <div class="relative mt-8 lg:mt-0 hero-image">
-
-                        <div class="rounded-3xl overflow-hidden shadow-2xl">
-
-                            <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1200&q=80"
-                            alt="Professional service worker" class="w-full h-[400px] lg:h-[450px] object-cover">
-
-                        </div>
-
-                        <!-- Floating Card -->
-
-                        <div
-                            class="absolute -bottom-6 -left-6 bg-gray-900 shadow-xl rounded-2xl p-5 border border-gray-800">
-
-                            <div class="flex items-center gap-3">
-
-                                <div
-                                    class="w-11 h-11 rounded-full bg-green-900/40 text-green-400 flex items-center justify-center">
-
-                                    ✓
-
-                                </div>
-
-
-                                <div>
-                                    <p class="font-semibold">
-                                        Trusted Professionals
-                                    </p>
-
-                                    <p class="text-sm text-gray-400">
-                                        Ready to help
-                                    </p>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </section>
-
-
-
-        <!-- SERVICES-->
-
-        <section id="services" class="max-w-7xl mx-auto px-6 py-24 bg-gray-950">
-
-
-            <div class="text-center max-w-2xl mx-auto">
-
-                <span class="text-violet-600 font-semibold text-sm uppercase tracking-wider">
-                    Our Services
-                </span>
-
-                <h2 class="text-3xl md:text-4xl font-bold mt-3">
-                    Services for your everyday needs
-                </h2>
-
-
-                <p class="mt-4 text-gray-400">
-
-                    Find skilled professionals for repairs,
-                    maintenance and other services around you.
-
-                </p>
-
-            </div>
-
-            <!-- Service Cards -->
-
-            <div id="servicesGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-14">
-
-                <!-- CARPENTER -->
-
-                <div class="service-card">
-
-                    <div class="service-image-container">
-
-                        <img class="service-image" data-service="carpenter"
-                            src="https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                            alt="Carpentry service">
-
-                    </div>
-
-                    <div class="p-6">
-
-                        <div class="flex items-center justify-between">
-
-                            <h3 class="text-xl font-bold">
-                                Carpentry
-                            </h3>
-
-                            <span class="service-icon">
-                                🪚
-                            </span>
-
-                        </div>
-
-                        <p class="mt-3 text-gray-400">
-
-                            Furniture, doors, beds, tables and other
-                            woodwork services.
-
-                        </p>
-
-                    </div>
-                </div>
-
-                <!-- ELECTRICIAN -->
-
-                <div class="service-card">
-
-                    <div class="service-image-container">
-
-                        <img class="service-image" data-service="electrician"
-                            src="https://images.unsplash.com/photo-1635335874521-7987db781153?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                            alt="Electrical service">
-
-                    </div>
-
-                    <div class="p-6">
-
-                        <div class="flex items-center justify-between">
-
-                            <h3 class="text-xl font-bold">
-                                Electrical
-                            </h3>
-
-                            <span class="service-icon">
-                                ⚡
-                            </span>
-
-                        </div>
-
-                        <p class="mt-3 text-gray-400">
-
-                            Wiring, switches, fans, lights and
-                            electrical repairs.
-
-                        </p>
-
-                    </div>
-                </div>
-
-                <!-- PLUMBER -->
-
-                <div class="service-card">
-
-                    <div class="service-image-container">
-
-                        <img class="service-image" data-service="plumber"
-                            src="https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?auto=format&fit=crop&w=900&q=80"
-                            alt="Plumbing service">
-
-                    </div>
-
-                    <div class="p-6">
-
-                        <div class="flex items-center justify-between">
-
-                            <h3 class="text-xl font-bold">
-                                Plumbing
-                            </h3>
-
-                            <span class="service-icon">
-                                🔧
-                            </span>
-
-                        </div>
-
-                        <p class="mt-3 text-gray-400">
-
-                            Pipe repairs, taps, leaks, sinks and
-                            other plumbing services.
-
-                        </p>
-
-                    </div>
-                </div>
-
-                <!-- PAINTER -->
-
-                <div class="service-card">
-
-                    <div class="service-image-container">
-
-                        <img class="service-image" data-service="painter"
-                            src="https://images.unsplash.com/photo-1688372198189-de6a51777a81?q=80&w=1245&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                            alt="Painting service">
-
-                    </div>
-
-                    <div class="p-6">
-
-                        <div class="flex items-center justify-between">
-
-                            <h3 class="text-xl font-bold">
-                                Painting
-                            </h3>
-
-                            <span class="service-icon">
-                                🎨
-                            </span>
-
-                        </div>
-
-                        <p class="mt-3 text-gray-400">
-
-                            Interior, exterior and home painting
-                            services.
-
-                        </p>
-
-                    </div>
-                </div>
-
-                <!-- CLEANING -->
-
-                <div class="service-card">
-
-                    <div class="service-image-container">
-
-                        <img class="service-image" data-service="cleaning"
-                            src="https://images.unsplash.com/photo-1740657254989-42fe9c3b8cce?q=80&w=1312&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                            alt="Cleaning service">
-
-                    </div>
-
-                    <div class="p-6">
-
-                        <div class="flex items-center justify-between">
-
-                            <h3 class="text-xl font-bold">
-                                Cleaning
-                            </h3>
-
-                            <span class="service-icon">
-                                🧹
-                            </span>
-
-                        </div>
-
-                        <p class="mt-3 text-gray-400">
-
-                            Home cleaning, deep cleaning and
-                            maintenance services.
-
-                        </p>
-
-                    </div>
-
-                </div>
-
-                <!-- APPLIANCE -->
-
-                <div class="service-card">
-
-                    <div class="service-image-container">
-
-                        <img class="service-image" data-service="appliance"
-                            src="https://plus.unsplash.com/premium_photo-1661342406124-740ae7a0dd0e?q=80&w=1169&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                            alt="Appliance repair service">
-
-                    </div>
-
-                    <div class="p-6">
-
-                        <div class="flex items-center justify-between">
-
-                            <h3 class="text-xl font-bold">
-                                Appliance Repair
-                            </h3>
-
-                            <span class="service-icon">
-                                🔩
-                            </span>
-
-                        </div>
-
-                        <p class="mt-3 text-gray-400">
-
-                            Repair and maintenance for your
-                            everyday household appliances.
-
-                        </p>
-
-                    </div>
-                </div>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- HOW IT WORKS-->
-
-        <section id="how-it-works" class="bg-gray-900 py-24 border-y border-gray-800">
-
-            <div class="max-w-7xl mx-auto px-6">
-
-                <div class="text-center">
-
-                    <span class="text-violet-600 font-semibold">
-                        SIMPLE PROCESS
-                    </span>
-
-                    <h2 class="text-3xl md:text-4xl font-bold mt-3">
-                        How ServiceHub works
-                    </h2>
-
-                </div>
-
-                <div class="grid md:grid-cols-4 gap-8 mt-14">
-
-                    <!-- Step 1 -->
-
-                    <div class="text-center">
-
-                        <div class="step-number">
-                            1
-                        </div>
-
-                        <h3 class="font-bold text-xl mt-5">
-                            Choose a Service
-                        </h3>
-
-                        <p class="text-gray-400 mt-3">
-                            Select the service you need.
-                        </p>
-
-                    </div>
-
-                    <!-- Step 2 -->
-
-                    <div class="text-center">
-
-                        <div class="step-number">
-                            2
-                        </div>
-
-                        <h3 class="font-bold text-xl mt-5">
-                            Describe the Problem
-                        </h3>
-
-                        <p class="text-gray-400 mt-3">
-                            Tell us what needs to be done.
-                        </p>
-
-                    </div>
-
-                    <!-- Step 3 -->
-
-                    <div class="text-center">
-
-                        <div class="step-number">
-                            3
-                        </div>
-
-                        <h3 class="font-bold text-xl mt-5">
-                            Choose a Professional
-                        </h3>
-
-                        <p class="text-gray-400 mt-3">
-                            Find the right professional for your job.
-                        </p>
-
-                    </div>
-
-                    <!-- Step 4 -->
-
-                    <div class="text-center">
-
-                        <div class="step-number">
-                            4
-                        </div>
-
-                        <h3 class="font-bold text-xl mt-5">
-                            Get the Job Done
-                        </h3>
-
-                        <p class="text-gray-400 mt-3">
-                            Sit back while your professional handles it.
-                        </p>
-
-                    </div>
-                </div>
-            </div>
-        </section>
-
-
-
-        <!--  WHY SERVICEHUB -->
-
-        <section class="max-w-7xl mx-auto px-6 py-24 bg-gray-950">
-
-            <div class="grid lg:grid-cols-2 gap-16 items-center">
-
-                <div>
-
-                    <span class="text-violet-600 font-semibold">
-
-                        WHY SERVICEHUB
-
-                    </span>
-
-                    <h2 class="text-3xl md:text-4xl font-bold mt-3">
-
-                        Making everyday services easier
-
-                    </h2>
-
-                    <p class="mt-5 text-gray-400">
-
-                        We want to make finding reliable professionals
-                        simple, transparent and convenient.
-
-                    </p>
-
-                </div>
-
-                <div class="grid sm:grid-cols-2 gap-5">
-
-                    <div class="feature-card">
-
-                        <div class="feature-icon">
-                            ✓
-                        </div>
-
-                        <h3 class="font-bold mt-4">
-                            Verified Professionals
-                        </h3>
-
-                        <p class="text-sm text-gray-400 mt-2">
-                            Connect with trusted service providers.
-                        </p>
-
-                    </div>
-
-                    <div class="feature-card">
-
-                        <div class="feature-icon">
-                            ₹
-                        </div>
-
-                        <h3 class="font-bold mt-4">
-                            Transparent Pricing
-                        </h3>
-
-                        <p class="text-sm text-gray-400 mt-2">
-                            Know the base price before booking.
-                        </p>
-
-                    </div>
-
-                    <div class="feature-card">
-
-                        <div class="feature-icon">
-                            ★
-                        </div>
-
-                        <h3 class="font-bold mt-4">
-                            Quality Service
-                        </h3>
-
-                        <p class="text-sm text-gray-400 mt-2">
-                            Choose professionals based on ratings.
-                        </p>
-
-                    </div>
-
-                    <div class="feature-card">
-
-                        <div class="feature-icon">
-                            🔒
-                        </div>
-
-                        <h3 class="font-bold mt-4">
-                            Secure Payments
-                        </h3>
-
-                        <p class="text-sm text-gray-400 mt-2">
-                            Simple and secure payment experience.
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-        <!--  CTA -->
-
-        <section class="px-6 pb-24 bg-gray-950">
-
-            <div class="max-w-7xl mx-auto rounded-3xl bg-violet-600 text-white px-8 py-16 text-center">
-
-                <h2 class="text-3xl md:text-4xl font-bold">
-
-                    Need a service? We've got you covered.
-
-                </h2>
-
-                <p class="mt-4 text-violet-100 max-w-xl mx-auto">
-
-                    Find the right professional for your next job
-                    with ServiceHub.
-
-                </p>
-
-                <a href="login.html"
-                    class="inline-block mt-8 px-8 py-3 rounded-full bg-white text-violet-700 font-semibold hover:bg-violet-50 transition">
-
-                    Get Started
-
+      <section
+        class="relative overflow-hidden bg-linear-to-br from-gray-950 via-gray-900 to-violet-950/50"
+      >
+        <div class="max-w-7xl mx-auto px-6 py-20 lg:py-12">
+          <div class="grid lg:grid-cols-2 gap-16 items-center">
+            <!-- Hero Text -->
+            <div>
+              <span
+                class="inline-block px-4 py-2 rounded-full border border-violet-800 bg-violet-950/40 text-violet-300 text-sm font-medium mb-6"
+              >
+                Your Trusted Local Service Platform
+              </span>
+
+              <h2
+                class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight"
+              >
+                Get the right
+                <span class="text-violet-400"> professional </span>
+                for the job.
+              </h2>
+
+              <p class="mt-6 text-lg text-gray-300 max-w-xl">
+                From electrical repairs to carpentry and plumbing, ServiceHub
+                connects you with trusted professionals for your everyday
+                service needs.
+              </p>
+
+              <div class="flex flex-wrap gap-4 mt-8">
+                <a
+                  href="login.html"
+                  class="px-7 py-3 rounded-full bg-violet-600 text-white font-semibold hover:bg-violet-700 transition"
+                >
+                  Book a Service
                 </a>
 
+                <a
+                  href="WorkerRegister.html"
+                  class="px-7 py-3 rounded-full border border-gray-700 font-semibold text-gray-200 hover:bg-gray-800 transition"
+                >
+                  Become a Professional
+                </a>
+              </div>
             </div>
 
-        </section>
+            <!-- Hero Image -->
 
+            <div class="relative mt-8 lg:mt-0 hero-image">
+              <div class="rounded-3xl overflow-hidden shadow-2xl">
+                <img
+                  src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1200&q=80"
+                  alt="Professional service worker"
+                  class="w-full h-[400px] lg:h-[450px] object-cover"
+                />
+              </div>
+
+              <!-- Floating Card -->
+
+              <div
+                class="absolute -bottom-6 -left-6 bg-gray-900 shadow-xl rounded-2xl p-5 border border-gray-800"
+              >
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-11 h-11 rounded-full bg-green-900/40 text-green-400 flex items-center justify-center"
+                  >
+                    ✓
+                  </div>
+
+                  <div>
+                    <p class="font-semibold">Trusted Professionals</p>
+
+                    <p class="text-sm text-gray-400">Ready to help</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SERVICES-->
+
+      <section id="services" class="max-w-7xl mx-auto px-6 py-24 bg-gray-950">
+        <div class="text-center max-w-2xl mx-auto">
+          <span
+            class="text-violet-600 font-semibold text-sm uppercase tracking-wider"
+          >
+            Our Services
+          </span>
+
+          <h2 class="text-3xl md:text-4xl font-bold mt-3">
+            Services for your everyday needs
+          </h2>
+
+          <p class="mt-4 text-gray-400">
+            Find skilled professionals for repairs, maintenance and other
+            services around you.
+          </p>
+        </div>
+
+        <!-- Service Cards -->
+
+        <div
+          id="servicesGrid"
+          class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-14"
+        >
+          <!-- CARPENTER -->
+
+          <div class="service-card">
+            <div class="service-image-container">
+              <img
+                class="service-image"
+                data-service="carpenter"
+                src="https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="Carpentry service"
+              />
+            </div>
+
+            <div class="p-6">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xl font-bold">Carpentry</h3>
+
+                <span class="service-icon"> 🪚 </span>
+              </div>
+
+              <p class="mt-3 text-gray-400">
+                Furniture, doors, beds, tables and other woodwork services.
+              </p>
+            </div>
+          </div>
+
+          <!-- ELECTRICIAN -->
+
+          <div class="service-card">
+            <div class="service-image-container">
+              <img
+                class="service-image"
+                data-service="electrician"
+                src="https://images.unsplash.com/photo-1635335874521-7987db781153?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="Electrical service"
+              />
+            </div>
+
+            <div class="p-6">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xl font-bold">Electrical</h3>
+
+                <span class="service-icon"> ⚡ </span>
+              </div>
+
+              <p class="mt-3 text-gray-400">
+                Wiring, switches, fans, lights and electrical repairs.
+              </p>
+            </div>
+          </div>
+
+          <!-- PLUMBER -->
+
+          <div class="service-card">
+            <div class="service-image-container">
+              <img
+                class="service-image"
+                data-service="plumber"
+                src="https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?auto=format&fit=crop&w=900&q=80"
+                alt="Plumbing service"
+              />
+            </div>
+
+            <div class="p-6">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xl font-bold">Plumbing</h3>
+
+                <span class="service-icon"> 🔧 </span>
+              </div>
+
+              <p class="mt-3 text-gray-400">
+                Pipe repairs, taps, leaks, sinks and other plumbing services.
+              </p>
+            </div>
+          </div>
+
+          <!-- PAINTER -->
+
+          <div class="service-card">
+            <div class="service-image-container">
+              <img
+                class="service-image"
+                data-service="painter"
+                src="https://images.unsplash.com/photo-1688372198189-de6a51777a81?q=80&w=1245&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="Painting service"
+              />
+            </div>
+
+            <div class="p-6">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xl font-bold">Painting</h3>
+
+                <span class="service-icon"> 🎨 </span>
+              </div>
+
+              <p class="mt-3 text-gray-400">
+                Interior, exterior and home painting services.
+              </p>
+            </div>
+          </div>
+
+          <!-- CLEANING -->
+
+          <div class="service-card">
+            <div class="service-image-container">
+              <img
+                class="service-image"
+                data-service="cleaning"
+                src="https://images.unsplash.com/photo-1740657254989-42fe9c3b8cce?q=80&w=1312&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="Cleaning service"
+              />
+            </div>
+
+            <div class="p-6">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xl font-bold">Cleaning</h3>
+
+                <span class="service-icon"> 🧹 </span>
+              </div>
+
+              <p class="mt-3 text-gray-400">
+                Home cleaning, deep cleaning and maintenance services.
+              </p>
+            </div>
+          </div>
+
+          <!-- APPLIANCE -->
+
+          <div class="service-card">
+            <div class="service-image-container">
+              <img
+                class="service-image"
+                data-service="appliance"
+                src="https://plus.unsplash.com/premium_photo-1661342406124-740ae7a0dd0e?q=80&w=1169&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="Appliance repair service"
+              />
+            </div>
+
+            <div class="p-6">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xl font-bold">Appliance Repair</h3>
+
+                <span class="service-icon"> 🔩 </span>
+              </div>
+
+              <p class="mt-3 text-gray-400">
+                Repair and maintenance for your everyday household appliances.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- HOW IT WORKS-->
+
+      <section
+        id="how-it-works"
+        class="bg-gray-900 py-24 border-y border-gray-800"
+      >
+        <div class="max-w-7xl mx-auto px-6">
+          <div class="text-center">
+            <span class="text-violet-600 font-semibold"> SIMPLE PROCESS </span>
+
+            <h2 class="text-3xl md:text-4xl font-bold mt-3">
+              How ServiceHub works
+            </h2>
+          </div>
+
+          <div class="grid md:grid-cols-4 gap-8 mt-14">
+            <!-- Step 1 -->
+
+            <div class="text-center">
+              <div class="step-number">1</div>
+
+              <h3 class="font-bold text-xl mt-5">Choose a Service</h3>
+
+              <p class="text-gray-400 mt-3">Select the service you need.</p>
+            </div>
+
+            <!-- Step 2 -->
+
+            <div class="text-center">
+              <div class="step-number">2</div>
+
+              <h3 class="font-bold text-xl mt-5">Describe the Problem</h3>
+
+              <p class="text-gray-400 mt-3">Tell us what needs to be done.</p>
+            </div>
+
+            <!-- Step 3 -->
+
+            <div class="text-center">
+              <div class="step-number">3</div>
+
+              <h3 class="font-bold text-xl mt-5">Choose a Professional</h3>
+
+              <p class="text-gray-400 mt-3">
+                Find the right professional for your job.
+              </p>
+            </div>
+
+            <!-- Step 4 -->
+
+            <div class="text-center">
+              <div class="step-number">4</div>
+
+              <h3 class="font-bold text-xl mt-5">Get the Job Done</h3>
+
+              <p class="text-gray-400 mt-3">
+                Sit back while your professional handles it.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!--  WHY SERVICEHUB -->
+
+      <section class="max-w-7xl mx-auto px-6 py-24 bg-gray-950">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+          <div>
+            <span class="text-violet-600 font-semibold"> WHY SERVICEHUB </span>
+
+            <h2 class="text-3xl md:text-4xl font-bold mt-3">
+              Making everyday services easier
+            </h2>
+
+            <p class="mt-5 text-gray-400">
+              We want to make finding reliable professionals simple, transparent
+              and convenient.
+            </p>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-5">
+            <div class="feature-card">
+              <div class="feature-icon">✓</div>
+
+              <h3 class="font-bold mt-4">Verified Professionals</h3>
+
+              <p class="text-sm text-gray-400 mt-2">
+                Connect with trusted service providers.
+              </p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-icon">₹</div>
+
+              <h3 class="font-bold mt-4">Transparent Pricing</h3>
+
+              <p class="text-sm text-gray-400 mt-2">
+                Know the base price before booking.
+              </p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-icon">★</div>
+
+              <h3 class="font-bold mt-4">Quality Service</h3>
+
+              <p class="text-sm text-gray-400 mt-2">
+                Choose professionals based on ratings.
+              </p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-icon">🔒</div>
+
+              <h3 class="font-bold mt-4">Secure Payments</h3>
+
+              <p class="text-sm text-gray-400 mt-2">
+                Simple and secure payment experience.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!--  CTA -->
+
+      <section class="px-6 pb-24 bg-gray-950">
+        <div
+          class="max-w-7xl mx-auto rounded-3xl bg-violet-600 text-white px-8 py-16 text-center"
+        >
+          <h2 class="text-3xl md:text-4xl font-bold">
+            Need a service? We've got you covered.
+          </h2>
+
+          <p class="mt-4 text-violet-100 max-w-xl mx-auto">
+            Find the right professional for your next job with ServiceHub.
+          </p>
+
+          <a
+            href="login.html"
+            class="inline-block mt-8 px-8 py-3 rounded-full bg-white text-violet-700 font-semibold hover:bg-violet-50 transition"
+          >
+            Get Started
+          </a>
+        </div>
+      </section>
     </main>
 
     <!--  FOOTER -->
 
     <footer id="contact" class="bg-gray-950 text-gray-300">
+      <div class="max-w-7xl mx-auto px-6 py-16">
+        <div class="grid md:grid-cols-4 gap-10">
+          <!-- Company -->
 
-        <div class="max-w-7xl mx-auto px-6 py-16">
+          <div class="md:col-span-2">
+            <h2 class="text-2xl font-bold text-white">ServiceHub</h2>
 
-            <div class="grid md:grid-cols-4 gap-10">
+            <p class="mt-4 max-w-md text-gray-400">
+              Trusted Services, Anytime Anywhere. Connecting customers with
+              skilled professionals for everyday services.
+            </p>
 
-                <!-- Company -->
+            <!-- Contact Us -->
 
-                <div class="md:col-span-2">
+            <div class="mt-8">
+              <h3 class="font-semibold text-white">Contact Us</h3>
 
-                    <h2 class="text-2xl font-bold text-white">
-                        ServiceHub
-                    </h2>
+              <div class="mt-4 flex items-center gap-5">
+                <a
+                  href="mailto:santoshku.mishra03@gmail.com"
+                  class="contact-icon"
+                  title="Email"
+                >
+                  <i class="fa-solid fa-envelope"></i>
+                </a>
 
-                    <p class="mt-4 max-w-md text-gray-400">
+                <a href="tel:+919178299774" class="contact-icon" title="Phone">
+                  <i class="fa-solid fa-phone"></i>
+                </a>
 
-                        Trusted Services, Anytime Anywhere.
-                        Connecting customers with skilled
-                        professionals for everyday services.
-
-                    </p>
-
-                    <!-- Contact Us -->
-
-                    <div class="mt-8">
-
-                        <h3 class="font-semibold text-white">
-                            Contact Us
-                        </h3>
-
-                        <div class="mt-4 flex items-center gap-5">
-
-                            <a href="mailto:santoshku.mishra03@gmail.com" class="contact-icon" title="Email">
-
-                                <i class="fa-solid fa-envelope"></i>
-
-                            </a>
-
-                            <a href="tel:+919178299774" class="contact-icon" title="Phone">
-
-                                <i class="fa-solid fa-phone"></i>
-
-                            </a>
-
-                            <a href="https://wa.me/919178299774" target="_blank" rel="noopener noreferrer"
-                                class="contact-icon" title="WhatsApp">
-
-                                <i class="fa-brands fa-square-whatsapp"></i>
-
-                            </a>
-
-                        </div>
-
-                    </div>
-
-                    <!-- Developer -->
-
-                    <div class="mt-7">
-
-                        <h3 class="font-semibold text-white">
-                            Developer
-                        </h3>
-
-                        <div class="mt-4 flex items-center gap-5">
-
-                            <a href="https://www.linkedin.com/in/santosh-mishra-087b36307/" target="_blank" rel="noopener noreferrer" class="contact-icon" title="LinkedIn">
-
-                                <i class="fa-brands fa-linkedin"></i>
-
-                            </a>
-
-                            <a href="https://github.com/s-santosh-mishra" target="_blank" rel="noopener noreferrer" class="contact-icon" title="GitHub">
-
-                                <i class="fa-brands fa-square-github"></i>
-
-                            </a>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <!-- Services -->
-
-                <div>
-
-                    <h3 class="font-semibold text-white">
-                        Services
-                    </h3>
-
-                    <ul class="mt-4 space-y-3 text-sm">
-
-                        <li>
-                            <a href="CustomerDashboard.html" class="footer-link">
-                                Carpentry
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="CustomerDashboard.html" class="footer-link">
-                                Electrical
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="CustomerDashboard.html" class="footer-link">
-                                Plumbing
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="CustomerDashboard.html" class="footer-link">
-                                Cleaning
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="CustomerDashboard.html" class="footer-link">
-                                Appliance Repair
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="CustomerDashboard.html" class="footer-link">
-                                Painting
-                            </a>
-                        </li>
-
-                    </ul>
-
-                </div>
-
-                <!-- Company Pages -->
-
-                <div>
-
-                    <h3 class="font-semibold text-white">
-                        Company
-                    </h3>
-
-
-                    <ul class="mt-4 space-y-3 text-sm">
-
-                        <li>
-                            <a href="Company.html#about" class="footer-link">
-                                About Us
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="Company.html#contact" class="footer-link">
-                                Contact Us
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="Company.html#careers" class="footer-link">
-                                Careers
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="Company.html#privacy" class="footer-link">
-                                Privacy Policy
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="Company.html#terms" class="footer-link">
-                                Terms & Conditions
-                            </a>
-                        </li>
-
-                    </ul>
-
-                </div>
-
+                <a
+                  href="https://wa.me/919178299774"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="contact-icon"
+                  title="WhatsApp"
+                >
+                  <i class="fa-brands fa-square-whatsapp"></i>
+                </a>
+              </div>
             </div>
 
+            <!-- Developer -->
 
+            <div class="mt-7">
+              <h3 class="font-semibold text-white">Developer</h3>
 
+              <div class="mt-4 flex items-center gap-5">
+                <a
+                  href="https://www.linkedin.com/in/santosh-mishra-087b36307/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="contact-icon"
+                  title="LinkedIn"
+                >
+                  <i class="fa-brands fa-linkedin"></i>
+                </a>
+
+                <a
+                  href="https://github.com/s-santosh-mishra"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="contact-icon"
+                  title="GitHub"
+                >
+                  <i class="fa-brands fa-square-github"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Services -->
+
+          <div>
+            <h3 class="font-semibold text-white">Services</h3>
+
+            <ul class="mt-4 space-y-3 text-sm">
+              <li>
+                <a href="CustomerDashboard.html" class="footer-link">
+                  Carpentry
+                </a>
+              </li>
+
+              <li>
+                <a href="CustomerDashboard.html" class="footer-link">
+                  Electrical
+                </a>
+              </li>
+
+              <li>
+                <a href="CustomerDashboard.html" class="footer-link">
+                  Plumbing
+                </a>
+              </li>
+
+              <li>
+                <a href="CustomerDashboard.html" class="footer-link">
+                  Cleaning
+                </a>
+              </li>
+
+              <li>
+                <a href="CustomerDashboard.html" class="footer-link">
+                  Appliance Repair
+                </a>
+              </li>
+
+              <li>
+                <a href="CustomerDashboard.html" class="footer-link">
+                  Painting
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Company Pages -->
+
+          <div>
+            <h3 class="font-semibold text-white">Company</h3>
+
+            <ul class="mt-4 space-y-3 text-sm">
+              <li>
+                <a href="Company.html#about" class="footer-link"> About Us </a>
+              </li>
+
+              <li>
+                <a href="Company.html#contact" class="footer-link">
+                  Contact Us
+                </a>
+              </li>
+
+              <li>
+                <a href="Company.html#careers" class="footer-link"> Careers </a>
+              </li>
+
+              <li>
+                <a href="Company.html#privacy" class="footer-link">
+                  Privacy Policy
+                </a>
+              </li>
+
+              <li>
+                <a href="Company.html#terms" class="footer-link">
+                  Terms & Conditions
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
+      </div>
 
-        <div class="border-t border-gray-800 mt-12"></div>
+      <div class="border-t border-gray-800 mt-12"></div>
 
-        <div class="footer-bottom-spacing max-w-7xl mx-auto px-6 pt-8 flex flex-col md:flex-row justify-between gap-4 text-sm text-gray-500 text-center">
+      <div
+        class="footer-bottom-spacing max-w-7xl mx-auto px-6 pt-8 flex flex-col md:flex-row justify-between gap-4 text-sm text-gray-500 text-center"
+      >
+        <p>© 2026 ServiceHub. All rights reserved.</p>
 
-                <p>
-                    © 2026 ServiceHub. All rights reserved.
-                </p>
-
-                <p>
-                    Built to make services simpler.
-                </p>
-
-        </div>
-
+        <p>Built to make services simpler.</p>
+      </div>
     </footer>
 
     <!-- JavaScript -->
 
     <script src="../JS/indexJs.js"></script>
-    <script src="https://kit.fontawesome.com/330033b57f.js" crossorigin="anonymous"></script>
-
-</body>
-
+    <script
+      src="https://kit.fontawesome.com/330033b57f.js"
+      crossorigin="anonymous"
+    ></script>
+  </body>
 </html>

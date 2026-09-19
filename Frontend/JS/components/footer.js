@@ -45,16 +45,10 @@ const serviceHubFooter = `
 
 `;
 
-
-
 /*   Insert Footer */
 
-const footerContainer =
-    document.getElementById("serviceHubFooter");
+const footerContainer = document.getElementById("serviceHubFooter");
 
 if (footerContainer) {
-
-    footerContainer.innerHTML =
-        serviceHubFooter;
-
+  footerContainer.innerHTML = serviceHubFooter;
 }

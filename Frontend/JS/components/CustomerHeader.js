@@ -111,30 +111,25 @@ const customerHeader = `
 </header>
 `;
 
-
 /*   Insert Header*/
 
 const headerContainer = document.getElementById("customerHeader");
 
 if (headerContainer) {
-    headerContainer.innerHTML = customerHeader;
+  headerContainer.innerHTML = customerHeader;
 }
-
 
 /*   Highlight Current Page*/
 
 const currentPage = window.location.pathname.split("/").pop();
 
-document.querySelectorAll(".nav-btn, .mobile-nav-btn").forEach(link => {
+document.querySelectorAll(".nav-btn, .mobile-nav-btn").forEach((link) => {
+  const linkPage = link.getAttribute("href");
 
-    const linkPage = link.getAttribute("href");
-
-    if (linkPage === currentPage) {
-        link.classList.add("active");
-    }
-
+  if (linkPage === currentPage) {
+    link.classList.add("active");
+  }
 });
-
 
 /*   Mobile Menu*/
 
@@ -142,54 +137,43 @@ const mobileMenuButton = document.getElementById("mobileMenuButton");
 const mobileMenu = document.getElementById("mobileMenu");
 
 if (mobileMenuButton && mobileMenu) {
+  mobileMenuButton.addEventListener("click", () => {
+    const isOpen = mobileMenu.classList.contains("max-h-96");
 
-    mobileMenuButton.addEventListener("click", () => {
-
-        const isOpen = mobileMenu.classList.contains("max-h-96");
-
-        if (isOpen) {
-
-            mobileMenu.classList.remove("max-h-96", "opacity-100");
-            mobileMenu.classList.add("max-h-0", "opacity-0");
-
-        } else {
-
-            mobileMenu.classList.remove("max-h-0", "opacity-0");
-            mobileMenu.classList.add("max-h-96", "opacity-100");
-
-        }
-
-    });
-
+    if (isOpen) {
+      mobileMenu.classList.remove("max-h-96", "opacity-100");
+      mobileMenu.classList.add("max-h-0", "opacity-0");
+    } else {
+      mobileMenu.classList.remove("max-h-0", "opacity-0");
+      mobileMenu.classList.add("max-h-96", "opacity-100");
+    }
+  });
 }
-
 
 /*   Customer Logout*/
 
 function customerLogout() {
+  const confirmed = confirm("Are you sure you want to log out?");
 
-    const confirmed = confirm("Are you sure you want to log out?");
+  if (!confirmed) {
+    return;
+  }
 
-    if (!confirmed) {
-        return;
-    }
+  localStorage.removeItem("servicehub_access_token");
+  localStorage.removeItem("servicehub_user_id");
+  localStorage.removeItem("servicehub_user_email");
+  localStorage.removeItem("servicehub_user_role");
 
-    localStorage.removeItem("servicehub_access_token");
-    localStorage.removeItem("servicehub_user_id");
-    localStorage.removeItem("servicehub_user_email");
-    localStorage.removeItem("servicehub_user_role");
-
-    window.location.href = "login.html";
+  window.location.href = "login.html";
 }
-
 
 const logoutButton = document.getElementById("logoutButton");
 const mobileLogoutButton = document.getElementById("mobileLogoutButton");
 
 if (logoutButton) {
-    logoutButton.addEventListener("click", customerLogout);
+  logoutButton.addEventListener("click", customerLogout);
 }
 
 if (mobileLogoutButton) {
-    mobileLogoutButton.addEventListener("click", customerLogout);
+  mobileLogoutButton.addEventListener("click", customerLogout);
 }

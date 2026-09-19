@@ -1,400 +1,226 @@
-const API_BASE_URL =
-    "http://localhost:8080/api/customer";
+const API_BASE_URL = "http://localhost:8080/api/customer";
 
+const accessToken = localStorage.getItem("servicehub_access_token");
 
-const accessToken =
-    localStorage.getItem(
-        "servicehub_access_token"
-    );
-
-
-const userRole =
-    localStorage.getItem(
-        "servicehub_user_role"
-    );
-
+const userRole = localStorage.getItem("servicehub_user_role");
 
 /* AUTH GUARD */
 
-if (
-    !accessToken ||
-    userRole !== "USER"
-) {
-
-    window.location.href =
-        "../HTML/login.html";
-
+if (!accessToken || userRole !== "USER") {
+  window.location.href = "../HTML/login.html";
 }
-
 
 /* ELEMENTS*/
 
-const bookingsLoading =
-    document.getElementById(
-        "bookings-loading"
-    );
+const bookingsLoading = document.getElementById("bookings-loading");
 
-const bookingsError =
-    document.getElementById(
-        "bookings-error"
-    );
+const bookingsError = document.getElementById("bookings-error");
 
-const bookingsErrorMessage =
-    document.getElementById(
-        "bookings-error-message"
-    );
+const bookingsErrorMessage = document.getElementById("bookings-error-message");
 
-const retryBookingsButton =
-    document.getElementById(
-        "retry-bookings-button"
-    );
+const retryBookingsButton = document.getElementById("retry-bookings-button");
 
-const noBookings =
-    document.getElementById(
-        "no-bookings"
-    );
+const noBookings = document.getElementById("no-bookings");
 
-const bookingsContainer =
-    document.getElementById(
-        "bookings-container"
-    );
-
+const bookingsContainer = document.getElementById("bookings-container");
 
 /* STATUS HELPERS */
 
 function getStatusLabel(status) {
+  const labels = {
+    PENDING: "Waiting for Worker",
 
-    const labels = {
+    ACCEPTED: "Accepted",
 
-        PENDING:
-            "Waiting for Worker",
+    IN_PROGRESS: "In Progress",
 
-        ACCEPTED:
-            "Accepted",
+    AUTO_COMPLETED: "Auto Completed",
 
-        IN_PROGRESS:
-            "In Progress",
+    COMPLETED: "Completed",
 
-        COMPLETED:
-            "Completed",
+    CANCELLED: "Cancelled",
 
-        CANCELLED:
-            "Cancelled",
+    NO_WORKER: "No Worker Found",
 
-        NO_WORKER:
-            "No Worker Found",
+    FAILED: "Failed",
 
-        FAILED:
-            "Failed",
+    WORKER_CANCELLED: "Worker Cancelled",
 
-        WORKER_CANCELLED:
-            "Worker Cancelled",
+    WORKER_CANNOT_COMPLETE: "Worker Could Not Complete",
+  };
 
-        WORKER_CANNOT_COMPLETE:
-            "Worker Could Not Complete"
-
-    };
-
-    return labels[status] || status;
-
+  return labels[status] || status;
 }
-
 
 function getStatusClasses(status) {
+  const classes = {
+    PENDING: "bg-yellow-500/10 text-yellow-400 border-yellow-500/30",
 
-    const classes = {
+    ACCEPTED: "bg-blue-500/10 text-blue-400 border-blue-500/30",
 
-        PENDING:
-            "bg-yellow-500/10 text-yellow-400 border-yellow-500/30",
+    IN_PROGRESS: "bg-purple-500/10 text-purple-400 border-purple-500/30",
 
-        ACCEPTED:
-            "bg-blue-500/10 text-blue-400 border-blue-500/30",
+    COMPLETED: "bg-green-500/10 text-green-400 border-green-500/30",
 
-        IN_PROGRESS:
-            "bg-purple-500/10 text-purple-400 border-purple-500/30",
+    AUTO_COMPLETED: "bg-green-500/10 text-green-400 border-green-500/30",
 
-        COMPLETED:
-            "bg-green-500/10 text-green-400 border-green-500/30",
+    CANCELLED: "bg-gray-500/10 text-gray-400 border-gray-500/30",
 
-        CANCELLED:
-            "bg-gray-500/10 text-gray-400 border-gray-500/30",
+    NO_WORKER: "bg-orange-500/10 text-orange-400 border-orange-500/30",
 
-        NO_WORKER:
-            "bg-orange-500/10 text-orange-400 border-orange-500/30",
+    FAILED: "bg-red-500/10 text-red-400 border-red-500/30",
+  };
 
-        FAILED:
-            "bg-red-500/10 text-red-400 border-red-500/30"
-
-    };
-
-    return classes[status] ||
-        "bg-gray-500/10 text-gray-400 border-gray-500/30";
-
+  return classes[status] || "bg-gray-500/10 text-gray-400 border-gray-500/30";
 }
-
 
 function getStatusDescription(status) {
+  const descriptions = {
+    PENDING: "Your request is waiting for a worker to accept it.",
 
-    const descriptions = {
+    ACCEPTED: "A worker has accepted your booking.",
 
-        PENDING:
-            "Your request is waiting for a worker to accept it.",
+    IN_PROGRESS: "Your service is currently in progress.",
 
-        ACCEPTED:
-            "A worker has accepted your booking.",
+    AUTO_COMPLETED:
+      "The service was automatically completed because the 30-minute confirmation window expired.",
 
-        IN_PROGRESS:
-            "Your service is currently in progress.",
+    COMPLETED: "This service has been completed.",
 
-        COMPLETED:
-            "This service has been completed.",
+    CANCELLED: "This booking was cancelled.",
 
-        CANCELLED:
-            "This booking was cancelled.",
+    NO_WORKER:
+      "No worker accepted your request within 30 minutes. You can try booking this service again.",
 
-        NO_WORKER:
-            "No worker accepted your request within 30 minutes. You can try booking this service again.",
+    FAILED: "This booking could not be completed.",
 
-        FAILED:
-            "This booking could not be completed.",
+    WORKER_CANCELLED:
+      "The worker cancelled the booking before starting the service. You can request this service again.",
 
-        WORKER_CANCELLED:
-            "The worker cancelled the booking before starting the service. You can request this service again.",
+    WORKER_CANNOT_COMPLETE:
+      "The worker could not complete the service after starting it. Please contact ServiceHub if you need further assistance.",
+  };
 
-        WORKER_CANNOT_COMPLETE:
-            "The worker could not complete the service after starting it. Please contact ServiceHub if you need further assistance."
-
-    };
-
-    return descriptions[status] ||
-        "Booking status information is unavailable.";
-
+  return descriptions[status] || "Booking status information is unavailable.";
 }
-
 
 /* DATE /  TIME*/
 
 function formatDateTime(value) {
-
-    if (!value) {
-
-        return {
-            date: "Not available",
-            time: "Not available"
-        };
-
-    }
-
-
-    const date =
-        new Date(value);
-
-
-    if (Number.isNaN(date.getTime())) {
-
-        return {
-            date: "Not available",
-            time: "Not available"
-        };
-
-    }
-
-
+  if (!value) {
     return {
-
-        date:
-            date.toLocaleDateString(
-                [],
-                {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric"
-                }
-            ),
-
-        time:
-            date.toLocaleTimeString(
-                [],
-                {
-                    hour: "2-digit",
-                    minute: "2-digit"
-                }
-            )
-
+      date: "Not available",
+      time: "Not available",
     };
+  }
 
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return {
+      date: "Not available",
+      time: "Not available",
+    };
+  }
+
+  return {
+    date: date.toLocaleDateString([], {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }),
+
+    time: date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+  };
 }
-
 
 /* LOAD BOOKINGS */
 
 async function loadBookings() {
+  showLoading();
 
-    showLoading();
+  try {
+    const response = await fetch(`${API_BASE_URL}/bookings`, {
+      method: "GET",
 
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
 
-    try {
+    if (response.status === 401) {
+      handleUnauthorized();
+      return;
+    }
 
-        const response =
-            await fetch(
-                `${API_BASE_URL}/bookings`,
-                {
-                    method: "GET",
+    if (!response.ok) {
+      throw new Error("Failed to load bookings.");
+    }
 
-                    headers: {
-                        "Authorization":
-                            `Bearer ${accessToken}`
-                    }
-                }
-            );
+    const bookings = await response.json();
 
+    hideLoading();
 
-        if (response.status === 401) {
+    if (!Array.isArray(bookings) || bookings.length === 0) {
+      showEmptyState();
+      return;
+    }
 
-            handleUnauthorized();
-            return;
-
-        }
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Failed to load bookings."
-            );
-
-        }
-
-
-        const bookings =
-            await response.json();
-
-
-        hideLoading();
-
-
-        if (
-            !Array.isArray(bookings) ||
-            bookings.length === 0
-        ) {
-
-            showEmptyState();
-            return;
-
-        }
-
-
-        /*
+    /*
             Newest bookings first.
         */
 
-        bookings.sort(
-            (a, b) =>
-                new Date(b.createdAt) -
-                new Date(a.createdAt)
-        );
+    bookings.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
+    renderBookings(bookings);
+  } catch (error) {
+    console.error("Booking loading error:", error);
 
-        renderBookings(bookings);
+    hideLoading();
 
-
-    } catch (error) {
-
-        console.error(
-            "Booking loading error:",
-            error
-        );
-
-        hideLoading();
-
-        showError(
-            "Something went wrong while loading your bookings."
-        );
-
-    }
-
+    showError("Something went wrong while loading your bookings.");
+  }
 }
-
 
 /* RENDER BOOKINGS */
 
 function renderBookings(bookings) {
+  bookingsContainer.innerHTML = "";
 
-    bookingsContainer.innerHTML = "";
+  bookings.forEach((booking) => {
+    const card = createBookingCard(booking);
 
+    bookingsContainer.appendChild(card);
+  });
 
-    bookings.forEach(
-        booking => {
+  bookingsContainer.classList.remove("hidden");
 
-            const card =
-                createBookingCard(
-                    booking
-                );
-
-            bookingsContainer.appendChild(
-                card
-            );
-
-        }
-    );
-
-
-    bookingsContainer.classList.remove(
-        "hidden"
-    );
-
-    noBookings.classList.add(
-        "hidden"
-    );
-
+  noBookings.classList.add("hidden");
 }
-
 
 /* CREATE BOOKING  CARD*/
 
 function createBookingCard(booking) {
+  const card = document.createElement("article");
 
-    const card =
-        document.createElement("article");
+  card.className = "border border-gray-800 bg-gray-900/40 rounded-2xl p-6";
 
+  const dateTime = formatDateTime(booking.createdAt);
 
-    card.className =
-        "border border-gray-800 bg-gray-900/40 rounded-2xl p-6";
+  const statusClasses = getStatusClasses(booking.status);
 
+  const statusLabel = getStatusLabel(booking.status);
 
-    const dateTime =
-        formatDateTime(
-            booking.createdAt
-        );
+  const description = getStatusDescription(booking.status);
 
+  const serviceName = booking.serviceName || "Service request";
 
-    const statusClasses =
-        getStatusClasses(
-            booking.status
-        );
+  const workerText = booking.workerName || "Worker not assigned";
 
-
-    const statusLabel =
-        getStatusLabel(
-            booking.status
-        );
-
-
-    const description =
-        getStatusDescription(
-            booking.status
-        );
-
-
-    const serviceName =
-        booking.serviceName || "Service request"
-
-
-    const workerText =
-        booking.workerName || "Worker not assigned"
-
-
-    card.innerHTML = `
+  card.innerHTML = `
 
         <div class="flex flex-col gap-5">
 
@@ -538,8 +364,8 @@ function createBookingCard(booking) {
                 <!-- Completed -->
 
                 ${
-                    booking.completedAt
-                        ? `
+                  booking.completedAt
+                    ? `
 
                             <div
                                 class="bg-green-950/10 border border-green-900/30 rounded-xl p-4"
@@ -580,7 +406,7 @@ function createBookingCard(booking) {
                             </div>
 
                         `
-                        : ""
+                    : ""
                 }
 
 
@@ -589,8 +415,9 @@ function createBookingCard(booking) {
 
             <!-- Customer Note -->
 
-            ${booking.customerNote
-            ? `
+            ${
+              booking.customerNote
+                ? `
 
                     <div
                         class="pt-4 border-t border-gray-800"
@@ -611,122 +438,68 @@ function createBookingCard(booking) {
                     </div>
 
                     `
-            : ""
-        }
+                : ""
+            }
 
 
         </div>
 
     `;
 
-
-    return card;
-
+  return card;
 }
-
 
 /* UI STATES */
 
 function showLoading() {
+  bookingsLoading.classList.remove("hidden");
 
-    bookingsLoading.classList.remove(
-        "hidden"
-    );
+  bookingsError.classList.add("hidden");
 
-    bookingsError.classList.add(
-        "hidden"
-    );
+  noBookings.classList.add("hidden");
 
-    noBookings.classList.add(
-        "hidden"
-    );
-
-    bookingsContainer.classList.add(
-        "hidden"
-    );
-
+  bookingsContainer.classList.add("hidden");
 }
-
 
 function hideLoading() {
-
-    bookingsLoading.classList.add(
-        "hidden"
-    );
-
+  bookingsLoading.classList.add("hidden");
 }
-
 
 function showEmptyState() {
+  bookingsError.classList.add("hidden");
 
-    bookingsError.classList.add(
-        "hidden"
-    );
+  noBookings.classList.remove("hidden");
 
-    noBookings.classList.remove(
-        "hidden"
-    );
-
-    bookingsContainer.classList.add(
-        "hidden"
-    );
-
+  bookingsContainer.classList.add("hidden");
 }
-
 
 function showError(message) {
+  bookingsErrorMessage.textContent = message;
 
-    bookingsErrorMessage.textContent =
-        message;
+  bookingsError.classList.remove("hidden");
 
-    bookingsError.classList.remove(
-        "hidden"
-    );
+  noBookings.classList.add("hidden");
 
-    noBookings.classList.add(
-        "hidden"
-    );
-
-    bookingsContainer.classList.add(
-        "hidden"
-    );
-
+  bookingsContainer.classList.add("hidden");
 }
-
 
 /* UNAUTHORIZED*/
 
 function handleUnauthorized() {
+  localStorage.removeItem("servicehub_access_token");
 
-    localStorage.removeItem(
-        "servicehub_access_token"
-    );
+  localStorage.removeItem("servicehub_user_id");
 
-    localStorage.removeItem(
-        "servicehub_user_id"
-    );
+  localStorage.removeItem("servicehub_user_email");
 
-    localStorage.removeItem(
-        "servicehub_user_email"
-    );
+  localStorage.removeItem("servicehub_user_role");
 
-    localStorage.removeItem(
-        "servicehub_user_role"
-    );
-
-    window.location.href =
-        "../HTML/login.html";
-
+  window.location.href = "../HTML/login.html";
 }
-
 
 /* RETRY*/
 
-retryBookingsButton.addEventListener(
-    "click",
-    loadBookings
-);
-
+retryBookingsButton.addEventListener("click", loadBookings);
 
 /* INITIALIZE*/
 

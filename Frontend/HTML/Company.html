@@ -1,802 +1,741 @@
-<!DOCTYPE html>
+<!doctype html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>ServiceHub | Company Information</title>
+    <link href="../CSS/output.css" rel="stylesheet" />
+    <link href="../CSS/indexCss.css" rel="stylesheet" />
+    <link
+      href="../Images/favicon-32x32.png?v=3"
+      rel="icon"
+      sizes="32x32"
+      type="image/png"
+    />
+    <link
+      href="../Images/favicon-16x16.png?v=3"
+      rel="icon"
+      sizes="16x16"
+      type="image/png"
+    />
+  </head>
 
-    <link rel="stylesheet" href="../CSS/output.css">
-    <link rel="stylesheet" href="../CSS/indexCss.css">
-
-    <link rel="icon" type="image/png" sizes="32x32" href="../Images/favicon-32x32.png?v=3">
-    <link rel="icon" type="image/png" sizes="16x16" href="../Images/favicon-16x16.png?v=3">
-
-</head>
-
-<body class="bg-gray-950 text-gray-100">
-
+  <body class="bg-gray-950 text-gray-100">
     <!-- NAVBAR -->
-
-    <header class="sticky top-0 z-50 bg-gray-950/90 backdrop-blur-md border-b border-gray-800">
-
-        <nav class="max-w-7xl mx-auto px-6 py-4">
-
-            <div class="flex items-center justify-between">
-
-                <!-- Logo + Company -->
-
-                <a href="index.html" class="flex items-center gap-3">
-
-                    <div
-                        class="w-12 h-12 rounded-xl border-2 border-violet-500 flex items-center justify-center overflow-hidden">
-
-                        <span class="text-purple-400">
-                            <i class="fa-solid fa-screwdriver-wrench text-3xl"></i>
-                        </span>
-
-                    </div>
-
-                    <div>
-
-                        <h1 class="text-xl font-bold tracking-tight">
-                            ServiceHub
-                        </h1>
-
-                        <p class="text-xs text-gray-400">
-                            Trusted Services, Anytime Anywhere
-                        </p>
-
-                    </div>
-
-                </a>
-
-
-                <!-- Desktop Navigation -->
-
-                <div class="hidden lg:flex items-center gap-3">
-
-                    <a href="index.html"
-                        class="nav-btn border border-gray-700 rounded-full hover:bg-violet-900/40">
-                        Home
-                    </a>
-
-                    <a href="#about" class="nav-btn border border-gray-700 rounded-full hover:bg-violet-900/40">
-                        About Us
-                    </a>
-
-                    <a href="login.html"
-                        class="nav-btn border border-gray-700 rounded-full hover:bg-violet-900/40">
-                        Login
-                    </a>
-
-                    <a href="UserRegistration.html"
-                        class="nav-btn border border-violet-600 rounded-full bg-violet-600 text-white hover:bg-violet-700">
-                        Register
-                    </a>
-
-                </div>
-
-
-                <!-- Mobile Menu Button -->
-
-                <button id="mobileMenuButton"
-                    class="lg:hidden border border-gray-700 rounded-full px-4 py-2 text-gray-200 hover:bg-gray-800">
-                    ☰
-                </button>
-
+    <header
+      class="sticky top-0 z-50 bg-gray-950/90 backdrop-blur-md border-b border-gray-800"
+    >
+      <nav class="max-w-7xl mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+          <!-- Logo + Company -->
+          <a class="flex items-center gap-3" href="index.html">
+            <div
+              class="w-12 h-12 rounded-xl border-2 border-violet-500 flex items-center justify-center overflow-hidden"
+            >
+              <span class="text-purple-400">
+                <i class="fa-solid fa-screwdriver-wrench text-3xl"> </i>
+              </span>
             </div>
-
-
-            <!-- Mobile Navigation -->
-
-            <div id="mobileMenu"
-                class="lg:hidden space-y-2 max-h-0 opacity-0 overflow-hidden transition-all duration-300 ease-in-out">
-
-                <a href="index.html" class="mobile-nav-btn">
-                    Home
-                </a>
-
-                <a href="login.html" class="mobile-nav-btn">
-                    Login
-                </a>
-
-                <a href="UserRegistration.html"
-                    class="mobile-nav-btn bg-violet-600 text-white">
-                    Register
-                </a>
-
+            <div>
+              <h1 class="text-xl font-bold tracking-tight">ServiceHub</h1>
+              <p class="text-xs text-gray-400">
+                Trusted Services, Anytime Anywhere
+              </p>
             </div>
-
-        </nav>
-
+          </a>
+          <!-- Desktop Navigation -->
+          <div class="hidden lg:flex items-center gap-3">
+            <a
+              class="nav-btn border border-gray-700 rounded-full hover:bg-violet-900/40"
+              href="index.html"
+            >
+              Home
+            </a>
+            <a
+              class="nav-btn border border-gray-700 rounded-full hover:bg-violet-900/40"
+              href="#about"
+            >
+              About Us
+            </a>
+            <a
+              class="nav-btn border border-gray-700 rounded-full hover:bg-violet-900/40"
+              href="login.html"
+            >
+              Login
+            </a>
+            <a
+              class="nav-btn border border-violet-600 rounded-full bg-violet-600 text-white hover:bg-violet-700"
+              href="UserRegistration.html"
+            >
+              Register
+            </a>
+          </div>
+          <!-- Mobile Menu Button -->
+          <button
+            class="lg:hidden border border-gray-700 rounded-full px-4 py-2 text-gray-200 hover:bg-gray-800"
+            id="mobileMenuButton"
+          >
+            ☰
+          </button>
+        </div>
+        <!-- Mobile Navigation -->
+        <div
+          class="lg:hidden space-y-2 max-h-0 opacity-0 overflow-hidden transition-all duration-300 ease-in-out"
+          id="mobileMenu"
+        >
+          <a class="mobile-nav-btn" href="index.html"> Home </a>
+          <a class="mobile-nav-btn" href="login.html"> Login </a>
+          <a
+            class="mobile-nav-btn bg-violet-600 text-white"
+            href="UserRegistration.html"
+          >
+            Register
+          </a>
+        </div>
+      </nav>
     </header>
-
-
     <!-- COMPANY DOCUMENTATION -->
+    <main>
+      <!-- PAGE HERO -->
+      <section
+        class="relative overflow-hidden bg-linear-to-br from-gray-950 via-gray-900 to-violet-950/50"
+      >
+        <div
+          class="max-w-7xl mx-auto px-6 py-20 lg:py-24 min-h-[calc(100vh-73px)]"
+        >
+          <div class="max-w-3xl">
+            <span
+              class="inline-block px-4 py-2 rounded-full border border-violet-800 bg-violet-950/40 text-violet-300 text-sm font-medium mb-6"
+            >
+              Company Information
+            </span>
+            <h2
+              class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight"
+            >
+              Everything you need to know about
+              <span class="text-violet-400"> ServiceHub. </span>
+            </h2>
+            <p class="mt-6 text-lg text-gray-300 max-w-2xl leading-8">
+              Learn more about who we are, how to reach us, career
+              opportunities, and the policies that guide our platform.
+            </p>
+          </div>
+        </div>
+      </section>
+      <!-- DOCUMENT -->
+      <section class="max-w-7xl mx-auto px-6 py-20" id="contents">
+        <div class="grid lg:grid-cols-[250px_1fr] gap-12 lg:gap-20">
+          <!-- INDEX -->
+          <aside>
+            <div class="lg:sticky lg:top-28">
+              <p
+                class="text-violet-600 font-semibold text-sm uppercase tracking-wider"
+              >
+                Contents
+              </p>
+              <nav class="mt-5 space-y-2">
+                <a
+                  class="block px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-violet-900/20 transition"
+                  href="#about"
+                >
+                  <span class="text-violet-400 mr-2"> 01 </span>
+                  About Us
+                </a>
+                <a
+                  class="block px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-violet-900/20 transition"
+                  href="#contact"
+                >
+                  <span class="text-violet-400 mr-2"> 02 </span>
+                  Contact Us
+                </a>
+                <a
+                  class="block px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-violet-900/20 transition"
+                  href="#careers"
+                >
+                  <span class="text-violet-400 mr-2"> 03 </span>
+                  Careers
+                </a>
+                <a
+                  class="block px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-violet-900/20 transition"
+                  href="#terms"
+                >
+                  <span class="text-violet-400 mr-2"> 04 </span>
+                  Terms &amp; Conditions
+                </a>
+                <a
+                  class="block px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-violet-900/20 transition"
+                  href="#privacy"
+                >
+                  <span class="text-violet-400 mr-2"> 05 </span>
+                  Privacy Policy
+                </a>
+              </nav>
+            </div>
+          </aside>
+          <!-- CONTENT -->
+          <article class="max-w-4xl space-y-24">
+            <section class="scroll-mt-28" id="about">
+              <span
+                class="text-violet-600 font-semibold text-sm uppercase tracking-wider"
+              >
+                01
+              </span>
+              <h2 class="text-3xl md:text-4xl font-bold mt-3">About Us</h2>
+              <div class="mt-8 space-y-10 text-gray-400 text-lg leading-8">
+                <div>
+                  <h3 class="text-xl font-bold text-gray-100 mb-3">
+                    About ServiceHub
+                  </h3>
+                  <p>
+                    ServiceHub is a platform designed to make finding reliable
+                    service professionals simple, convenient, and accessible.
+                  </p>
+                  <p>
+                    From electrical repairs to carpentry, plumbing, cleaning,
+                    appliance repair, and painting, ServiceHub brings everyday
+                    service needs together in one place.
+                  </p>
+                  <p>
+                    Our goal is to connect customers with skilled professionals
+                    while making the process of finding a service, requesting
+                    assistance, and managing a booking easier.
+                  </p>
+                  <p>
+                    We believe professional services should be easy to find,
+                    straightforward to request, and convenient to manage.
+                  </p>
+                </div>
+              </div>
+              <a
+                class="inline-block mt-6 text-sm text-gray-500 hover:text-violet-400 transition"
+                href="#contents"
+              >
+                &uarr; Back to contents
+              </a>
+            </section>
+            <section class="scroll-mt-28" id="contact">
+              <span
+                class="text-violet-600 font-semibold text-sm uppercase tracking-wider"
+              >
+                02
+              </span>
+              <h2 class="text-3xl md:text-4xl font-bold mt-3">Contact Us</h2>
+              <div class="mt-8 space-y-10 text-gray-400 text-lg leading-8">
+                <div>
+                  <h3 class="text-xl font-bold text-gray-100 mb-3">
+                    Get in Touch
+                  </h3>
+                  <p>
+                    Have a question, suggestion, or need assistance with
+                    ServiceHub? We are here to help.
+                  </p>
+                  <p>
+                    For account, booking, payment, or service-related questions,
+                    please contact us using the available contact options.
+                    Providing relevant details will help us assist you more
+                    efficiently.
+                  </p>
+                </div>
+                <div class="mt-8 space-y-5">
+                  <div class="border-l-2 border-violet-600 pl-5">
+                    <p class="text-sm text-gray-500">Email</p>
+                    <a
+                      class="text-gray-200 hover:text-violet-400 transition"
+                      href="mailto:santoshku.mishra03@gmail.com"
+                    >
+                      santoshku.mishra03@gmail.com
+                    </a>
+                  </div>
+                  <div class="border-l-2 border-gray-700 pl-5">
+                    <p class="text-sm text-gray-500">Phone</p>
+                    <a
+                      class="text-gray-200 hover:text-violet-400 transition"
+                      href="tel:+919178299774"
+                    >
+                      +91 91782 99774
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <a
+                class="inline-block mt-6 text-sm text-gray-500 hover:text-violet-400 transition"
+                href="#contents"
+              >
+                &uarr; Back to contents
+              </a>
+            </section>
+            <section class="scroll-mt-28" id="careers">
+              <span
+                class="text-violet-600 font-semibold text-sm uppercase tracking-wider"
+              >
+                03
+              </span>
+              <h2 class="text-3xl md:text-4xl font-bold mt-3">Careers</h2>
+              <div class="mt-8 space-y-10 text-gray-400 text-lg leading-8">
+                <div>
+                  <h3 class="text-xl font-bold text-gray-100 mb-3">
+                    Build with ServiceHub
+                  </h3>
+                  <p>
+                    ServiceHub is being built with the vision of creating a
+                    reliable service ecosystem for customers and skilled
+                    professionals.
+                  </p>
+                  <p>
+                    As the platform grows, opportunities may become available
+                    across technology, operations, customer support, business
+                    development, and other areas.
+                  </p>
+                  <p>
+                    If you are interested in joining our journey, check this
+                    section for future opportunities.
+                  </p>
+                </div>
+                <!-- Current Opportunities -->
+                <div class="mt-8">
+                  <h3 class="text-2xl font-semibold text-white mb-4">
+                    Current Opportunities
+                  </h3>
 
-    <main >
+                  <div
+                    class="bg-gray-900 border border-gray-800 rounded-xl p-6"
+                  >
+                    <h4 class="text-xl font-semibold text-white mb-2">
+                      Register as a Worker
+                    </h4>
 
-        <!-- PAGE HERO -->
-
-        <section class="relative overflow-hidden bg-linear-to-br from-gray-950 via-gray-900 to-violet-950/50">
-
-            <div class="max-w-7xl mx-auto px-6 py-20 lg:py-24 min-h-[calc(100vh-73px)]">
-
-                <div class="max-w-3xl">
-
-                    <span
-                        class="inline-block px-4 py-2 rounded-full border border-violet-800 bg-violet-950/40 text-violet-300 text-sm font-medium mb-6">
-                        Company Information
-                    </span>
-
-                    <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-                        Everything you need to know about
-                        <span class="text-violet-400">
-                            ServiceHub.
-                        </span>
-                    </h2>
-
-                    <p class="mt-6 text-lg text-gray-300 max-w-2xl leading-8">
-                        Learn more about who we are, how to reach us, career
-                        opportunities, and the policies that guide our platform.
+                    <p class="text-gray-400 leading-relaxed mb-5">
+                      Join ServiceHub as a service worker and provide your
+                      skills to customers who need reliable home and local
+                      services.
                     </p>
 
+                    <p class="text-gray-400 leading-relaxed mb-6">
+                      Interested in becoming a worker? Register with ServiceHub
+                      and create your worker profile to get started.
+                    </p>
+
+                    <a
+                      href="../HTML/WorkerRegister.html"
+                      class="inline-block px-6 py-3 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors duration-300"
+                    >
+                      Register as a Worker
+                    </a>
+                  </div>
                 </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- DOCUMENT -->
-
-        <section class="max-w-7xl mx-auto px-6 py-20"  id="contents">
-
-            <div class="grid lg:grid-cols-[250px_1fr] gap-12 lg:gap-20">
-
-
-                <!-- INDEX -->
-
-                <aside>
-
-                    <div class="lg:sticky lg:top-28">
-
-                        <p class="text-violet-600 font-semibold text-sm uppercase tracking-wider">
-                            Contents
-                        </p>
-
-                        <nav class="mt-5 space-y-2">
-
-                            <a href="#rules"
-                                class="block px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-violet-900/20 transition">
-
-                                <span class="text-violet-400 mr-2">
-                                    01
-                                </span>
-
-                                Rules & Regulations
-
-                            </a>
-
-
-                            <a href="#about"
-                                class="block px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-violet-900/20 transition">
-                                <span class="text-violet-400 mr-2">02</span>
-                                About Us
-                            </a>
-
-                            <a href="#contact"
-                                class="block px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-violet-900/20 transition">
-                                <span class="text-violet-400 mr-2">03</span>
-                                Contact Us
-                            </a>
-
-                            <a href="#careers"
-                                class="block px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-violet-900/20 transition">
-                                <span class="text-violet-400 mr-2">04</span>
-                                Careers
-                            </a>
-
-                            <a href="#privacy"
-                                class="block px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-violet-900/20 transition">
-                                <span class="text-violet-400 mr-2">05</span>
-                                Privacy Policy
-                            </a>
-
-                            <a href="#terms"
-                                class="block px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-violet-900/20 transition">
-                                <span class="text-violet-400 mr-2">06</span>
-                                Terms & Conditions
-                            </a>
-
-                        </nav>
-
-                    </div>
-
-                </aside>
-
-
-                <!-- CONTENT -->
-
-                <article class="max-w-4xl space-y-24">
-
-                    <!-- RULES & REGULATIONS -->
-
-                    <section id="rules" class="scroll-mt-28">
-
-                        <span class="text-violet-600 font-semibold text-sm uppercase tracking-wider">
-                            01
-                        </span>
-
-                        <h2 class="text-3xl md:text-4xl font-bold mt-3">
-                            Rules & Regulations
-                        </h2>
-
-                        <p class="mt-2 text-sm text-gray-500">
-                            Rules governing the use of ServiceHub by users and workers
-                        </p>
-
-
-                        <div class="mt-8 space-y-10 text-gray-400 text-lg leading-8">
-
-                            <!-- REGULATIONS FOR USERS -->
-
-                            <div>
-
-                                <h3 class="text-xl font-bold text-gray-100 mb-4">
-                                    1. Regulations for Users
-                                </h3>
-
-                                <ul class="list-disc list-inside space-y-3">
-
-                                    <li>
-                                        Users must provide accurate and up-to-date information
-                                        when creating and using their ServiceHub account.
-                                    </li>
-
-                                    <li>
-                                        A user may have a maximum of three active bookings
-                                        at a time.
-                                    </li>
-
-                                    <li>
-                                        A user cannot create another active booking for a service
-                                        that already has an active booking under their account.
-                                    </li>
-
-                                    <li>
-                                        If no worker accepts a booking within 30 minutes of
-                                        the booking being placed, the booking will be marked as
-                                        <strong class="text-gray-200">
-                                            NO WORKER
-                                        </strong>
-                                        and the user may try booking the service again.
-                                    </li>
-
-                                    <li>
-                                        If a worker has already accepted a booking, the user
-                                        must contact ServiceHub administration for cancellation
-                                        or further assistance.
-                                    </li>
-
-                                    <li>
-                                        Users must provide accurate and relevant information
-                                        about the requested service and clearly describe the
-                                        issue or work required.
-                                    </li>
-
-                                    <li>
-                                        Users are expected to provide the worker with reasonable
-                                        access to the location required to perform the requested
-                                        service.
-                                    </li>
-
-                                    <li>
-                                        Users must treat workers respectfully and must not use
-                                        ServiceHub for unlawful, abusive, or inappropriate purposes.
-                                    </li>
-
-                                </ul>
-
-                            </div>
-
-
-                            <!-- REGULATIONS FOR WORKERS -->
-
-                            <div>
-
-                                <h3 class="text-xl font-bold text-gray-100 mb-4">
-                                    2. Regulations for Workers
-                                </h3>
-
-                                <ul class="list-disc list-inside space-y-3">
-
-                                    <li>
-                                        Workers must provide accurate and genuine information
-                                        during registration and verification.
-                                    </li>
-
-                                    <li>
-                                        Only verified workers can accept service bookings.
-                                    </li>
-
-                                    <li>
-                                        Workers must keep their availability status accurate
-                                        and up to date.
-                                    </li>
-
-                                    <li>
-                                        A worker can have only one active booking at a time.
-                                    </li>
-
-                                    <li>
-                                        When a worker accepts a booking, their availability
-                                        status changes to
-                                        <strong class="text-gray-200">
-                                            BUSY
-                                        </strong>.
-                                    </li>
-
-                                    <li>
-                                        Workers may reject a pending booking when they are unable
-                                        or unwilling to provide the requested service.
-                                    </li>
-
-                                    <li>
-                                        Workers must only accept bookings for services that
-                                        they provide.
-                                    </li>
-
-                                    <li>
-                                        After accepting a booking, workers are expected to
-                                        proceed with the service and communicate with the
-                                        customer as required.
-                                    </li>
-
-                                    <li>
-                                        Workers should mark the service as started only after
-                                        reaching the customer's location and beginning the work.
-                                    </li>
-
-                                    <li>
-                                        After completing the work, the worker must confirm that
-                                        the service has been completed.
-                                    </li>
-
-                                    <li>
-                                        Workers must behave professionally and must not misuse
-                                        customer information or the ServiceHub platform.
-                                    </li>
-
-                                </ul>
-
-                            </div>
-
-
-                        </div>
-
-                        <a href="#contents" class="inline-block mt-6 text-sm text-gray-500 hover:text-violet-400 transition">
-                            ↑ Back to contents
-                        </a>
-                    </section>
-
-                    <!-- ABOUT US -->
-
-                    <section id="about" class="scroll-mt-28">
-
-                        <span class="text-violet-600 font-semibold text-sm uppercase tracking-wider">
-                            02
-                        </span>
-
-                        <h2 class="text-3xl md:text-4xl font-bold mt-3">
-                            About Us
-                        </h2>
-
-                        <div class="mt-7 space-y-5 text-gray-400 text-lg leading-8">
-
-                            <p>
-                                ServiceHub is a platform designed to make finding
-                                reliable service professionals simple, convenient,
-                                and accessible.
-                            </p>
-
-                            <p>
-                                From electrical repairs to carpentry, plumbing,
-                                cleaning, appliance repair, and painting, ServiceHub
-                                brings everyday service needs together in one place.
-                            </p>
-
-                            <p>
-                                Our goal is to connect customers with skilled
-                                professionals while making the process of finding
-                                a service, requesting assistance, and managing a
-                                booking easier.
-                            </p>
-
-                            <p>
-                                We believe professional services should be easy to
-                                find, straightforward to request, and convenient
-                                to manage.
-                            </p>
-
-                        </div>
-
-                        <a href="#contents" class="inline-block mt-6 text-sm text-gray-500 hover:text-violet-400 transition">
-                            ↑ Back to contents
-                        </a>
-
-                    </section>
-
-
-                    <!-- CONTACT US -->
-
-                    <section id="contact" class="scroll-mt-28">
-
-                        <span class="text-violet-600 font-semibold text-sm uppercase tracking-wider">
-                            03
-                        </span>
-
-                        <h2 class="text-3xl md:text-4xl font-bold mt-3">
-                            Contact Us
-                        </h2>
-
-                        <div class="mt-7 space-y-5 text-gray-400 text-lg leading-8">
-
-                            <p>
-                                Have a question, suggestion, or need assistance
-                                with ServiceHub? We are here to help.
-                            </p>
-
-                            <p>
-                                For account, booking, or service-related questions,
-                                please contact us using the available contact
-                                options. Providing relevant details will help us
-                                assist you more efficiently.
-                            </p>
-
-                        </div>
-
-
-                        <div class="mt-8 space-y-5">
-
-                            <div class="border-l-2 border-violet-600 pl-5">
-
-                                <p class="text-sm text-gray-500">
-                                    Email
-                                </p>
-
-                                <a href="mailto:santoshku.mishra03@gmail.com"
-                                    class="text-gray-200 hover:text-violet-400 transition">
-                                    santoshku.mishra03@gmail.com
-                                </a>
-
-                            </div>
-
-
-                            <div class="border-l-2 border-gray-700 pl-5">
-
-                                <p class="text-sm text-gray-500">
-                                    Phone
-                                </p>
-
-                                <a href="tel:+919178299774" class="text-gray-200 hover:text-violet-400 transition">
-                                    +91 91782 99774
-                                </a>
-
-                            </div>
-
-                        </div>
-
-                        <a href="#contents" class="inline-block mt-6 text-sm text-gray-500 hover:text-violet-400 transition">
-                            ↑ Back to contents
-                        </a>
-
-                    </section>
-
-
-                    <!-- CAREERS -->
-
-                    <section id="careers" class="scroll-mt-28">
-
-                        <span class="text-violet-600 font-semibold text-sm uppercase tracking-wider">
-                            04
-                        </span>
-
-                        <h2 class="text-3xl md:text-4xl font-bold mt-3">
-                            Careers
-                        </h2>
-
-                        <div class="mt-7 space-y-5 text-gray-400 text-lg leading-8">
-
-                            <p>
-                                ServiceHub is being built with the vision of creating
-                                a reliable service ecosystem for customers and skilled
-                                professionals.
-                            </p>
-
-                            <p>
-                                As the platform grows, opportunities may become
-                                available across technology, operations, customer
-                                support, business development, and other areas.
-                            </p>
-
-                            <p>
-                                If you are interested in joining our journey, check
-                                this section for future opportunities.
-                            </p>
-
-                        </div>
-
-
-                        <div class="mt-8 border border-gray-800 rounded-2xl p-6 bg-gray-900/40">
-
-                            <h3 class="text-xl font-bold">
-                                Current Opportunities
-                            </h3>
-
-                            <p class="mt-2 text-gray-400">
-                                There are currently no open positions.
-                                Please check back later for future opportunities.
-                            </p>
-
-                        </div>
-
-                        <a href="#contents" class="inline-block mt-6 text-sm text-gray-500 hover:text-violet-400 transition">
-                            ↑ Back to contents
-                        </a>
-
-                    </section>
-
-
-                    <!-- PRIVACY POLICY -->
-
-                    <section id="privacy" class="scroll-mt-28">
-
-                        <span class="text-violet-600 font-semibold text-sm uppercase tracking-wider">
-                            05
-                        </span>
-
-                        <h2 class="text-3xl md:text-4xl font-bold mt-3">
-                            Privacy Policy
-                        </h2>
-
-                        <p class="mt-2 text-sm text-gray-500">
-                            Last updated: September 2026
-                        </p>
-
-
-                        <div class="mt-8 space-y-10 text-gray-400 text-lg leading-8">
-
-
-                            <div>
-
-                                <h3 class="text-xl font-bold text-gray-100 mb-3">
-                                    Information We Collect
-                                </h3>
-
-                                <p>
-                                    When you use ServiceHub, we may collect information
-                                    required to provide and improve our services,
-                                    including account information, contact details,
-                                    service requests, and booking-related information.
-                                </p>
-
-                            </div>
-
-
-                            <div>
-
-                                <h3 class="text-xl font-bold text-gray-100 mb-3">
-                                    How We Use Your Information
-                                </h3>
-
-                                <p>
-                                    Information may be used to create and manage
-                                    accounts, process service requests, facilitate
-                                    communication, manage bookings, provide support,
-                                    and improve the ServiceHub platform.
-                                </p>
-
-                            </div>
-
-
-                            <div>
-
-                                <h3 class="text-xl font-bold text-gray-100 mb-3">
-                                    Information Security
-                                </h3>
-
-                                <p>
-                                    We take reasonable measures to protect information
-                                    associated with your account against unauthorized
-                                    access, alteration, disclosure, or misuse.
-                                </p>
-
-                            </div>
-
-
-                            <div>
-
-                                <h3 class="text-xl font-bold text-gray-100 mb-3">
-                                    Information Sharing
-                                </h3>
-
-                                <p>
-                                    We do not intend to sell personal information.
-                                    Information may be shared when necessary to provide
-                                    requested services, operate the platform, comply
-                                    with applicable legal requirements, or protect
-                                    users and ServiceHub.
-                                </p>
-
-                            </div>
-
-
-                            <div>
-
-                                <h3 class="text-xl font-bold text-gray-100 mb-3">
-                                    Your Choices
-                                </h3>
-
-                                <p>
-                                    You may be able to access, update, or request
-                                    changes to information associated with your
-                                    account. Contact us if you have questions about
-                                    your personal information.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                        <a href="#contents" class="inline-block mt-6 text-sm text-gray-500 hover:text-violet-400 transition">
-                            ↑ Back to contents
-                        </a>
-
-                    </section>
-
-
-
-                    <!-- TERMS -->
-
-                    <section id="terms" class="scroll-mt-28">
-
-                        <span class="text-violet-600 font-semibold text-sm uppercase tracking-wider">
-                            06
-                        </span>
-
-                        <h2 class="text-3xl md:text-4xl font-bold mt-3">
-                            Terms & Conditions
-                        </h2>
-
-                        <p class="mt-2 text-sm text-gray-500">
-                            Last updated: September 2026
-                        </p>
-
-
-                        <div class="mt-8 space-y-10 text-gray-400 text-lg leading-8">
-
-
-                            <div>
-
-                                <h3 class="text-xl font-bold text-gray-100 mb-3">
-                                    Acceptance of Terms
-                                </h3>
-
-                                <p>
-                                    By accessing or using ServiceHub, you agree to
-                                    comply with these Terms & Conditions. If you do
-                                    not agree, please do not use the platform.
-                                </p>
-
-                            </div>
-
-
-                            <div>
-
-                                <h3 class="text-xl font-bold text-gray-100 mb-3">
-                                    Use of ServiceHub
-                                </h3>
-
-                                <p>
-                                    ServiceHub provides a platform through which
-                                    customers can request services and connect with
-                                    service professionals. Users are expected to
-                                    provide accurate information and use the platform
-                                    responsibly.
-                                </p>
-
-                            </div>
-
-
-                            <div>
-
-                                <h3 class="text-xl font-bold text-gray-100 mb-3">
-                                    Bookings and Services
-                                </h3>
-
-                                <p>
-                                    Service availability, pricing, materials, and
-                                    other conditions may vary depending on the requested
-                                    service and the circumstances of the work.
-                                    Additional materials or work may result in
-                                    additional charges where applicable.
-                                </p>
-
-                            </div>
-
-
-                            <div>
-
-                                <h3 class="text-xl font-bold text-gray-100 mb-3">
-                                    User Responsibilities
-                                </h3>
-
-                                <p>
-                                    Users are responsible for maintaining the security
-                                    of their account credentials and for activity
-                                    performed through their account.
-                                </p>
-
-                            </div>
-
-
-                            <div>
-
-                                <h3 class="text-xl font-bold text-gray-100 mb-3">
-                                    Platform Availability
-                                </h3>
-
-                                <p>
-                                    We aim to keep ServiceHub reliable and available,
-                                    but uninterrupted access cannot be guaranteed at
-                                    all times. Maintenance, technical issues, or
-                                    circumstances outside our control may temporarily
-                                    affect the platform.
-                                </p>
-
-                            </div>
-
-
-                            <div>
-
-                                <h3 class="text-xl font-bold text-gray-100 mb-3">
-                                    Changes to These Terms
-                                </h3>
-
-                                <p>
-                                    ServiceHub may update these Terms & Conditions
-                                    when necessary. Updated terms will be published
-                                    on this page.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                        <a href="#contents" class="inline-block mt-6 text-sm text-gray-500 hover:text-violet-400 transition">
-                            ↑ Back to contents
-                        </a>
-
-                    </section>
-
-                </article>
-
-            </div>
-
-        </section>
-
+              </div>
+              <a
+                class="inline-block mt-6 text-sm text-gray-500 hover:text-violet-400 transition"
+                href="#contents"
+              >
+                &uarr; Back to contents
+              </a>
+            </section>
+            <section class="scroll-mt-28" id="terms">
+              <span
+                class="text-violet-600 font-semibold text-sm uppercase tracking-wider"
+              >
+                04
+              </span>
+              <h2 class="text-3xl md:text-4xl font-bold mt-3">
+                Terms &amp; Conditions
+              </h2>
+              <p class="mt-2 text-sm text-gray-500">
+                Terms governing the use of ServiceHub by users and workers
+              </p>
+              <div class="mt-8 space-y-10 text-gray-400 text-lg leading-8">
+                <div id="userTerms">
+                  <h3 class="text-xl font-bold text-gray-100 mb-3">
+                    1. Terms and Conditions for Users
+                  </h3>
+                  <ul class="list-disc list-inside space-y-3">
+                    <li>
+                      Users must provide accurate, complete, and up-to-date
+                      information when creating and using their ServiceHub
+                      account.
+                    </li>
+                    <li>
+                      A user may have a maximum of three active bookings at a
+                      time.
+                    </li>
+                    <li>
+                      A user cannot create another active booking for a service
+                      that already has an active booking under their account.
+                    </li>
+                    <li>
+                      If no worker accepts a booking within 30 minutes, the
+                      booking will be marked as NO WORKER and the user may
+                      request the service again.
+                    </li>
+                    <li>
+                      If a worker has accepted a booking, the user must contact
+                      ServiceHub for cancellation or assistance instead of
+                      attempting to cancel the booking directly.
+                    </li>
+                    <li>
+                      Cancellation charges may apply when a worker has already
+                      accepted a booking and has started travelling toward the
+                      service location.
+                    </li>
+                    <li>
+                      If a worker has started the service, charges may apply for
+                      the work, travel, and approved parts or materials already
+                      used, even if the service is later cancelled or cannot be
+                      completed.
+                    </li>
+                    <li>
+                      Users must provide accurate and relevant information about
+                      the requested service and clearly describe the issue or
+                      work required.
+                    </li>
+                    <li>
+                      Users must provide the worker with reasonable access to
+                      the service location and cooperate as reasonably required
+                      for the service to be performed.
+                    </li>
+                    <li>
+                      Users must confirm completion of the service after the
+                      worker marks the service as completed. If the user does
+                      not respond within the specified confirmation period, the
+                      booking may be automatically completed.
+                    </li>
+                    <li>
+                      An additional charge may apply when a booking is
+                      automatically completed because the user does not provide
+                      the required completion confirmation within the specified
+                      time.
+                    </li>
+                    <li>
+                      Users who contact ServiceHub for assistance before
+                      automatic completion may have their booking reviewed by
+                      ServiceHub administration.
+                    </li>
+                    <li>
+                      Users are responsible for paying the final amount
+                      applicable to their completed or otherwise billable
+                      service.
+                    </li>
+                    <li>
+                      Users may be asked to approve additional parts or
+                      materials required during a service before those items are
+                      added to the final bill.
+                    </li>
+                    <li>
+                      Users may provide a rating and predefined feedback for a
+                      worker after a service has been completed or automatically
+                      completed.
+                    </li>
+                    <li>
+                      Users must treat workers respectfully and must not use
+                      ServiceHub for unlawful, abusive, threatening, fraudulent,
+                      or inappropriate purposes.
+                    </li>
+                    <li>
+                      ServiceHub may review complaints, disputes, cancellations,
+                      and other exceptional situations and may take appropriate
+                      action when necessary.
+                    </li>
+                  </ul>
+                </div>
+                <div id="workerTerms">
+                  <h3 class="text-xl font-bold text-gray-100 mb-3">
+                    2. Terms and Conditions for Workers
+                  </h3>
+                  <ul class="list-disc list-inside space-y-3">
+                    <li>
+                      Workers must provide accurate, genuine, and up-to-date
+                      information during registration and verification.
+                    </li>
+                    <li>
+                      Only verified workers are permitted to accept service
+                      bookings.
+                    </li>
+                    <li>
+                      Workers must keep their availability information accurate
+                      and up to date.
+                    </li>
+                    <li>
+                      A worker may have only one active service booking at a
+                      time.
+                    </li>
+                    <li>
+                      When a worker accepts a booking, they are expected to
+                      proceed with the service and communicate with the customer
+                      as reasonably required.
+                    </li>
+                    <li>
+                      Workers may reject or decline pending bookings when they
+                      are unable or unwilling to provide the requested service.
+                    </li>
+                    <li>
+                      Workers must only accept bookings for services that they
+                      are qualified and registered to provide.
+                    </li>
+                    <li>
+                      Workers must mark a service as started only after reaching
+                      the customer's location and actually beginning the work.
+                    </li>
+                    <li>
+                      Workers must accurately report the progress and completion
+                      status of the service through the ServiceHub platform.
+                    </li>
+                    <li>
+                      If a worker is unable to complete a service after starting
+                      it, the worker must provide an appropriate reason through
+                      the platform and inform the customer as required.
+                    </li>
+                    <li>
+                      Workers must not intentionally delay, abandon, or misuse
+                      an active service booking.
+                    </li>
+                    <li>
+                      Workers may be required to provide information about parts
+                      or materials required for a service, and additional parts
+                      or materials may require customer approval.
+                    </li>
+                    <li>
+                      Worker location may be collected while using relevant
+                      ServiceHub services in order to support service
+                      coordination, worker availability, distance-based service
+                      features, and customer safety.
+                    </li>
+                    <li>
+                      Workers must keep location information and other
+                      service-related information accurate whenever such
+                      information is required by ServiceHub.
+                    </li>
+                    <li>
+                      After completing the work, workers must mark the service
+                      as completed through the ServiceHub platform.
+                    </li>
+                    <li>
+                      Workers must remain available for the current booking
+                      until the booking has been completed, automatically
+                      completed, or otherwise resolved by ServiceHub.
+                    </li>
+                    <li>
+                      Workers must behave professionally and respectfully toward
+                      customers and must not misuse customer information or the
+                      ServiceHub platform.
+                    </li>
+                    <li>
+                      Workers must not use ServiceHub customer information for
+                      purposes unrelated to providing the requested service.
+                    </li>
+                    <li>
+                      ServiceHub may review worker performance, ratings,
+                      complaints, cancellations, and other service-related
+                      activity.
+                    </li>
+                    <li>
+                      ServiceHub may take appropriate action, including
+                      restricting or suspending a worker's access to the
+                      platform, when necessary.
+                    </li>
+                  </ul>
+                </div>
+                <div>
+                  <h3 class="text-xl font-bold text-gray-100 mb-3">
+                    3. General Terms
+                  </h3>
+                  <ul class="list-disc list-inside space-y-3">
+                    <li>
+                      Service availability depends on the availability of
+                      suitable workers in the requested service area.
+                    </li>
+                    <li>
+                      ServiceHub may contact users or workers when necessary to
+                      resolve booking issues, cancellations, disputes, payment
+                      matters, or service-related concerns.
+                    </li>
+                    <li>
+                      ServiceHub may review booking and service information when
+                      investigating complaints, disputes, fraud, misuse, or
+                      other exceptional situations.
+                    </li>
+                    <li>
+                      Payments, applicable service charges, cancellation
+                      charges, and other billable amounts must be settled
+                      according to the information presented to the user before
+                      or after the service, as applicable.
+                    </li>
+                    <li>
+                      Payment failures do not necessarily cancel a completed
+                      service, and users may be required to retry a failed
+                      payment.
+                    </li>
+                    <li>
+                      Refunds, where applicable, are subject to review and
+                      approval by ServiceHub.
+                    </li>
+                    <li>
+                      ServiceHub may update these Terms &amp; Conditions when
+                      the platform, services, or applicable policies change.
+                    </li>
+                    <li>
+                      By continuing to use ServiceHub, users and workers agree
+                      to comply with these Terms &amp; Conditions and any
+                      applicable ServiceHub policies.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <a
+                class="inline-block mt-6 text-sm text-gray-500 hover:text-violet-400 transition"
+                href="#contents"
+              >
+                &uarr; Back to contents
+              </a>
+            </section>
+            <section class="scroll-mt-28" id="privacy">
+              <span
+                class="text-violet-600 font-semibold text-sm uppercase tracking-wider"
+              >
+                05
+              </span>
+              <h2 class="text-3xl md:text-4xl font-bold mt-3">
+                Privacy Policy
+              </h2>
+              <p class="mt-2 text-sm text-gray-500">
+                Last updated: September 2026
+              </p>
+              <div class="mt-8 space-y-10 text-gray-400 text-lg leading-8">
+                <div>
+                  <h3 class="text-xl font-bold text-gray-100 mb-3">
+                    Information We Collect
+                  </h3>
+                  <p>
+                    When you use ServiceHub, we may collect information required
+                    to create and manage your account and provide our services,
+                    including account information, contact details, service
+                    requests, booking information, and information related to
+                    interactions with the platform.
+                  </p>
+                  <p>
+                    Depending on the service and features you use, ServiceHub
+                    may also collect service-related location information. For
+                    example, worker location may be collected while relevant
+                    worker services are active to support service coordination,
+                    availability, distance-based features, and customer safety.
+                  </p>
+                </div>
+                <div>
+                  <h3 class="text-xl font-bold text-gray-100 mb-3">
+                    How We Use Your Information
+                  </h3>
+                  <p>
+                    Information may be used to create and manage accounts,
+                    process service requests, facilitate communication, manage
+                    bookings, coordinate services, process payments, provide
+                    customer and worker support, manage feedback and ratings,
+                    improve the ServiceHub platform, and maintain platform
+                    security.
+                  </p>
+                  <p>
+                    Location information, where collected, may be used for
+                    service coordination, worker availability, distance-related
+                    service features, and safety-related purposes.
+                  </p>
+                </div>
+                <div>
+                  <h3 class="text-xl font-bold text-gray-100 mb-3">
+                    Information Sharing
+                  </h3>
+                  <p>We do not intend to sell personal information.</p>
+                  <p>
+                    Information may be shared when necessary to provide
+                    requested services, connect customers and workers, operate
+                    the platform, process payments, provide support, comply with
+                    applicable legal requirements, investigate misuse or
+                    disputes, or protect users and ServiceHub.
+                  </p>
+                </div>
+                <div>
+                  <h3 class="text-xl font-bold text-gray-100 mb-3">
+                    Location Information
+                  </h3>
+                  <p>
+                    When location-related features are required for a service,
+                    ServiceHub may collect and use location information to
+                    support the operation of those features.
+                  </p>
+                  <p>
+                    Worker location may be used to support service coordination,
+                    availability, distance-based service features, and customer
+                    safety. Location information should only be used for
+                    legitimate ServiceHub-related purposes.
+                  </p>
+                </div>
+                <div>
+                  <h3 class="text-xl font-bold text-gray-100 mb-3">
+                    Information Security
+                  </h3>
+                  <p>
+                    We take reasonable measures to protect information
+                    associated with your account against unauthorized access,
+                    alteration, disclosure, or misuse.
+                  </p>
+                  <p>
+                    However, no method of electronic storage or transmission can
+                    be guaranteed to be completely secure.
+                  </p>
+                </div>
+                <div>
+                  <h3 class="text-xl font-bold text-gray-100 mb-3">
+                    Data Retention
+                  </h3>
+                  <p>
+                    ServiceHub may retain account, booking, payment, service,
+                    feedback, and related information for as long as reasonably
+                    necessary to provide services, maintain records, resolve
+                    disputes, meet operational requirements, or comply with
+                    applicable legal obligations.
+                  </p>
+                </div>
+                <div>
+                  <h3 class="text-xl font-bold text-gray-100 mb-3">
+                    Your Choices and Rights
+                  </h3>
+                  <p>
+                    You may be able to access, update, or request changes to
+                    information associated with your account, subject to
+                    applicable requirements and platform functionality.
+                  </p>
+                  <p>
+                    If you have questions or concerns about your personal
+                    information or how it is used, you may contact ServiceHub
+                    using the available contact information.
+                  </p>
+                </div>
+                <div>
+                  <h3 class="text-xl font-bold text-gray-100 mb-3">
+                    Changes to This Privacy Policy
+                  </h3>
+                  <p>
+                    ServiceHub may update this Privacy Policy when the platform,
+                    services, data practices, or applicable requirements change.
+                    Updated versions will be published on this page.
+                  </p>
+                </div>
+              </div>
+              <a
+                class="inline-block mt-6 text-sm text-gray-500 hover:text-violet-400 transition"
+                href="#contents"
+              >
+                &uarr; Back to contents
+              </a>
+            </section>
+          </article>
+        </div>
+      </section>
     </main>
-
     <div id="serviceHubFooter"></div>
-
     <script src="../JS/indexJs.js"></script>
     <script src="../JS/components/footer.js"></script>
-
-    <script src="https://kit.fontawesome.com/330033b57f.js" crossorigin="anonymous"></script>
-
-</body>
-
+    <script
+      crossorigin="anonymous"
+      src="https://kit.fontawesome.com/330033b57f.js"
+    ></script>
+  </body>
 </html>

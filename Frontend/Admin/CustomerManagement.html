@@ -1,544 +1,347 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
 
-<head>
-    <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Customer Management - ServiceHub</title>
 
-    <link rel="icon"
-          type="image/x-icon"
-          href="../Images/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="../Images/favicon.ico" />
 
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
 
-    <link rel="stylesheet"
-          href="../CSS/output.css">
+    <link rel="stylesheet" href="../CSS/output.css" />
 
-    <link rel="icon" type="image/png" sizes="32x32" href="../Images/favicon-32x32.png?v=3">
-    <link rel="icon" type="image/png" sizes="16x16" href="../Images/favicon-16x16.png?v=3">
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../Images/favicon-32x32.png?v=3"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="../Images/favicon-16x16.png?v=3"
+    />
+  </head>
 
-    
-</head>
-
-<body class="bg-gray-950 text-white">
-
+  <body class="bg-gray-950 text-white">
     <!-- Admin Sidebar -->
     <div id="adminSidebar"></div>
 
-
     <!-- Main Content -->
     <main class="min-h-screen lg:ml-64">
+      <!-- Admin Header -->
+      <div id="adminHeader"></div>
 
-        <!-- Admin Header -->
-        <div id="adminHeader"></div>
+      <!-- Page Content -->
+      <section class="px-6 py-8">
+        <div class="max-w-7xl mx-auto">
+          <!-- Page Heading -->
+          <div class="mb-8">
+            <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
+              <a
+                href="AdminDashboard.html"
+                class="hover:text-violet-400 transition-colors"
+              >
+                Dashboard
+              </a>
 
+              <i class="fa-solid fa-chevron-right text-xs"></i>
 
-        <!-- Page Content -->
-        <section class="px-6 py-8">
-
-            <div class="max-w-7xl mx-auto">
-
-                <!-- Page Heading -->
-                <div class="mb-8">
-
-                        <div class="flex items-center gap-2
-                                    text-sm text-gray-500 mb-2">
-
-                            <a href="AdminDashboard.html" class="hover:text-violet-400 transition-colors">
-
-                                Dashboard
-
-                            </a>
-
-                            <i class="fa-solid fa-chevron-right text-xs"></i>
-
-                            <span class="text-gray-400">
-                                Customer Management
-                            </span>
-
-                        </div>
-
-                        <h1 class="text-2xl font-bold sm:text-3xl">
-                            Customer Management
-                        </h1>
-
-                        <p class="mt-2 text-gray-400">
-                            Review and manage ServiceHub Customers.
-                        </p>
-
-                    </div>
-
-
-                <!-- Search + Filters -->
-                <div class="flex flex-col lg:flex-row
-                            lg:items-center lg:justify-between
-                            gap-4 mb-8">
-
-                    <!-- Search -->
-                    <div class="relative w-full lg:w-1/2">
-
-                        <i class="fa-solid fa-magnifying-glass
-                                  absolute left-5 top-1/2
-                                  -translate-y-1/2
-                                  text-gray-500"></i>
-
-                        <input
-                            type="text"
-                            id="customerSearch"
-                            placeholder="Search customers..."
-                            oninput="searchCustomers()"
-                            class="w-full
-                                   bg-gray-900
-                                   border border-gray-800
-                                   rounded-lg
-                                   pl-14 pr-5 py-4
-                                   text-white
-                                   placeholder-gray-500
-                                   focus:outline-none
-                                   focus:border-gray-700
-                                   transition-colors">
-                    </div>
-
-
-                    <!-- Status Filters -->
-                    <div class="flex gap-3">
-
-                        <button
-                            id="activeFilter"
-                            onclick="filterCustomers('active')"
-                            class="px-5 py-3
-                                   bg-gray-800
-                                   border border-gray-700
-                                   text-white
-                                   rounded-lg
-                                   hover:bg-gray-700
-                                   transition-colors">
-
-                            Active
-                        </button>
-
-                        <button
-                            id="inactiveFilter"
-                            onclick="filterCustomers('inactive')"
-                            class="px-5 py-3
-                                   bg-gray-900
-                                   border border-gray-800
-                                   text-gray-400
-                                   rounded-lg
-                                   hover:bg-gray-800
-                                   hover:text-white
-                                   transition-colors">
-
-                            Inactive
-                        </button>
-
-                    </div>
-
-                </div>
-
-
-                <!-- Customer Table -->
-                <div class="overflow-x-auto
-                            bg-gray-900
-                            border border-gray-800
-                            rounded-xl">
-
-                    <table class="w-full">
-
-                        <thead class="bg-gray-900">
-
-                            <tr class="border-b border-gray-800">
-
-                                <th class="px-6 py-5
-                                           text-left
-                                           text-sm
-                                           font-semibold
-                                           text-gray-400">
-                                    Name
-                                </th>
-
-                                <th class="px-6 py-5
-                                           text-left
-                                           text-sm
-                                           font-semibold
-                                           text-gray-400">
-                                    Email
-                                </th>
-
-                                <th class="px-6 py-5
-                                           text-left
-                                           text-sm
-                                           font-semibold
-                                           text-gray-400">
-                                    Phone
-                                </th>
-
-                                <th class="px-6 py-5
-                                           text-left
-                                           text-sm
-                                           font-semibold
-                                           text-gray-400">
-                                    City
-                                </th>
-
-                                <th class="px-6 py-5
-                                           text-left
-                                           text-sm
-                                           font-semibold
-                                           text-gray-400">
-                                    Status
-                                </th>
-
-                                <th class="px-6 py-5
-                                           text-left
-                                           text-sm
-                                           font-semibold
-                                           text-gray-400">
-                                    Created At
-                                </th>
-
-                                <th class="px-6 py-5
-                                           text-left
-                                           text-sm
-                                           font-semibold
-                                           text-gray-400">
-                                    Action
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody id="customerTableBody">
-
-                            <tr>
-                                <td colspan="7"
-                                    class="px-6 py-12
-                                           text-center
-                                           text-gray-500">
-
-                                    Loading customers...
-
-                                </td>
-                            </tr>
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
+              <span class="text-gray-400"> Customer Management </span>
             </div>
 
-        </section>
+            <h1 class="text-2xl font-bold sm:text-3xl">Customer Management</h1>
 
+            <p class="mt-2 text-gray-400">
+              Review and manage ServiceHub Customers.
+            </p>
+          </div>
+
+          <!-- Search + Filters -->
+          <div
+            class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8"
+          >
+            <!-- Search -->
+            <div class="relative w-full lg:w-1/2">
+              <i
+                class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-gray-500"
+              ></i>
+
+              <input
+                type="text"
+                id="customerSearch"
+                placeholder="Search customers..."
+                oninput="searchCustomers()"
+                class="w-full bg-gray-900 border border-gray-800 rounded-lg pl-14 pr-5 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-gray-700 transition-colors"
+              />
+            </div>
+
+            <!-- Status Filters -->
+            <div class="flex gap-3">
+              <button
+                id="activeFilter"
+                onclick="filterCustomers('active')"
+                class="px-5 py-3 bg-gray-800 border border-gray-700 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                Active
+              </button>
+
+              <button
+                id="inactiveFilter"
+                onclick="filterCustomers('inactive')"
+                class="px-5 py-3 bg-gray-900 border border-gray-800 text-gray-400 rounded-lg hover:bg-gray-800 hover:text-white transition-colors"
+              >
+                Inactive
+              </button>
+            </div>
+          </div>
+
+          <!-- Customer Table -->
+          <div
+            class="overflow-x-auto bg-gray-900 border border-gray-800 rounded-xl"
+          >
+            <table class="w-full">
+              <thead class="bg-gray-900">
+                <tr class="border-b border-gray-800">
+                  <th
+                    class="px-6 py-5 text-left text-sm font-semibold text-gray-400"
+                  >
+                    Name
+                  </th>
+
+                  <th
+                    class="px-6 py-5 text-left text-sm font-semibold text-gray-400"
+                  >
+                    Email
+                  </th>
+
+                  <th
+                    class="px-6 py-5 text-left text-sm font-semibold text-gray-400"
+                  >
+                    Phone
+                  </th>
+
+                  <th
+                    class="px-6 py-5 text-left text-sm font-semibold text-gray-400"
+                  >
+                    City
+                  </th>
+
+                  <th
+                    class="px-6 py-5 text-left text-sm font-semibold text-gray-400"
+                  >
+                    Status
+                  </th>
+
+                  <th
+                    class="px-6 py-5 text-left text-sm font-semibold text-gray-400"
+                  >
+                    Created At
+                  </th>
+
+                  <th
+                    class="px-6 py-5 text-left text-sm font-semibold text-gray-400"
+                  >
+                    Action
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody id="customerTableBody">
+                <tr>
+                  <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                    Loading customers...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
     </main>
 
-
     <!-- Customer Details Modal -->
-    <div id="customerModal"
-         class="hidden fixed inset-0 z-50
-                bg-black/70 backdrop-blur-sm
-                p-4">
+    <div
+      id="customerModal"
+      class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm p-4"
+    >
+      <div class="flex w-full min-h-full items-center justify-center">
+        <div
+          class="flex w-full max-w-3xl max-h-[90vh] flex-col overflow-hidden bg-gray-900 border border-gray-800 rounded-xl"
+        >
+          <!-- Modal Header -->
+          <div
+            class="flex shrink-0 items-center justify-between px-6 py-5 border-b border-gray-800"
+          >
+            <div>
+              <h2
+                id="customerModalName"
+                class="text-xl font-semibold text-white"
+              >
+                Customer
+              </h2>
 
-        <div class="flex w-full min-h-full items-center justify-center">
+              <div id="customerModalStatus" class="mt-2"></div>
+            </div>
 
-        <div class="flex w-full max-w-3xl
-                max-h-[90vh]
-                flex-col overflow-hidden
-                    bg-gray-900
-                    border border-gray-800
-                    rounded-xl">
+            <button
+              onclick="closeCustomerModal()"
+              class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700 transition-colors"
+            >
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
 
-            <!-- Modal Header -->
-            <div class="flex shrink-0 items-center justify-between
-                        px-6 py-5
-                        border-b border-gray-800">
+          <!-- Modal Body -->
+          <div class="min-h-0 flex-1 overflow-y-auto px-6 py-6">
+            <!-- Personal Information -->
+            <div class="mb-8">
+              <h3 class="text-lg font-semibold text-white mb-4">
+                Personal Information
+              </h3>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <p class="text-sm text-gray-500">Full Name</p>
+
+                  <p id="customerFullName" class="mt-1 text-gray-200">N/A</p>
+                </div>
 
                 <div>
+                  <p class="text-sm text-gray-500">Email</p>
 
-                    <h2 id="customerModalName"
-                        class="text-xl font-semibold text-white">
-                        Customer
-                    </h2>
-
-                    <div id="customerModalStatus"
-                         class="mt-2">
-                    </div>
-
+                  <p id="customerEmail" class="mt-1 text-gray-200 break-all">
+                    N/A
+                  </p>
                 </div>
 
-                <button
-                    onclick="closeCustomerModal()"
-                    class="w-10 h-10
-                           flex items-center justify-center
-                           rounded-lg
-                           bg-gray-800
-                           text-gray-400
-                           hover:text-white
-                           hover:bg-gray-700
-                           transition-colors">
-
-                    <i class="fa-solid fa-xmark"></i>
-
-                </button>
-
-            </div>
-
-
-            <!-- Modal Body -->
-            <div class="min-h-0 flex-1 overflow-y-auto px-6 py-6">
-
-                <!-- Personal Information -->
-                <div class="mb-8">
-
-                    <h3 class="text-lg font-semibold text-white mb-4">
-                        Personal Information
-                    </h3>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-                        <div>
-                            <p class="text-sm text-gray-500">
-                                Full Name
-                            </p>
-
-                            <p id="customerFullName"
-                               class="mt-1 text-gray-200">
-                                N/A
-                            </p>
-                        </div>
-
-
-                        <div>
-                            <p class="text-sm text-gray-500">
-                                Email
-                            </p>
-
-                            <p id="customerEmail"
-                               class="mt-1 text-gray-200 break-all">
-                                N/A
-                            </p>
-                        </div>
-
-
-                        <div>
-                            <p class="text-sm text-gray-500">
-                                Phone
-                            </p>
-
-                            <p id="customerPhone"
-                               class="mt-1 text-gray-200">
-                                N/A
-                            </p>
-                        </div>
-
-
-                        <div>
-                            <p class="text-sm text-gray-500">
-                                Age
-                            </p>
-
-                            <p id="customerAge"
-                               class="mt-1 text-gray-200">
-                                N/A
-                            </p>
-                        </div>
-
-
-                        <div>
-                            <p class="text-sm text-gray-500">
-                                Gender
-                            </p>
-
-                            <p id="customerGender"
-                               class="mt-1 text-gray-200">
-                                N/A
-                            </p>
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- Address Information -->
-                <div class="mb-8">
-
-                    <h3 class="text-lg font-semibold text-white mb-4">
-                        Address Information
-                    </h3>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-                        <div>
-                            <p class="text-sm text-gray-500">
-                                Address Line 1
-                            </p>
-
-                            <p id="customerAddressLine1"
-                               class="mt-1 text-gray-200">
-                                N/A
-                            </p>
-                        </div>
-
-
-                        <div>
-                            <p class="text-sm text-gray-500">
-                                Address Line 2
-                            </p>
-
-                            <p id="customerAddressLine2"
-                               class="mt-1 text-gray-200">
-                                N/A
-                            </p>
-                        </div>
-
-
-                        <div>
-                            <p class="text-sm text-gray-500">
-                                Landmark
-                            </p>
-
-                            <p id="customerLandmark"
-                               class="mt-1 text-gray-200">
-                                N/A
-                            </p>
-                        </div>
-
-
-                        <div>
-                            <p class="text-sm text-gray-500">
-                                City
-                            </p>
-
-                            <p id="customerCity"
-                               class="mt-1 text-gray-200">
-                                N/A
-                            </p>
-                        </div>
-
-
-                        <div>
-                            <p class="text-sm text-gray-500">
-                                State
-                            </p>
-
-                            <p id="customerState"
-                               class="mt-1 text-gray-200">
-                                N/A
-                            </p>
-                        </div>
-
-
-                        <div>
-                            <p class="text-sm text-gray-500">
-                                PIN Code
-                            </p>
-
-                            <p id="customerPinCode"
-                               class="mt-1 text-gray-200">
-                                N/A
-                            </p>
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- Account Information -->
                 <div>
+                  <p class="text-sm text-gray-500">Phone</p>
 
-                    <h3 class="text-lg font-semibold text-white mb-4">
-                        Account Information
-                    </h3>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-                        <div>
-                            <p class="text-sm text-gray-500">
-                                Terms Accepted
-                            </p>
-
-                            <p id="customerTermsAccepted"
-                               class="mt-1 text-gray-200">
-                                N/A
-                            </p>
-                        </div>
-
-
-                        <div>
-                            <p class="text-sm text-gray-500">
-                                Created At
-                            </p>
-
-                            <p id="customerCreatedAt"
-                               class="mt-1 text-gray-200">
-                                N/A
-                            </p>
-                        </div>
-
-
-                        <div>
-                            <p class="text-sm text-gray-500">
-                                Last Updated
-                            </p>
-
-                            <p id="customerUpdatedAt"
-                               class="mt-1 text-gray-200">
-                                N/A
-                            </p>
-                        </div>
-
-                    </div>
-
+                  <p id="customerPhone" class="mt-1 text-gray-200">N/A</p>
                 </div>
 
+                <div>
+                  <p class="text-sm text-gray-500">Age</p>
+
+                  <p id="customerAge" class="mt-1 text-gray-200">N/A</p>
+                </div>
+
+                <div>
+                  <p class="text-sm text-gray-500">Gender</p>
+
+                  <p id="customerGender" class="mt-1 text-gray-200">N/A</p>
+                </div>
+              </div>
             </div>
 
+            <!-- Address Information -->
+            <div class="mb-8">
+              <h3 class="text-lg font-semibold text-white mb-4">
+                Address Information
+              </h3>
 
-            <!-- Modal Footer -->
-            <div class="flex shrink-0 justify-end gap-3
-                        px-6 py-5
-                        border-t border-gray-800">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <p class="text-sm text-gray-500">Address Line 1</p>
 
-                <div id="customerModalActions"></div>
+                  <p id="customerAddressLine1" class="mt-1 text-gray-200">
+                    N/A
+                  </p>
+                </div>
 
-                <button
-                    onclick="closeCustomerModal()"
-                    class="px-4 py-2
-                           bg-gray-800
-                           hover:bg-gray-700
-                           text-gray-300
-                           rounded-lg
-                           transition-colors">
+                <div>
+                  <p class="text-sm text-gray-500">Address Line 2</p>
 
-                    Close
+                  <p id="customerAddressLine2" class="mt-1 text-gray-200">
+                    N/A
+                  </p>
+                </div>
 
-                </button>
+                <div>
+                  <p class="text-sm text-gray-500">Landmark</p>
 
+                  <p id="customerLandmark" class="mt-1 text-gray-200">N/A</p>
+                </div>
+
+                <div>
+                  <p class="text-sm text-gray-500">City</p>
+
+                  <p id="customerCity" class="mt-1 text-gray-200">N/A</p>
+                </div>
+
+                <div>
+                  <p class="text-sm text-gray-500">State</p>
+
+                  <p id="customerState" class="mt-1 text-gray-200">N/A</p>
+                </div>
+
+                <div>
+                  <p class="text-sm text-gray-500">PIN Code</p>
+
+                  <p id="customerPinCode" class="mt-1 text-gray-200">N/A</p>
+                </div>
+              </div>
             </div>
 
-        </div>
+            <!-- Account Information -->
+            <div>
+              <h3 class="text-lg font-semibold text-white mb-4">
+                Account Information
+              </h3>
 
-        </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <p class="text-sm text-gray-500">Terms Accepted</p>
 
+                  <p id="customerTermsAccepted" class="mt-1 text-gray-200">
+                    N/A
+                  </p>
+                </div>
+
+                <div>
+                  <p class="text-sm text-gray-500">Created At</p>
+
+                  <p id="customerCreatedAt" class="mt-1 text-gray-200">N/A</p>
+                </div>
+
+                <div>
+                  <p class="text-sm text-gray-500">Last Updated</p>
+
+                  <p id="customerUpdatedAt" class="mt-1 text-gray-200">N/A</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal Footer -->
+          <div
+            class="flex shrink-0 justify-end gap-3 px-6 py-5 border-t border-gray-800"
+          >
+            <div id="customerModalActions"></div>
+
+            <button
+              onclick="closeCustomerModal()"
+              class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-
 
     <!-- Shared Admin Layout -->
     <script src="components/AdminLayout.js"></script>
 
     <!-- Customer Management Logic -->
     <script src="CustomerManagement.js"></script>
-
-</body>
-
+  </body>
 </html>

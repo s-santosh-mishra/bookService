@@ -1,9 +1,16 @@
 package com.servicehub.serv.controller;
 
+import com.servicehub.serv.dto.AddBookingPartDto;
 import com.servicehub.serv.dto.BookingDto;
+import com.servicehub.serv.dto.UnlistedPartRequestDto;
+import com.servicehub.serv.dto.WorkerBookingLocationDto;
 import com.servicehub.serv.dto.WorkerBookingRequestDto;
 import com.servicehub.serv.dto.WorkerCancellationRequestDto;
+import com.servicehub.serv.entity.BookingPart;
+import com.servicehub.serv.entity.UnlistedPartRequest;
+import com.servicehub.serv.service.BookingPartService;
 import com.servicehub.serv.service.BookingService;
+import com.servicehub.serv.service.UnlistedPartRequestService;
 
 import jakarta.validation.Valid;
 
@@ -17,9 +24,17 @@ import java.util.UUID;
 @RequestMapping("/api/worker/bookings")
 public class WorkerBookingController {
     private final BookingService bookingService;
+    private final BookingPartService bookingPartService;
+    private final UnlistedPartRequestService unlistedPartRequestService;
 
-    public WorkerBookingController(BookingService bookingService) {
+    public WorkerBookingController(
+            BookingService bookingService,
+            BookingPartService bookingPartService,
+            UnlistedPartRequestService unlistedPartRequestService) {
+
         this.bookingService = bookingService;
+        this.bookingPartService = bookingPartService;
+        this.unlistedPartRequestService = unlistedPartRequestService;
     }
 
     @GetMapping("/requests")
@@ -29,8 +44,16 @@ public class WorkerBookingController {
     }
 
     @PostMapping("/{bookingId}/accept")
-    public ResponseEntity<BookingDto> acceptBooking(@PathVariable UUID bookingId, Authentication authentication) {
-        return ResponseEntity.ok(bookingService.acceptBooking(UUID.fromString(authentication.getName()), bookingId));
+    public ResponseEntity<BookingDto> acceptBooking(
+            @PathVariable UUID bookingId,
+            @Valid @RequestBody WorkerBookingLocationDto request,
+            Authentication authentication) {
+
+        return ResponseEntity.ok(
+                bookingService.acceptBooking(
+                        UUID.fromString(authentication.getName()),
+                        bookingId,
+                        request));
     }
 
     @PostMapping("/{bookingId}/reject")
@@ -62,6 +85,44 @@ public class WorkerBookingController {
             Authentication authentication) {
         return ResponseEntity
                 .ok(bookingService.workerConfirmCompletion(UUID.fromString(authentication.getName()), bookingId));
+    }
+
+    @PostMapping("/{bookingId}/parts")
+    public ResponseEntity<BookingPart> addBookingPart(
+            @PathVariable UUID bookingId,
+            @Valid @RequestBody AddBookingPartDto request,
+            Authentication authentication) {
+
+        UUID workerId = UUID.fromString(authentication.getName());
+
+        return ResponseEntity.ok(
+                bookingPartService.addPart(
+                        workerId,
+                        bookingId,
+                        request));
+    }
+
+    @PostMapping("/{bookingId}/unlisted-parts")
+    public ResponseEntity<UnlistedPartRequest> requestUnlistedPart(
+            @PathVariable UUID bookingId,
+            @Valid @RequestBody UnlistedPartRequestDto request,
+            Authentication authentication) {
+
+        UUID workerId = UUID.fromString(authentication.getName());
+
+        return ResponseEntity.ok(
+                unlistedPartRequestService.createRequest(
+                        workerId,
+                        bookingId,
+                        request));
+    }
+
+    @GetMapping("/{bookingId}/parts")
+    public ResponseEntity<List<BookingPart>> getBookingParts(
+            @PathVariable UUID bookingId) {
+
+        return ResponseEntity.ok(
+                bookingPartService.getBookingParts(bookingId));
     }
 
     @GetMapping

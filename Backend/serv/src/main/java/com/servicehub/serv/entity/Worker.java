@@ -4,6 +4,7 @@ import com.servicehub.serv.enums.AvailabilityStatus;
 import com.servicehub.serv.enums.VerificationStatus;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
@@ -35,6 +36,9 @@ public class Worker {
     @Enumerated(EnumType.STRING)
     @Column(name = "availability_status", nullable = false)
     private AvailabilityStatus availabilityStatus = AvailabilityStatus.UNAVAILABLE;
+
+    @Column(nullable = false, precision = 2, scale = 1)
+    private BigDecimal rating = BigDecimal.valueOf(5.0);
 
     // Getters and Setters
 
@@ -92,5 +96,13 @@ public class Worker {
 
     public void setAvailabilityStatus(AvailabilityStatus availabilityStatus) {
         this.availabilityStatus = availabilityStatus;
+    }
+
+    public BigDecimal getRating() {
+        return rating;
+    }
+
+    public void setRating(BigDecimal rating) {
+        this.rating = rating;
     }
 }

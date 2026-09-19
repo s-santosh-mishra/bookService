@@ -3,166 +3,102 @@ const ROLE_KEY = "servicehub_user_role";
 
 const API_BASE_URL = "http://localhost:8080/api/worker";
 
-
 // Authentication
 
 function checkWorkerLogin() {
+  const token = localStorage.getItem(ACCESS_TOKEN_KEY);
 
-    const token =
-        localStorage.getItem(ACCESS_TOKEN_KEY);
+  const role = localStorage.getItem(ROLE_KEY);
 
-    const role =
-        localStorage.getItem(ROLE_KEY);
+  if (!token || role !== "WORKER") {
+    window.location.href = "../HTML/login.html";
 
-    if (!token || role !== "WORKER") {
+    return false;
+  }
 
-        window.location.href =
-            "../HTML/login.html";
-
-        return false;
-    }
-
-    return true;
+  return true;
 }
-
 
 // API Helper
 
 async function workerApiRequest(url, options = {}) {
+  const token = localStorage.getItem(ACCESS_TOKEN_KEY);
 
-    const token =
-        localStorage.getItem(ACCESS_TOKEN_KEY);
+  const response = await fetch(url, {
+    ...options,
 
-    const response =
-        await fetch(url, {
+    headers: {
+      "Content-Type": "application/json",
 
-            ...options,
+      Authorization: `Bearer ${token}`,
 
-            headers: {
+      ...(options.headers || {}),
+    },
+  });
 
-                "Content-Type":
-                    "application/json",
+  /*
+   * Only clear authentication when the token
+   * itself is invalid or expired.
+   */
 
-                "Authorization":
-                    `Bearer ${token}`,
+  if (response.status === 401) {
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
 
-                ...(options.headers || {})
+    localStorage.removeItem(ROLE_KEY);
 
-            }
+    window.location.href = "../HTML/login.html";
 
-        });
+    throw new Error("Unauthorized");
+  }
 
+  if (!response.ok) {
+    let message = "Something went wrong.";
 
-    /*
-     * Only clear authentication when the token
-     * itself is invalid or expired.
-     */
+    try {
+      const data = await response.json();
 
-    if (response.status === 401) {
-
-        localStorage.removeItem(
-            ACCESS_TOKEN_KEY
-        );
-
-        localStorage.removeItem(
-            ROLE_KEY
-        );
-
-        window.location.href =
-            "../HTML/login.html";
-
-        throw new Error("Unauthorized");
+      if (data.message) {
+        message = data.message;
+      }
+    } catch (error) {
+      // Ignore parsing errors
     }
 
+    throw new Error(message);
+  }
 
-    if (!response.ok) {
+  if (response.status === 204) {
+    return null;
+  }
 
-        let message =
-            "Something went wrong.";
-
-        try {
-
-            const data =
-                await response.json();
-
-            if (data.message) {
-
-                message =
-                    data.message;
-            }
-
-        } catch (error) {
-
-            // Ignore parsing errors
-
-        }
-
-        throw new Error(message);
-    }
-
-
-    if (response.status === 204) {
-
-        return null;
-    }
-
-
-    return response.json();
+  return response.json();
 }
-
 
 // Load Completed Work
 
 async function loadCompletedWork() {
+  const container = document.getElementById("completedWorkContainer");
 
-    const container =
-        document.getElementById(
-            "completedWorkContainer"
-        );
+  if (!container) {
+    return;
+  }
 
+  try {
+    const bookings = await workerApiRequest(`${API_BASE_URL}/bookings`);
 
-    if (!container) {
+    const completedBookings = (bookings || [])
+      .filter((booking) => booking.status === "COMPLETED")
+      .sort(
+        (a, b) =>
+          new Date(b.completedAt || b.updatedAt) -
+          new Date(a.completedAt || a.updatedAt),
+      );
 
-        return;
-    }
+    renderCompletedWork(completedBookings);
+  } catch (error) {
+    console.error("Failed to load completed work:", error);
 
-
-    try {
-
-        const bookings =
-            await workerApiRequest(
-                `${API_BASE_URL}/bookings`
-            );
-
-
-        const completedBookings =
-            (bookings || [])
-                .filter(
-                    booking =>
-                        booking.status === "COMPLETED"
-                )
-                .sort(
-                    (a, b) =>
-                        new Date(b.completedAt || b.updatedAt)
-                        -
-                        new Date(a.completedAt || a.updatedAt)
-                );
-
-
-        renderCompletedWork(
-            completedBookings
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "Failed to load completed work:",
-            error
-        );
-
-
-        container.innerHTML = `
+    container.innerHTML = `
 
             <div class="bg-gray-900
                         border border-gray-800
@@ -222,44 +158,25 @@ async function loadCompletedWork() {
 
         `;
 
+    const retryButton = document.getElementById("retryCompletedWork");
 
-        const retryButton =
-            document.getElementById(
-                "retryCompletedWork"
-            );
-
-
-        if (retryButton) {
-
-            retryButton.addEventListener(
-                "click",
-                loadCompletedWork
-            );
-        }
+    if (retryButton) {
+      retryButton.addEventListener("click", loadCompletedWork);
     }
+  }
 }
-
 
 // Render Completed Work
 
 function renderCompletedWork(bookings) {
+  const container = document.getElementById("completedWorkContainer");
 
-    const container =
-        document.getElementById(
-            "completedWorkContainer"
-        );
+  if (!container) {
+    return;
+  }
 
-
-    if (!container) {
-
-        return;
-    }
-
-
-    if (!bookings ||
-        bookings.length === 0) {
-
-        container.innerHTML = `
+  if (!bookings || bookings.length === 0) {
+    container.innerHTML = `
 
             <div class="bg-gray-900
                         border border-gray-800
@@ -302,50 +219,28 @@ function renderCompletedWork(bookings) {
 
         `;
 
-        return;
-    }
+    return;
+  }
 
-
-    container.innerHTML =
-        bookings.map(
-            booking =>
-                createCompletedBookingCard(
-                    booking
-                )
-        ).join("");
+  container.innerHTML = bookings
+    .map((booking) => createCompletedBookingCard(booking))
+    .join("");
 }
-
 
 // Completed Booking Card
 
 // Completed Booking Card
 
 function createCompletedBookingCard(booking) {
+  const customerName = escapeHtml(booking.customerName || "Customer");
 
-    const customerName =
-        escapeHtml(
-            booking.customerName ||
-            "Customer"
-        );
+  const serviceName = escapeHtml(booking.serviceName || "Service");
 
-    const serviceName =
-        escapeHtml(
-            booking.serviceName ||
-            "Service"
-        );
+  const requestedDateTime = formatDateTime(booking.createdAt);
 
-    const requestedDateTime =
-        formatDateTime(
-            booking.createdAt
-        );
+  const completedDateTime = formatDateTime(booking.completedAt);
 
-    const completedDateTime =
-        formatDateTime(
-            booking.completedAt
-        );
-
-
-    return `
+  return `
 
         <article
             class="border border-gray-800 bg-gray-900/40 rounded-2xl p-6"
@@ -527,8 +422,9 @@ function createCompletedBookingCard(booking) {
 
                 <!-- Customer Note -->
 
-                ${booking.customerNote
-            ? `
+                ${
+                  booking.customerNote
+                    ? `
 
                             <div
                                 class="pt-4 border-t border-gray-800"
@@ -543,16 +439,14 @@ function createCompletedBookingCard(booking) {
                                 <p
                                     class="text-sm text-gray-300 leading-relaxed"
                                 >
-                                    ${escapeHtml(
-                booking.customerNote
-            )}
+                                    ${escapeHtml(booking.customerNote)}
                                 </p>
 
                             </div>
 
                         `
-            : ""
-        }
+                    : ""
+                }
 
 
 
@@ -601,118 +495,70 @@ function createCompletedBookingCard(booking) {
     `;
 }
 
-
 // Customer Address
 
 function buildCustomerAddress(booking) {
+  const addressParts = [
+    booking.customerAddressLine1,
 
-    const addressParts = [
+    booking.customerAddressLine2,
 
-        booking.customerAddressLine1,
+    booking.customerLandmark,
 
-        booking.customerAddressLine2,
+    booking.customerCity,
 
-        booking.customerLandmark,
+    booking.customerState,
 
-        booking.customerCity,
+    booking.customerPinCode,
+  ].filter(Boolean);
 
-        booking.customerState,
+  if (addressParts.length === 0) {
+    return "Address not provided";
+  }
 
-        booking.customerPinCode
-
-    ].filter(Boolean);
-
-
-    if (addressParts.length === 0) {
-
-        return "Address not provided";
-    }
-
-
-    return addressParts
-        .map(part =>
-            escapeHtml(part)
-        )
-        .join(", ");
+  return addressParts.map((part) => escapeHtml(part)).join(", ");
 }
-
 
 // Date Formatting
 
 function formatDateTime(dateString) {
+  if (!dateString) {
+    return "—";
+  }
 
-    if (!dateString) {
+  const date = new Date(dateString);
 
-        return "—";
-    }
+  if (Number.isNaN(date.getTime())) {
+    return "—";
+  }
 
-
-    const date =
-        new Date(dateString);
-
-
-    if (Number.isNaN(
-        date.getTime()
-    )) {
-
-        return "—";
-    }
-
-
-    return date.toLocaleString(
-        undefined,
-        {
-            dateStyle: "medium",
-            timeStyle: "short"
-        }
-    );
+  return date.toLocaleString(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
 }
-
 
 // HTML Escape
 
 function escapeHtml(value) {
+  if (value === null || value === undefined) {
+    return "";
+  }
 
-    if (value === null ||
-        value === undefined) {
+  return String(value)
+    .replace(/&/g, "&amp;")
 
-        return "";
-    }
+    .replace(/</g, "&lt;")
 
+    .replace(/>/g, "&gt;")
 
-    return String(value)
+    .replace(/"/g, "&quot;")
 
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-
-        .replace(
-            /</g,
-            "&lt;"
-        )
-
-        .replace(
-            />/g,
-            "&gt;"
-        )
-
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-
-        .replace(
-            /'/g,
-            "&#039;"
-        );
+    .replace(/'/g, "&#039;");
 }
-
 
 // Initialisation
 
 if (checkWorkerLogin()) {
-
-    loadCompletedWork();
-
+  loadCompletedWork();
 }

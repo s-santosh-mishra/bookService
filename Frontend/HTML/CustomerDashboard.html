@@ -1,519 +1,437 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Customer Dashboard - ServiceHub</title>
 
-    <link rel="stylesheet" href="../CSS/output.css">
-    <link rel="stylesheet" href="../CSS/CustomerDashboard.css">
+    <link rel="stylesheet" href="../CSS/output.css" />
+    <link rel="stylesheet" href="../CSS/CustomerDashboard.css" />
 
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
 
-    <link rel="icon"
-          type="image/png"
-          sizes="32x32"
-          href="../Images/favicon-32x32.png?v=3">
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../Images/favicon-32x32.png?v=3"
+    />
 
-    <link rel="icon"
-          type="image/png"
-          sizes="16x16"
-          href="../Images/favicon-16x16.png?v=3">
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="../Images/favicon-16x16.png?v=3"
+    />
+  </head>
 
-</head>
-
-
-<body class="bg-gray-950 text-gray-100 min-h-screen">
-
-
+  <body class="bg-gray-950 text-gray-100 min-h-screen">
     <!-- Header -->
 
     <div id="customerHeader"></div>
 
-
     <!-- Main Content -->
 
     <main class="max-w-7xl mx-auto px-6 py-10">
+      <!-- Welcome Section -->
 
+      <section class="mb-10">
+        <div
+          class="flex flex-col md:flex-row md:items-center md:justify-between gap-6"
+        >
+          <div>
+            <p class="text-violet-400 text-sm font-medium mb-2">
+              Customer Dashboard
+            </p>
 
-        <!-- Welcome Section -->
+            <h2 id="welcomeMessage" class="text-3xl md:text-4xl font-bold mb-3">
+              Welcome back!
+            </h2>
 
-        <section class="mb-10">
+            <p class="text-gray-400 max-w-2xl">
+              Find trusted professionals for your home and personal service
+              needs.
+            </p>
+          </div>
+        </div>
+      </section>
 
-            <div class="flex flex-col md:flex-row md:items-center
-                        md:justify-between gap-6">
+      <!-- Search -->
 
-                <div>
+      <section class="mb-12">
+        <div class="relative max-w-3xl">
+          <i
+            class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-gray-500"
+          ></i>
 
-                    <p class="text-violet-400 text-sm font-medium mb-2">
-                        Customer Dashboard
-                    </p>
+          <input
+            type="text"
+            id="serviceSearch"
+            placeholder="Search for a service..."
+            class="w-full bg-gray-900 border border-gray-800 rounded-2xl py-4 pl-12 pr-5 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-violet-500 transition"
+          />
+        </div>
+      </section>
 
-                    <h2 id="welcomeMessage"
-                        class="text-3xl md:text-4xl font-bold mb-3">
+      <!-- Search Results -->
 
-                        Welcome back!
+      <section id="searchResultsSection" class="hidden mb-14">
+        <div class="mb-6">
+          <h3 class="text-2xl font-bold">Search Results</h3>
+          <p id="searchResultsDescription" class="text-sm text-gray-400 mt-1">
+            Services matching your search
+          </p>
+        </div>
+        <div
+          id="searchResultsContainer"
+          class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+        ></div>
+      </section>
 
-                    </h2>
+      <!-- Active Booking -->
 
-                    <p class="text-gray-400 max-w-2xl">
+      <section class="mb-14">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <h3 class="text-2xl font-bold">Active Booking</h3>
 
-                        Find trusted professionals for your home and personal
-                        service needs.
+            <p class="text-sm text-gray-400 mt-1">
+              Your current service request
+            </p>
+          </div>
+        </div>
 
-                    </p>
+        <!-- Active Booking Card -->
 
+        <div
+          id="activeBookingCard"
+          class="hidden bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-violet-500/50 transition"
+        >
+          <div
+            class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
+          >
+            <!-- Booking Information -->
+
+            <div class="flex items-start gap-5">
+              <div
+                class="w-14 h-14 rounded-xl bg-violet-900/30 border border-violet-700/40 flex items-center justify-center shrink-0"
+              >
+                <i class="fa-solid fa-wrench text-violet-400 text-xl"></i>
+              </div>
+
+              <div>
+                <div class="flex flex-wrap items-center gap-3 mb-2">
+                  <h4
+                    id="activeBookingService"
+                    class="text-lg font-semibold"
+                  ></h4>
+
+                  <span
+                    id="activeBookingStatus"
+                    class="px-3 py-1 rounded-full text-xs font-medium bg-yellow-900/30 text-yellow-400 border border-yellow-700/30"
+                  >
+                  </span>
                 </div>
 
-            </div>
+                <p
+                  id="activeBookingDescription"
+                  class="text-sm text-gray-400 mb-3"
+                ></p>
 
-        </section>
+                <div
+                  class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-400"
+                >
+                  <span>
+                    <i class="fa-solid fa-user mr-2 text-violet-400"></i>
 
+                    <span id="activeBookingWorker"> </span>
+                  </span>
 
-        <!-- Search -->
+                  <span>
+                    <i
+                      class="fa-solid fa-calendar-days mr-2 text-violet-400"
+                    ></i>
 
-        <section class="mb-12">
+                    <span id="activeBookingDate"> </span>
+                  </span>
 
-            <div class="relative max-w-3xl">
+                  <span>
+                    <i class="fa-solid fa-clock mr-2 text-violet-400"></i>
 
-                <i class="fa-solid fa-magnifying-glass
-                          absolute left-5 top-1/2
-                          -translate-y-1/2 text-gray-500"></i>
-
-                <input
-                    type="text"
-                    id="serviceSearch"
-                    placeholder="Search for a service..."
-                    class="w-full bg-gray-900 border border-gray-800
-                           rounded-2xl py-4 pl-12 pr-5
-                           text-gray-100 placeholder-gray-500
-                           focus:outline-none focus:border-violet-500
-                           transition">
-
-            </div>
-
-        </section>
-
-
-        <!-- Search Results -->
-
-        <section id="searchResultsSection" class="hidden mb-14">
-            <div class="mb-6">
-                <h3 class="text-2xl font-bold">Search Results</h3>
-                <p id="searchResultsDescription" class="text-sm text-gray-400 mt-1">Services matching your search</p>
-            </div>
-            <div id="searchResultsContainer" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-        </section>
-
-
-        <!-- Active Booking -->
-
-        <section class="mb-14">
-
-            <div class="flex items-center justify-between mb-5">
-
-                <div>
-
-                    <h3 class="text-2xl font-bold">
-                        Active Booking
-                    </h3>
-
-                    <p class="text-sm text-gray-400 mt-1">
-                        Your current service request
-                    </p>
-
+                    <span id="activeBookingTime"> </span>
+                  </span>
                 </div>
-
+              </div>
             </div>
 
+            <!-- View Details -->
 
-            <!-- Active Booking Card -->
+            <div class="lg:text-right shrink-0">
+              <button
+                id="viewActiveBookingButton"
+                class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-violet-600 text-white hover:bg-violet-700 transition font-medium"
+              >
+                <span>View Details</span>
 
-            <div id="activeBookingCard"
-                 class="hidden bg-gray-900 border border-gray-800
-                        rounded-2xl p-6
-                        hover:border-violet-500/50 transition">
-
-                <div class="flex flex-col lg:flex-row
-                            lg:items-center lg:justify-between gap-6">
-
-
-                    <!-- Booking Information -->
-
-                    <div class="flex items-start gap-5">
-
-                        <div class="w-14 h-14 rounded-xl
-                                    bg-violet-900/30
-                                    border border-violet-700/40
-                                    flex items-center justify-center
-                                    shrink-0">
-
-                            <i class="fa-solid fa-wrench
-                                      text-violet-400 text-xl"></i>
-
-                        </div>
-
-
-                        <div>
-
-                            <div class="flex flex-wrap
-                                        items-center gap-3 mb-2">
-
-                                <h4 id="activeBookingService"
-                                    class="text-lg font-semibold">
-                                </h4>
-
-                                <span id="activeBookingStatus"
-                                      class="px-3 py-1 rounded-full
-                                             text-xs font-medium
-                                             bg-yellow-900/30
-                                             text-yellow-400
-                                             border border-yellow-700/30">
-                                </span>
-
-                            </div>
-
-
-                            <p id="activeBookingDescription"
-                               class="text-sm text-gray-400 mb-3">
-                            </p>
-
-
-                            <div class="flex flex-wrap
-                                        gap-x-6 gap-y-2
-                                        text-sm text-gray-400">
-
-                                <span>
-                                    <i class="fa-solid fa-user mr-2
-                                              text-violet-400"></i>
-
-                                    <span id="activeBookingWorker">
-                                    </span>
-                                </span>
-
-
-                                <span>
-                                    <i class="fa-solid fa-calendar-days
-                                              mr-2 text-violet-400"></i>
-
-                                    <span id="activeBookingDate">
-                                    </span>
-                                </span>
-
-
-                                <span>
-                                    <i class="fa-solid fa-clock mr-2
-                                              text-violet-400"></i>
-
-                                    <span id="activeBookingTime">
-                                    </span>
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- View Details -->
-
-                    <div class="lg:text-right shrink-0">
-
-                        <button
-                            id="viewActiveBookingButton"
-                            class="inline-flex items-center
-                                   justify-center gap-2
-                                   px-5 py-3 rounded-xl
-                                   bg-violet-600 text-white
-                                   hover:bg-violet-700
-                                   transition font-medium">
-
-                            <span>View Details</span>
-
-                            <i class="fa-solid fa-arrow-right"></i>
-
-                        </button>
-
-                    </div>
-
-                </div>
-
+                <i class="fa-solid fa-arrow-right"></i>
+              </button>
             </div>
+          </div>
+        </div>
 
+        <!-- No Active Booking -->
 
-            <!-- No Active Booking -->
+        <div
+          id="noActiveBooking"
+          class="bg-gray-900 border border-gray-800 rounded-2xl p-10 text-center"
+        >
+          <div
+            class="w-16 h-16 mx-auto mb-5 rounded-full bg-gray-800 flex items-center justify-center"
+          >
+            <i class="fa-solid fa-calendar-check text-gray-500 text-2xl"></i>
+          </div>
 
-            <div id="noActiveBooking"
-                 class="bg-gray-900 border border-gray-800
-                        rounded-2xl p-10 text-center">
+          <h4 class="text-lg font-semibold mb-2">No active bookings</h4>
 
-                <div class="w-16 h-16 mx-auto mb-5
-                            rounded-full bg-gray-800
-                            flex items-center justify-center">
+          <p class="text-gray-400 text-sm">
+            You don't have any ongoing services right now.
+          </p>
+        </div>
+      </section>
 
-                    <i class="fa-solid fa-calendar-check
-                              text-gray-500 text-2xl"></i>
+      <!-- Categories -->
 
-                </div>
+      <section id="services" class="mb-14">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h3 class="text-2xl font-bold">Browse Categories</h3>
 
+            <p class="text-sm text-gray-400 mt-1">
+              Explore services based on your needs
+            </p>
+          </div>
+        </div>
 
-                <h4 class="text-lg font-semibold mb-2">
-                    No active bookings
-                </h4>
+        <div
+          id="categoryContainer"
+          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4"
+        ></div>
+      </section>
 
+      <!-- Category Results -->
 
-                <p class="text-gray-400 text-sm">
-                    You don't have any ongoing services right now.
-                </p>
+      <section id="categoryServicesSection" class="hidden mb-14">
+        <div class="mb-6">
+          <h3 id="categoryServicesHeading" class="text-2xl font-bold">
+            Services
+          </h3>
 
-            </div>
+          <p
+            id="categoryServicesDescription"
+            class="text-sm text-gray-400 mt-1"
+          >
+            Select a category to view its services
+          </p>
+        </div>
 
-        </section>
+        <div
+          id="categoryServicesContainer"
+          class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+        ></div>
+      </section>
 
+      <!-- Popular Services -->
 
-        <!-- Categories -->
+      <section class="mb-10">
+        <div class="mb-6">
+          <h3 class="text-2xl font-bold">Popular Services</h3>
 
-        <section id="services" class="mb-14">
+          <p class="text-sm text-gray-400 mt-1">
+            Services customers commonly book
+          </p>
+        </div>
 
-            <div class="flex items-center
-                        justify-between mb-6">
-
-                <div>
-
-                    <h3 class="text-2xl font-bold">
-                        Browse Categories
-                    </h3>
-
-                    <p class="text-sm text-gray-400 mt-1">
-                        Explore services based on your needs
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div id="categoryContainer"
-                 class="grid grid-cols-2 md:grid-cols-3
-                        lg:grid-cols-6 gap-4">
-
-            </div>
-
-        </section>
-
-
-        <!-- Category Results -->
-
-        <section id="categoryServicesSection" class="hidden mb-14">
-
-            <div class="mb-6">
-
-                <h3 id="categoryServicesHeading" class="text-2xl font-bold">
-                    Services
-                </h3>
-
-                <p id="categoryServicesDescription" class="text-sm text-gray-400 mt-1">
-                    Select a category to view its services
-                </p>
-
-            </div>
-
-            <div id="categoryServicesContainer"
-                 class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-            </div>
-
-        </section>
-
-
-        <!-- Popular Services -->
-
-        <section class="mb-10">
-
-            <div class="mb-6">
-
-                <h3 class="text-2xl font-bold">
-                    Popular Services
-                </h3>
-
-                <p class="text-sm text-gray-400 mt-1">
-                    Services customers commonly book
-                </p>
-
-            </div>
-
-
-            <div id="popularServicesContainer"
-                 class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-            </div>
-
-        </section>
-
-
+        <div
+          id="popularServicesContainer"
+          class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+        ></div>
+      </section>
     </main>
-
 
     <!-- Create Booking Modal -->
 
-    <div id="createBookingModal"
-         class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm
-                flex items-center justify-center px-4 py-6">
-
-        <div class="w-full max-w-lg bg-gray-900 border border-gray-800
-                    rounded-2xl shadow-2xl">
-
-            <div class="flex items-center justify-between px-6 py-5 border-b border-gray-800">
-                <div>
-                    <p class="text-violet-400 text-sm font-medium mb-1">Book Service</p>
-                    <h3 id="createBookingService" class="text-xl font-bold">Service</h3>
-                </div>
-                <button id="closeCreateBookingButton" type="button"
-                        class="w-10 h-10 rounded-xl bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700 transition">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <div class="p-6 space-y-5">
-                <p class="text-sm text-gray-400">A suitable available worker will receive your request.</p>
-
-                <div>
-                    <label for="customerBookingNote" class="block text-sm font-medium mb-2">Note (optional)</label>
-                    <textarea id="customerBookingNote" maxlength="500" rows="4"
-                              placeholder="Add any useful details for the worker..."
-                              class="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-gray-100 placeholder-gray-600 focus:outline-none focus:border-violet-500 transition resize-none"></textarea>
-                </div>
-
-                <div class="flex justify-end gap-3">
-                    <button id="cancelCreateBookingButton" type="button"
-                            class="px-5 py-3 rounded-xl bg-gray-800 text-gray-300 hover:bg-gray-700 transition">Cancel</button>
-                    <button id="confirmCreateBookingButton" type="button"
-                            class="px-5 py-3 rounded-xl bg-violet-600 text-white hover:bg-violet-700 transition font-medium">
-                        Request Service
-                    </button>
-                </div>
-            </div>
+    <div
+      id="createBookingModal"
+      class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center px-4 py-6"
+    >
+      <div
+        class="w-full max-w-lg bg-gray-900 border border-gray-800 rounded-2xl shadow-2xl"
+      >
+        <div
+          class="flex items-center justify-between px-6 py-5 border-b border-gray-800"
+        >
+          <div>
+            <p class="text-violet-400 text-sm font-medium mb-1">Book Service</p>
+            <h3 id="createBookingService" class="text-xl font-bold">Service</h3>
+          </div>
+          <button
+            id="closeCreateBookingButton"
+            type="button"
+            class="w-10 h-10 rounded-xl bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700 transition"
+          >
+            <i class="fa-solid fa-xmark"></i>
+          </button>
         </div>
-    </div>
 
+        <div class="p-6 space-y-5">
+          <p class="text-sm text-gray-400">
+            A suitable available worker will receive your request.
+          </p>
+
+          <div>
+            <label
+              for="customerBookingNote"
+              class="block text-sm font-medium mb-2"
+              >Note (optional)</label
+            >
+            <textarea
+              id="customerBookingNote"
+              maxlength="500"
+              rows="4"
+              placeholder="Add any useful details for the worker..."
+              class="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-gray-100 placeholder-gray-600 focus:outline-none focus:border-violet-500 transition resize-none"
+            ></textarea>
+          </div>
+
+          <div class="flex justify-end gap-3">
+            <button
+              id="cancelCreateBookingButton"
+              type="button"
+              class="px-5 py-3 rounded-xl bg-gray-800 text-gray-300 hover:bg-gray-700 transition"
+            >
+              Cancel
+            </button>
+            <button
+              id="confirmCreateBookingButton"
+              type="button"
+              class="px-5 py-3 rounded-xl bg-violet-600 text-white hover:bg-violet-700 transition font-medium"
+            >
+              Request Service
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Booking Details Modal -->
 
-    <div id="bookingDetailsModal"
-         class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm
-                flex items-center justify-center px-4 py-6">
+    <div
+      id="bookingDetailsModal"
+      class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center px-4 py-6"
+    >
+      <div
+        class="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-gray-900 border border-gray-800 rounded-2xl shadow-2xl"
+      >
+        <div
+          class="flex items-center justify-between px-6 py-5 border-b border-gray-800"
+        >
+          <div>
+            <p class="text-violet-400 text-sm font-medium mb-1">
+              Booking Details
+            </p>
 
-        <div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto
-                    bg-gray-900 border border-gray-800 rounded-2xl
-                    shadow-2xl">
+            <h3 id="bookingDetailsService" class="text-xl font-bold">
+              Service
+            </h3>
+          </div>
 
-            <div class="flex items-center justify-between
-                        px-6 py-5 border-b border-gray-800">
-
-                <div>
-                    <p class="text-violet-400 text-sm font-medium mb-1">
-                        Booking Details
-                    </p>
-
-                    <h3 id="bookingDetailsService"
-                        class="text-xl font-bold">
-                        Service
-                    </h3>
-                </div>
-
-                <button id="closeBookingDetailsButton"
-                        type="button"
-                        class="w-10 h-10 rounded-xl bg-gray-800
-                               text-gray-400 hover:text-white
-                               hover:bg-gray-700 transition">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-
-            </div>
-
-            <div class="p-6 space-y-6">
-
-                <div>
-                    <span id="bookingDetailsStatus"
-                          class="inline-flex px-3 py-1 rounded-full
-                                 text-xs font-medium bg-yellow-900/30
-                                 text-yellow-400 border border-yellow-700/30">
-                    </span>
-
-                    <p id="bookingDetailsDescription"
-                       class="text-sm text-gray-400 mt-3">
-                    </p>
-                </div>
-
-                <div class="grid sm:grid-cols-2 gap-4">
-
-                    <div class="bg-gray-950 border border-gray-800 rounded-xl p-4">
-                        <p class="text-xs text-gray-500 mb-1">Worker</p>
-                        <p id="bookingDetailsWorker" class="font-medium">
-                        </p>
-                    </div>
-
-                    <div class="bg-gray-950 border border-gray-800 rounded-xl p-4">
-                        <p class="text-xs text-gray-500 mb-1">Requested</p>
-                        <p id="bookingDetailsCreated" class="font-medium">
-                        </p>
-                    </div>
-
-                </div>
-
-                <div>
-                    <h4 class="text-sm font-semibold mb-3">Booking Timeline</h4>
-                    <div id="bookingDetailsTimeline" class="space-y-3">
-                    </div>
-                </div>
-
-                <div id="customerCompletionContainer"
-                     class="hidden bg-violet-950/20 border border-violet-700/30 rounded-xl p-4">
-                    <p class="text-sm text-gray-300 mb-3">
-                        The worker has marked the service as finished. Confirm that the work is actually complete to finish this booking.
-                    </p>
-                    <button id="confirmCustomerCompletionButton" type="button"
-                            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-violet-600 text-white hover:bg-violet-700 transition font-medium text-sm">
-                        <i class="fa-solid fa-check"></i>
-                        Confirm Work Completed
-                    </button>
-                </div>
-
-                <div id="bookingDetailsNoteContainer"
-                     class="hidden bg-gray-950 border border-gray-800
-                            rounded-xl p-4">
-                    <p class="text-xs text-gray-500 mb-1">Your Note</p>
-                    <p id="bookingDetailsNote"
-                       class="text-sm text-gray-300 whitespace-pre-wrap">
-                    </p>
-                </div>
-
-                <!-- Customer Cancel Booking -->
-
-                <div
-                    id="customerCancelContainer"
-                    class="hidden pt-5 border-t border-gray-800"
-                >
-                </div>
-
-            </div>
-
+          <button
+            id="closeBookingDetailsButton"
+            type="button"
+            class="w-10 h-10 rounded-xl bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700 transition"
+          >
+            <i class="fa-solid fa-xmark"></i>
+          </button>
         </div>
 
+        <div class="p-6 space-y-6">
+          <div>
+            <span
+              id="bookingDetailsStatus"
+              class="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-yellow-900/30 text-yellow-400 border border-yellow-700/30"
+            >
+            </span>
+
+            <p
+              id="bookingDetailsDescription"
+              class="text-sm text-gray-400 mt-3"
+            ></p>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div class="bg-gray-950 border border-gray-800 rounded-xl p-4">
+              <p class="text-xs text-gray-500 mb-1">Worker</p>
+              <p id="bookingDetailsWorker" class="font-medium"></p>
+            </div>
+
+            <div class="bg-gray-950 border border-gray-800 rounded-xl p-4">
+              <p class="text-xs text-gray-500 mb-1">Requested</p>
+              <p id="bookingDetailsCreated" class="font-medium"></p>
+            </div>
+          </div>
+
+          <div>
+            <h4 class="text-sm font-semibold mb-3">Booking Timeline</h4>
+            <div id="bookingDetailsTimeline" class="space-y-3"></div>
+          </div>
+
+          <div
+            id="customerCompletionContainer"
+            class="hidden bg-violet-950/20 border border-violet-700/30 rounded-xl p-4"
+          >
+            <p class="text-sm text-gray-300 mb-3">
+              The worker has marked the service as finished. Confirm that the
+              work is actually complete to finish this booking.
+            </p>
+            <button
+              id="confirmCustomerCompletionButton"
+              type="button"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-violet-600 text-white hover:bg-violet-700 transition font-medium text-sm"
+            >
+              <i class="fa-solid fa-check"></i>
+              Confirm Work Completed
+            </button>
+          </div>
+
+          <div
+            id="bookingDetailsNoteContainer"
+            class="hidden bg-gray-950 border border-gray-800 rounded-xl p-4"
+          >
+            <p class="text-xs text-gray-500 mb-1">Your Note</p>
+            <p
+              id="bookingDetailsNote"
+              class="text-sm text-gray-300 whitespace-pre-wrap"
+            ></p>
+          </div>
+
+          <!-- Customer Cancel Booking -->
+
+          <div
+            id="customerCancelContainer"
+            class="hidden pt-5 border-t border-gray-800"
+          ></div>
+        </div>
+      </div>
     </div>
 
     <div id="serviceHubFooter"></div>
 
-
     <script src="../JS/components/CustomerHeader.js"></script>
     <script src="../JS/components/footer.js"></script>
     <script src="../JS/CustomerDashboard.js"></script>
-
-</body>
-
+  </body>
 </html>

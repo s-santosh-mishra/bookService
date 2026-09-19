@@ -2,6 +2,7 @@ package com.servicehub.serv.service;
 
 import com.servicehub.serv.dto.BookingDto;
 import com.servicehub.serv.dto.CreateBookingDto;
+import com.servicehub.serv.dto.WorkerBookingLocationDto;
 import com.servicehub.serv.dto.WorkerBookingRequestDto;
 import com.servicehub.serv.dto.WorkerCancellationRequestDto;
 import com.servicehub.serv.entity.*;
@@ -20,6 +21,7 @@ public class BookingService {
     private final WorkerRepository workerRepository;
     private final WorkerServiceRepository workerServiceRepository;
     private final WorkerBookingRejectionRepository workerBookingRejectionRepository;
+    private final BillingService billingService;
 
     public BookingService(
             BookingRepository bookingRepository,
@@ -27,7 +29,8 @@ public class BookingService {
             ServiceRepository serviceRepository,
             WorkerRepository workerRepository,
             WorkerServiceRepository workerServiceRepository,
-            WorkerBookingRejectionRepository workerBookingRejectionRepository) {
+            WorkerBookingRejectionRepository workerBookingRejectionRepository,
+            BillingService billingService) {
 
         this.bookingRepository = bookingRepository;
         this.customerRepository = customerRepository;
@@ -35,6 +38,7 @@ public class BookingService {
         this.workerRepository = workerRepository;
         this.workerServiceRepository = workerServiceRepository;
         this.workerBookingRejectionRepository = workerBookingRejectionRepository;
+        this.billingService = billingService;
     }
 
     private List<BookingStatus> customerActiveStatuses() {
@@ -61,6 +65,9 @@ public class BookingService {
         booking.setWorker(null);
         booking.setStatus(BookingStatus.PENDING);
         booking.setCustomerNote(request.getCustomerNote());
+        booking.setServiceLatitude(request.getLatitude());
+        booking.setServiceLongitude(request.getLongitude());
+
         return toDto(bookingRepository.save(booking));
     }
 
@@ -68,53 +75,115 @@ public class BookingService {
     public BookingDto cancelBooking(UUID customerId, UUID bookingId) {
 
         Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new IllegalArgumentException("Customer not found."));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Customer not found."));
 
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new IllegalArgumentException("Booking not found."));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Booking not found."));
 
         if (!booking.getCustomer().getUserId().equals(customerId)) {
             throw new IllegalStateException(
                     "Booking does not belong to this customer.");
         }
 
-        if (booking.getStatus() != BookingStatus.PENDING) {
+        BookingStatus status = booking.getStatus();
+
+        /*
+         * PENDING:
+         * Customer can cancel without any charge.
+         */
+        if (status == BookingStatus.PENDING) {
+
+            booking.setStatus(BookingStatus.CANCELLED);
+
+            booking.setCancelledAt(LocalDateTime.now());
+
+            return toDto(
+                    bookingRepository.save(booking));
+        }
+
+        /*
+         * ACCEPTED or IN_PROGRESS:
+         * Customer cancellation is allowed,
+         * but billing rules apply.
+         */
+        if (status != BookingStatus.ACCEPTED
+                && status != BookingStatus.IN_PROGRESS) {
+
             throw new IllegalStateException(
                     "This booking cannot be cancelled. Please contact support.");
         }
 
-        booking.setStatus(BookingStatus.CANCELLED);
-        booking.setCancelledAt(LocalDateTime.now());
+        LocalDateTime cancellationTime = LocalDateTime.now();
 
-        return toDto(bookingRepository.save(booking));
+        booking.setStatus(BookingStatus.CANCELLED);
+        booking.setCancelledAt(cancellationTime);
+
+        /*
+         * Create the cancellation billing snapshot
+         * before returning the booking.
+         */
+        billingService.createCustomerCancellationBilling(
+                booking,
+                cancellationTime);
+
+        /*
+         * Once the customer cancels an accepted or
+         * in-progress booking, the worker becomes available.
+         */
+        if (booking.getWorker() != null) {
+            booking.getWorker()
+                    .setAvailabilityStatus(
+                            AvailabilityStatus.AVAILABLE);
+        }
+
+        return toDto(
+                bookingRepository.save(booking));
     }
 
     @Transactional
-    public BookingDto acceptBooking(UUID workerId, UUID bookingId) {
+    public BookingDto acceptBooking(
+            UUID workerId,
+            UUID bookingId,
+            WorkerBookingLocationDto request) {
+
         Worker worker = workerRepository.findById(workerId)
                 .orElseThrow(() -> new IllegalArgumentException("Worker not found."));
+
         if (worker.getVerificationStatus() != VerificationStatus.VERIFIED)
             throw new IllegalStateException("Only verified workers can accept bookings.");
+
         if (worker.getAvailabilityStatus() != AvailabilityStatus.AVAILABLE)
             throw new IllegalStateException("Worker is not available.");
+
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found."));
+
         if (booking.getStatus() != BookingStatus.PENDING)
             throw new IllegalStateException("Booking is no longer available.");
+
         if (booking.getWorker() != null)
             throw new IllegalStateException("Booking has already been assigned.");
+
         boolean provides = workerServiceRepository.findByWorker_UserId(workerId).stream()
                 .anyMatch(ws -> ws.getService().getServiceId().equals(booking.getService().getServiceId()));
+
         if (!provides)
             throw new IllegalStateException("Worker does not provide this service.");
+
         if (bookingRepository.existsByWorkerUserIdAndStatusIn(workerId,
                 List.of(BookingStatus.ACCEPTED, BookingStatus.IN_PROGRESS)))
             throw new IllegalStateException(
                     "You can't accept another booking until you finish your current booking.");
+
         booking.setWorker(worker);
         booking.setStatus(BookingStatus.ACCEPTED);
+        booking.setWorkerAcceptanceLatitude(request.getLatitude());
+        booking.setWorkerAcceptanceLongitude(request.getLongitude());
         booking.setAcceptedAt(LocalDateTime.now());
         worker.setAvailabilityStatus(AvailabilityStatus.BUSY);
+
         return toDto(bookingRepository.save(booking));
     }
 
@@ -320,6 +389,7 @@ public class BookingService {
         if (worker.getVerificationStatus() != VerificationStatus.VERIFIED)
             throw new IllegalStateException("Only verified workers can confirm completion.");
         booking.setWorkerConfirmedCompletion(true);
+        booking.setWorkerCompletedAt(LocalDateTime.now());
         completeIfBothConfirmed(booking);
         return toDto(bookingRepository.save(booking));
     }
@@ -334,17 +404,28 @@ public class BookingService {
             throw new IllegalStateException("Booking does not belong to this customer.");
         if (booking.getStatus() != BookingStatus.IN_PROGRESS)
             throw new IllegalStateException("Booking is not in progress.");
+        if (!booking.isWorkerConfirmedCompletion()) {
+            throw new RuntimeException("Worker has not marked the service as complete yet");
+        }
         booking.setCustomerConfirmedCompletion(true);
         completeIfBothConfirmed(booking);
         return toDto(bookingRepository.save(booking));
     }
 
     private void completeIfBothConfirmed(Booking booking) {
-        if (booking.isWorkerConfirmedCompletion() && booking.isCustomerConfirmedCompletion()) {
+
+        if (booking.isWorkerConfirmedCompletion()
+                && booking.isCustomerConfirmedCompletion()) {
+
             booking.setStatus(BookingStatus.COMPLETED);
             booking.setCompletedAt(LocalDateTime.now());
-            if (booking.getWorker() != null)
-                booking.getWorker().setAvailabilityStatus(AvailabilityStatus.AVAILABLE);
+
+            billingService.createBilling(booking);
+
+            if (booking.getWorker() != null) {
+                booking.getWorker()
+                        .setAvailabilityStatus(AvailabilityStatus.AVAILABLE);
+            }
         }
     }
 
@@ -373,6 +454,7 @@ public class BookingService {
         d.setAcceptedAt(b.getAcceptedAt());
         d.setStartedAt(b.getStartedAt());
         d.setCompletedAt(b.getCompletedAt());
+        d.setWorkerCompletedAt(b.getWorkerCompletedAt());
         d.setCancelledAt(b.getCancelledAt());
         d.setFailedAt(b.getFailedAt());
         d.setWorkerCancelledAt(b.getWorkerCancelledAt());
