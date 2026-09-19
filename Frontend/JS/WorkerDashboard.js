@@ -14,7 +14,6 @@ function checkWorkerLogin() {
 
     const role =
         localStorage.getItem(ROLE_KEY);
-
     if (!token || role !== "WORKER") {
 
         window.location.href =
@@ -1077,25 +1076,45 @@ function renderActiveService(bookings) {
 
         actionButton = `
 
-            <button
-                class="start-service-btn
-                       w-full sm:w-auto
-                       px-6 py-3
-                       rounded-xl
-                       bg-violet-600
-                       hover:bg-violet-500
-                       text-white
-                       font-medium
-                       transition"
-                data-booking-id="${activeBooking.bookingId}">
+            <div class="flex flex-wrap items-center gap-3">
 
-                <i class="fa-solid
-                          fa-play
-                          mr-2"></i>
+                <button
+                    class="start-service-btn
+                           px-6 py-3
+                           rounded-xl
+                           bg-violet-600
+                           hover:bg-violet-500
+                           text-white
+                           font-medium
+                           transition"
+                    data-booking-id="${activeBooking.bookingId}">
 
-                Start Service
+                    <i class="fa-solid fa-play mr-2"></i>
 
-            </button>
+                    Start Service
+
+                </button>
+
+                <button
+                    class="cancel-service-btn
+                           px-6 py-3
+                           rounded-xl
+                           bg-gray-800
+                           hover:bg-gray-700
+                           border border-gray-700
+                           text-gray-200
+                           font-medium
+                           transition"
+                    data-booking-id="${activeBooking.bookingId}"
+                    data-booking-status="ACCEPTED">
+
+                    <i class="fa-solid fa-xmark mr-2"></i>
+
+                    Cancel
+
+                </button>
+
+            </div>
 
         `;
     }
@@ -1124,25 +1143,45 @@ function renderActiveService(bookings) {
 
             actionButton = `
 
-                <button
-                    class="complete-service-btn
-                           w-full sm:w-auto
-                           px-6 py-3
-                           rounded-xl
-                           bg-green-600
-                           hover:bg-green-500
-                           text-white
-                           font-medium
-                           transition"
-                    data-booking-id="${activeBooking.bookingId}">
+                <div class="flex flex-wrap items-center gap-3">
 
-                    <i class="fa-solid
-                              fa-circle-check
-                              mr-2"></i>
+                    <button
+                        class="complete-service-btn
+                               px-6 py-3
+                               rounded-xl
+                               bg-green-600
+                               hover:bg-green-500
+                               text-white
+                               font-medium
+                               transition"
+                        data-booking-id="${activeBooking.bookingId}">
 
-                    Mark Service Completed
+                        <i class="fa-solid fa-circle-check mr-2"></i>
 
-                </button>
+                        Mark Service Completed
+
+                    </button>
+
+                    <button
+                        class="cancel-service-btn
+                               px-6 py-3
+                               rounded-xl
+                               bg-gray-800
+                               hover:bg-gray-700
+                               border border-gray-700
+                               text-gray-200
+                               font-medium
+                               transition"
+                        data-booking-id="${activeBooking.bookingId}"
+                        data-booking-status="IN_PROGRESS">
+
+                        <i class="fa-solid fa-xmark mr-2"></i>
+
+                        Cancel
+
+                    </button>
+
+                </div>
 
             `;
         }
@@ -1534,6 +1573,166 @@ function renderActiveService(bookings) {
     `;
 }
 
+// Worker Cancellation
+
+const ACCEPTED_CANCELLATION_REASONS = [
+    { value: "EMERGENCY_PERSONAL_ISSUE", label: "Emergency / personal issue" },
+    { value: "VEHICLE_TRANSPORT_PROBLEM", label: "Vehicle / transport problem" },
+    { value: "UNABLE_TO_REACH_CUSTOMER", label: "Unable to reach customer" },
+    { value: "INCORRECT_BOOKING_SERVICE_INFORMATION", label: "Incorrect booking / service information" },
+    { value: "OTHER", label: "Other" }
+];
+
+const IN_PROGRESS_CANCELLATION_REASONS = [
+    { value: "CANNOT_SOLVE_PROBLEM", label: "Cannot solve the problem" },
+    { value: "REQUIRES_DIFFERENT_EXPERTISE", label: "Requires different expertise" },
+    { value: "REQUIRED_EQUIPMENT_UNAVAILABLE", label: "Required equipment unavailable" },
+    { value: "REQUIRED_PART_MATERIAL_UNAVAILABLE", label: "Required part / material unavailable" },
+    { value: "OTHER", label: "Other" }
+];
+
+function showWorkerCancellationDialog(bookingId, bookingStatus) {
+
+    return new Promise(resolve => {
+
+        const reasons =
+            bookingStatus === "ACCEPTED"
+                ? ACCEPTED_CANCELLATION_REASONS
+                : IN_PROGRESS_CANCELLATION_REASONS;
+
+        const modal = document.createElement("div");
+
+        modal.id = "workerCancellationModal";
+        modal.className =
+            "fixed inset-0 z-[100] flex items-center justify-center " +
+            "bg-black/70 backdrop-blur-sm px-4";
+
+        modal.innerHTML = `
+            <div class="w-full max-w-lg bg-gray-900 border border-gray-800 rounded-2xl shadow-2xl p-6">
+                <div class="flex items-start justify-between gap-4 mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold">Cancel Booking</h3>
+                        <p class="text-sm text-gray-400 mt-1">
+                            ${bookingStatus === "ACCEPTED"
+                                ? "Please select a reason for cancelling this booking."
+                                : "Please tell us why you cannot complete this service."}
+                        </p>
+                    </div>
+                    <button type="button" id="closeWorkerCancellationModal" class="text-gray-500 hover:text-gray-300 text-xl">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="mb-5">
+                    <label for="workerCancellationReason" class="block text-sm font-medium text-gray-300 mb-2">Reason</label>
+                    <select id="workerCancellationReason" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-gray-100 focus:outline-none focus:border-violet-500">
+                        <option value="">Select a reason</option>
+                        ${reasons.map(reason => `<option value="${reason.value}">${reason.label}</option>`).join("")}
+                    </select>
+                </div>
+
+                <div id="workerCancellationMessageContainer" class="mb-5 hidden">
+                    <label for="workerCancellationMessage" class="block text-sm font-medium text-gray-300 mb-2">Please explain</label>
+                    <textarea id="workerCancellationMessage" rows="4" maxlength="1000" placeholder="Please provide a short explanation..." class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-gray-100 placeholder-gray-500 resize-none focus:outline-none focus:border-violet-500"></textarea>
+                </div>
+
+                <p id="workerCancellationError" class="text-sm text-red-400 mb-4 hidden"></p>
+
+                <div class="flex justify-end gap-3">
+                    <button type="button" id="cancelWorkerCancellation" class="px-5 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 text-sm font-medium transition">Keep Booking</button>
+                    <button type="button" id="confirmWorkerCancellation" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-sm font-medium transition">Confirm Cancellation</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        const reasonSelect =
+            document.getElementById("workerCancellationReason");
+        const messageContainer =
+            document.getElementById("workerCancellationMessageContainer");
+        const messageInput =
+            document.getElementById("workerCancellationMessage");
+        const errorElement =
+            document.getElementById("workerCancellationError");
+
+        function closeModal(result = null) {
+            modal.remove();
+            resolve(result);
+        }
+
+        reasonSelect.addEventListener("change", () => {
+            if (reasonSelect.value === "OTHER") {
+                messageContainer.classList.remove("hidden");
+            } else {
+                messageContainer.classList.add("hidden");
+                messageInput.value = "";
+            }
+
+            errorElement.classList.add("hidden");
+            errorElement.textContent = "";
+        });
+
+        document.getElementById("closeWorkerCancellationModal")
+            .addEventListener("click", () => closeModal(null));
+        document.getElementById("cancelWorkerCancellation")
+            .addEventListener("click", () => closeModal(null));
+        document.getElementById("confirmWorkerCancellation")
+            .addEventListener("click", () => {
+                const reason = reasonSelect.value;
+                const message = messageInput.value.trim();
+
+                if (!reason) {
+                    errorElement.textContent = "Please select a reason.";
+                    errorElement.classList.remove("hidden");
+                    return;
+                }
+
+                if (reason === "OTHER" && !message) {
+                    errorElement.textContent = "Please provide an explanation.";
+                    errorElement.classList.remove("hidden");
+                    return;
+                }
+
+                closeModal({ reason, message });
+            });
+    });
+}
+
+async function cancelWorkerBooking(bookingId, bookingStatus) {
+
+    const cancellation =
+        await showWorkerCancellationDialog(bookingId, bookingStatus);
+
+    if (!cancellation) {
+        return;
+    }
+
+    if (!confirm("Are you sure you want to cancel this booking?")) {
+        return;
+    }
+
+    try {
+        await workerApiRequest(
+            `${API_BASE_URL}/bookings/${bookingId}/cancel`,
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    reason: cancellation.reason,
+                    message: cancellation.message
+                })
+            }
+        );
+
+        await Promise.all([
+            loadWorkerBookings(),
+            loadWorkerStatus()
+        ]);
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
 // Start Service
 
 async function startService(bookingId) {
@@ -1666,6 +1865,23 @@ document.addEventListener("click", event => {
 
         completeService(
             completeButton.dataset.bookingId
+        );
+
+        return;
+    }
+
+
+    const cancelButton =
+        event.target.closest(
+            ".cancel-service-btn"
+        );
+
+
+    if (cancelButton) {
+
+        cancelWorkerBooking(
+            cancelButton.dataset.bookingId,
+            cancelButton.dataset.bookingStatus
         );
 
     }

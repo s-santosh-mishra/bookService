@@ -7,5 +7,8 @@ public enum BookingStatus {
     COMPLETED,
     CANCELLED,
     NO_WORKER,
-    FAILED
+    FAILED,
+    WORKER_CANCELLED,
+    WORKER_CANNOT_COMPLETE
+    
 }

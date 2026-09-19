@@ -85,7 +85,13 @@ function getStatusLabel(status) {
             "No Worker Found",
 
         FAILED:
-            "Failed"
+            "Failed",
+
+        WORKER_CANCELLED:
+            "Worker Cancelled",
+
+        WORKER_CANNOT_COMPLETE:
+            "Worker Could Not Complete"
 
     };
 
@@ -150,7 +156,13 @@ function getStatusDescription(status) {
             "No worker accepted your request within 30 minutes. You can try booking this service again.",
 
         FAILED:
-            "This booking could not be completed."
+            "This booking could not be completed.",
+
+        WORKER_CANCELLED:
+            "The worker cancelled the booking before starting the service. You can request this service again.",
+
+        WORKER_CANNOT_COMPLETE:
+            "The worker could not complete the service after starting it. Please contact ServiceHub if you need further assistance."
 
     };
 

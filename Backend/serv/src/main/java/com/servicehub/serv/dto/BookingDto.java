@@ -6,11 +6,23 @@ import java.util.UUID;
 
 public class BookingDto {
     private UUID bookingId, customerId, workerId, serviceId;
+
     private String serviceName, workerName;
+
     private BookingStatus status;
+
     private String customerNote;
+
     private LocalDateTime createdAt, updatedAt, acceptedAt, startedAt, completedAt, cancelledAt, failedAt;
+
+    private LocalDateTime workerCancelledAt;
+
+    private String workerCancellationReason;
+
+    private String workerCancellationMessage;
+
     private boolean workerConfirmedCompletion, customerConfirmedCompletion;
+
     private String customerName, customerPhone, customerAddressLine1, customerAddressLine2, customerLandmark,
             customerCity, customerState, customerPinCode;
 
@@ -132,6 +144,30 @@ public class BookingDto {
 
     public void setFailedAt(LocalDateTime v) {
         failedAt = v;
+    }
+
+    public LocalDateTime getWorkerCancelledAt() {
+        return workerCancelledAt;
+    }
+
+    public void setWorkerCancelledAt(LocalDateTime v) {
+        workerCancelledAt = v;
+    }
+
+    public String getWorkerCancellationReason() {
+        return workerCancellationReason;
+    }
+
+    public void setWorkerCancellationReason(String v) {
+        workerCancellationReason = v;
+    }
+
+    public String getWorkerCancellationMessage() {
+        return workerCancellationMessage;
+    }
+
+    public void setWorkerCancellationMessage(String v) {
+        workerCancellationMessage = v;
     }
 
     public boolean isWorkerConfirmedCompletion() {

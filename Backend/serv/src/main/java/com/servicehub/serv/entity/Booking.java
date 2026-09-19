@@ -31,27 +31,36 @@ public class Booking {
 
     @Column(name = "customer_note")
     private String customerNote;
-    
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
-    
+
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-    
+
     @Column(name = "accepted_at")
     private LocalDateTime acceptedAt;
-    
+
     @Column(name = "started_at")
     private LocalDateTime startedAt;
-    
+
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
-    
+
     @Column(name = "cancelled_at")
     private LocalDateTime cancelledAt;
-    
+
     @Column(name = "failed_at")
     private LocalDateTime failedAt;
+
+    @Column(name = "worker_cancelled_at")
+    private LocalDateTime workerCancelledAt;
+
+    @Column(name = "worker_cancellation_reason", length = 100)
+    private String workerCancellationReason;
+
+    @Column(name = "worker_cancellation_message", length = 1000)
+    private String workerCancellationMessage;
 
     @Column(name = "worker_confirmed_completion", nullable = false)
     private boolean workerConfirmedCompletion = false;
@@ -167,6 +176,30 @@ public class Booking {
 
     public void setFailedAt(LocalDateTime v) {
         failedAt = v;
+    }
+
+    public LocalDateTime getWorkerCancelledAt() {
+        return workerCancelledAt;
+    }
+
+    public void setWorkerCancelledAt(LocalDateTime v) {
+        workerCancelledAt = v;
+    }
+
+    public String getWorkerCancellationReason() {
+        return workerCancellationReason;
+    }
+
+    public void setWorkerCancellationReason(String v) {
+        workerCancellationReason = v;
+    }
+
+    public String getWorkerCancellationMessage() {
+        return workerCancellationMessage;
+    }
+
+    public void setWorkerCancellationMessage(String v) {
+        workerCancellationMessage = v;
     }
 
     public boolean isWorkerConfirmedCompletion() {

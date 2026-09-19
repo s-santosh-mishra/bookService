@@ -2,7 +2,11 @@ package com.servicehub.serv.controller;
 
 import com.servicehub.serv.dto.BookingDto;
 import com.servicehub.serv.dto.WorkerBookingRequestDto;
+import com.servicehub.serv.dto.WorkerCancellationRequestDto;
 import com.servicehub.serv.service.BookingService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +42,19 @@ public class WorkerBookingController {
     @PostMapping("/{bookingId}/start")
     public ResponseEntity<BookingDto> startBooking(@PathVariable UUID bookingId, Authentication authentication) {
         return ResponseEntity.ok(bookingService.startBooking(UUID.fromString(authentication.getName()), bookingId));
+    }
+
+    @PostMapping("/{bookingId}/cancel")
+    public ResponseEntity<BookingDto> workerCancelBooking(
+            @PathVariable UUID bookingId,
+            @Valid @RequestBody WorkerCancellationRequestDto request,
+            Authentication authentication) {
+
+        return ResponseEntity.ok(
+                bookingService.workerCancelBooking(
+                        UUID.fromString(authentication.getName()),
+                        bookingId,
+                        request));
     }
 
     @PostMapping("/{bookingId}/complete")

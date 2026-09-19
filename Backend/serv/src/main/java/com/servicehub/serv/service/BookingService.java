@@ -3,6 +3,7 @@ package com.servicehub.serv.service;
 import com.servicehub.serv.dto.BookingDto;
 import com.servicehub.serv.dto.CreateBookingDto;
 import com.servicehub.serv.dto.WorkerBookingRequestDto;
+import com.servicehub.serv.dto.WorkerCancellationRequestDto;
 import com.servicehub.serv.entity.*;
 import com.servicehub.serv.enums.*;
 import com.servicehub.serv.repository.*;
@@ -221,6 +222,92 @@ public class BookingService {
     }
 
     @Transactional
+    public BookingDto workerCancelBooking(
+            UUID workerId,
+            UUID bookingId,
+            WorkerCancellationRequestDto request) {
+
+        Worker worker = workerRepository.findById(workerId)
+                .orElseThrow(() -> new IllegalArgumentException("Worker not found."));
+
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new IllegalArgumentException("Booking not found."));
+
+        // Make sure this booking belongs to the logged-in worker
+        if (booking.getWorker() == null
+                || !booking.getWorker().getUserId().equals(workerId)) {
+
+            throw new IllegalStateException(
+                    "Booking is not assigned to this worker.");
+        }
+
+        if (worker.getVerificationStatus() != VerificationStatus.VERIFIED) {
+            throw new IllegalStateException(
+                    "Only verified workers can cancel bookings.");
+        }
+
+        String reason = request.getReason();
+
+        if (reason == null || reason.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Cancellation reason is required.");
+        }
+
+        String message = request.getMessage();
+
+        if ("OTHER".equals(reason)
+                && (message == null || message.isBlank())) {
+
+            throw new IllegalArgumentException(
+                    "Please provide a message for the selected reason.");
+        }
+
+        /*
+         * Worker cancellation before starting the service.
+         */
+        if (booking.getStatus() == BookingStatus.ACCEPTED) {
+
+            validateAcceptedCancellationReason(reason);
+
+            booking.setStatus(BookingStatus.WORKER_CANCELLED);
+
+        }
+
+        /*
+         * Worker cannot complete after the service has started.
+         */
+        else if (booking.getStatus() == BookingStatus.IN_PROGRESS) {
+
+            validateInProgressCancellationReason(reason);
+
+            booking.setStatus(BookingStatus.WORKER_CANNOT_COMPLETE);
+
+        }
+
+        else {
+
+            throw new IllegalStateException(
+                    "This booking cannot be cancelled by the worker.");
+        }
+
+        booking.setWorkerCancelledAt(LocalDateTime.now());
+        booking.setWorkerCancellationReason(reason);
+        booking.setWorkerCancellationMessage(
+                message == null || message.isBlank()
+                        ? null
+                        : message.trim());
+
+        /*
+         * The worker is no longer handling this booking,
+         * so make the worker available again.
+         */
+
+        worker.setAvailabilityStatus(AvailabilityStatus.AVAILABLE);
+
+        return toDto(bookingRepository.save(booking));
+    }
+
+    @Transactional
     public BookingDto workerConfirmCompletion(UUID workerId, UUID bookingId) {
         Worker worker = workerRepository.findById(workerId)
                 .orElseThrow(() -> new IllegalArgumentException("Worker not found."));
@@ -288,6 +375,9 @@ public class BookingService {
         d.setCompletedAt(b.getCompletedAt());
         d.setCancelledAt(b.getCancelledAt());
         d.setFailedAt(b.getFailedAt());
+        d.setWorkerCancelledAt(b.getWorkerCancelledAt());
+        d.setWorkerCancellationReason(b.getWorkerCancellationReason());
+        d.setWorkerCancellationMessage(b.getWorkerCancellationMessage());
         d.setWorkerConfirmedCompletion(b.isWorkerConfirmedCompletion());
         d.setCustomerConfirmedCompletion(b.isCustomerConfirmedCompletion());
         d.setCustomerName(b.getCustomer().getUser().getFullName());
@@ -299,5 +389,39 @@ public class BookingService {
         d.setCustomerState(b.getCustomer().getUser().getState());
         d.setCustomerPinCode(b.getCustomer().getUser().getPinCode());
         return d;
+    }
+
+    private void validateAcceptedCancellationReason(String reason) {
+
+        switch (reason) {
+
+            case "EMERGENCY_PERSONAL_ISSUE":
+            case "VEHICLE_TRANSPORT_PROBLEM":
+            case "UNABLE_TO_REACH_CUSTOMER":
+            case "INCORRECT_BOOKING_SERVICE_INFORMATION":
+            case "OTHER":
+                return;
+
+            default:
+                throw new IllegalArgumentException(
+                        "Invalid cancellation reason for an accepted booking.");
+        }
+    }
+
+    private void validateInProgressCancellationReason(String reason) {
+
+        switch (reason) {
+
+            case "CANNOT_SOLVE_PROBLEM":
+            case "REQUIRES_DIFFERENT_EXPERTISE":
+            case "REQUIRED_EQUIPMENT_UNAVAILABLE":
+            case "REQUIRED_PART_MATERIAL_UNAVAILABLE":
+            case "OTHER":
+                return;
+
+            default:
+                throw new IllegalArgumentException(
+                        "Invalid cancellation reason for an in-progress booking.");
+        }
     }
 }
