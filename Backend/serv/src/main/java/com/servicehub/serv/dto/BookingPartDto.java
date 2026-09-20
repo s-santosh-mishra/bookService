@@ -1,52 +1,44 @@
-package com.servicehub.serv.entity;
+package com.servicehub.serv.dto;
 
 import com.servicehub.serv.enums.PartApprovalStatus;
-import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Entity
-@Table(name = "booking_parts")
-public class BookingPart {
+public class BookingPartDto {
 
-    @Id
-    @GeneratedValue
-    @Column(name = "booking_part_id")
     private UUID bookingPartId;
-
-    @ManyToOne
-    @JoinColumn(name = "booking_id", nullable = false)
-    private Booking booking;
-
-    @Column(name = "part_name", nullable = false, length = 150)
     private String partName;
-
-    @Column(name = "unit_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal unitPrice;
-
-    @Column(nullable = false)
     private Integer quantity;
-
-    @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalPrice;
-
-    @Column(name = "photo", nullable = false, columnDefinition = "BYTEA")
-    private byte[] photo;
-
-    @Column(name = "photo_content_type", nullable = false, length = 100)
-    private String photoContentType;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20)
     private PartApprovalStatus status;
-
-    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
-
-    @Column(name = "approved_at")
     private LocalDateTime approvedAt;
+
+    public BookingPartDto() {
+    }
+
+    public BookingPartDto(
+            UUID bookingPartId,
+            String partName,
+            BigDecimal unitPrice,
+            Integer quantity,
+            BigDecimal totalPrice,
+            PartApprovalStatus status,
+            LocalDateTime createdAt,
+            LocalDateTime approvedAt) {
+
+        this.bookingPartId = bookingPartId;
+        this.partName = partName;
+        this.unitPrice = unitPrice;
+        this.quantity = quantity;
+        this.totalPrice = totalPrice;
+        this.status = status;
+        this.createdAt = createdAt;
+        this.approvedAt = approvedAt;
+    }
 
     public UUID getBookingPartId() {
         return bookingPartId;
@@ -54,14 +46,6 @@ public class BookingPart {
 
     public void setBookingPartId(UUID bookingPartId) {
         this.bookingPartId = bookingPartId;
-    }
-
-    public Booking getBooking() {
-        return booking;
-    }
-
-    public void setBooking(Booking booking) {
-        this.booking = booking;
     }
 
     public String getPartName() {
@@ -94,22 +78,6 @@ public class BookingPart {
 
     public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
-    }
-
-    public byte[] getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(byte[] photo) {
-        this.photo = photo;
-    }
-
-    public String getPhotoContentType() {
-        return photoContentType;
-    }
-
-    public void setPhotoContentType(String photoContentType) {
-        this.photoContentType = photoContentType;
     }
 
     public PartApprovalStatus getStatus() {

@@ -2,45 +2,46 @@ package com.servicehub.serv.controller;
 
 import com.servicehub.serv.dto.AddBookingPartDto;
 import com.servicehub.serv.dto.BookingDto;
-import com.servicehub.serv.dto.UnlistedPartRequestDto;
 import com.servicehub.serv.dto.WorkerBookingLocationDto;
 import com.servicehub.serv.dto.WorkerBookingRequestDto;
 import com.servicehub.serv.dto.WorkerCancellationRequestDto;
 import com.servicehub.serv.entity.BookingPart;
-import com.servicehub.serv.entity.UnlistedPartRequest;
 import com.servicehub.serv.service.BookingPartService;
 import com.servicehub.serv.service.BookingService;
-import com.servicehub.serv.service.UnlistedPartRequestService;
 
 import jakarta.validation.Valid;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/worker/bookings")
 public class WorkerBookingController {
+
     private final BookingService bookingService;
     private final BookingPartService bookingPartService;
-    private final UnlistedPartRequestService unlistedPartRequestService;
 
     public WorkerBookingController(
             BookingService bookingService,
-            BookingPartService bookingPartService,
-            UnlistedPartRequestService unlistedPartRequestService) {
+            BookingPartService bookingPartService) {
 
         this.bookingService = bookingService;
         this.bookingPartService = bookingPartService;
-        this.unlistedPartRequestService = unlistedPartRequestService;
     }
 
     @GetMapping("/requests")
-    public ResponseEntity<List<WorkerBookingRequestDto>> getBookingRequests(Authentication authentication) {
+    public ResponseEntity<List<WorkerBookingRequestDto>> getBookingRequests(
+            Authentication authentication) {
+
         UUID workerId = UUID.fromString(authentication.getName());
-        return ResponseEntity.ok(bookingService.getWorkerBookingRequests(workerId));
+
+        return ResponseEntity.ok(
+                bookingService.getWorkerBookingRequests(workerId));
     }
 
     @PostMapping("/{bookingId}/accept")
@@ -57,14 +58,26 @@ public class WorkerBookingController {
     }
 
     @PostMapping("/{bookingId}/reject")
-    public ResponseEntity<Void> rejectBooking(@PathVariable UUID bookingId, Authentication authentication) {
-        bookingService.rejectBooking(UUID.fromString(authentication.getName()), bookingId);
+    public ResponseEntity<Void> rejectBooking(
+            @PathVariable UUID bookingId,
+            Authentication authentication) {
+
+        bookingService.rejectBooking(
+                UUID.fromString(authentication.getName()),
+                bookingId);
+
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{bookingId}/start")
-    public ResponseEntity<BookingDto> startBooking(@PathVariable UUID bookingId, Authentication authentication) {
-        return ResponseEntity.ok(bookingService.startBooking(UUID.fromString(authentication.getName()), bookingId));
+    public ResponseEntity<BookingDto> startBooking(
+            @PathVariable UUID bookingId,
+            Authentication authentication) {
+
+        return ResponseEntity.ok(
+                bookingService.startBooking(
+                        UUID.fromString(authentication.getName()),
+                        bookingId));
     }
 
     @PostMapping("/{bookingId}/cancel")
@@ -81,16 +94,27 @@ public class WorkerBookingController {
     }
 
     @PostMapping("/{bookingId}/complete")
-    public ResponseEntity<BookingDto> workerConfirmCompletion(@PathVariable UUID bookingId,
+    public ResponseEntity<BookingDto> workerConfirmCompletion(
+            @PathVariable UUID bookingId,
             Authentication authentication) {
-        return ResponseEntity
-                .ok(bookingService.workerConfirmCompletion(UUID.fromString(authentication.getName()), bookingId));
+
+        return ResponseEntity.ok(
+                bookingService.workerConfirmCompletion(
+                        UUID.fromString(authentication.getName()),
+                        bookingId));
     }
 
-    @PostMapping("/{bookingId}/parts")
-    public ResponseEntity<BookingPart> addBookingPart(
+    // =========================
+    // BOOKING PARTS
+    // =========================
+
+    @PostMapping(
+            value = "/{bookingId}/parts",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<BookingPart> addPart(
             @PathVariable UUID bookingId,
-            @Valid @RequestBody AddBookingPartDto request,
+            @Valid @ModelAttribute AddBookingPartDto request,
             Authentication authentication) {
 
         UUID workerId = UUID.fromString(authentication.getName());
@@ -102,31 +126,29 @@ public class WorkerBookingController {
                         request));
     }
 
-    @PostMapping("/{bookingId}/unlisted-parts")
-    public ResponseEntity<UnlistedPartRequest> requestUnlistedPart(
+    @GetMapping("/{bookingId}/parts")
+    public ResponseEntity<List<BookingPart>> getBookingParts(
             @PathVariable UUID bookingId,
-            @Valid @RequestBody UnlistedPartRequestDto request,
             Authentication authentication) {
 
         UUID workerId = UUID.fromString(authentication.getName());
 
         return ResponseEntity.ok(
-                unlistedPartRequestService.createRequest(
+                bookingPartService.getBookingParts(
                         workerId,
-                        bookingId,
-                        request));
+                        bookingId));
     }
 
-    @GetMapping("/{bookingId}/parts")
-    public ResponseEntity<List<BookingPart>> getBookingParts(
-            @PathVariable UUID bookingId) {
-
-        return ResponseEntity.ok(
-                bookingPartService.getBookingParts(bookingId));
-    }
+    // =========================
+    // WORKER BOOKINGS
+    // =========================
 
     @GetMapping
-    public ResponseEntity<List<BookingDto>> getWorkerBookings(Authentication authentication) {
-        return ResponseEntity.ok(bookingService.getWorkerBookings(UUID.fromString(authentication.getName())));
+    public ResponseEntity<List<BookingDto>> getWorkerBookings(
+            Authentication authentication) {
+
+        return ResponseEntity.ok(
+                bookingService.getWorkerBookings(
+                        UUID.fromString(authentication.getName())));
     }
 }

@@ -16,10 +16,16 @@ public class BookingTimeoutService {
 
     private final BookingRepository bookingRepository;
     private final BillingService billingService;
+    private final BookingPartService bookingPartService;
 
-    public BookingTimeoutService(BookingRepository bookingRepository, BillingService billingService) {
+    public BookingTimeoutService(
+            BookingRepository bookingRepository,
+            BillingService billingService,
+            BookingPartService bookingPartService) {
+
         this.bookingRepository = bookingRepository;
         this.billingService = billingService;
+        this.bookingPartService = bookingPartService;
     }
 
     @Scheduled(fixedRate = 60000)
@@ -57,10 +63,15 @@ public class BookingTimeoutService {
 
             booking.setStatus(BookingStatus.AUTO_COMPLETED);
             booking.setCompletedAt(LocalDateTime.now());
+
+            bookingPartService.autoApprovePendingParts(
+                    booking.getBookingId());
+
             billingService.createBilling(booking);
 
             if (booking.getWorker() != null) {
-                booking.getWorker().setAvailabilityStatus(AvailabilityStatus.AVAILABLE);
+                booking.getWorker().setAvailabilityStatus(
+                        AvailabilityStatus.AVAILABLE);
             }
         }
 
