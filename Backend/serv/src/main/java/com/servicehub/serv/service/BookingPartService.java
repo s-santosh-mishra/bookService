@@ -32,7 +32,7 @@ public class BookingPartService {
         }
 
         @Transactional
-        public BookingPart addPart(
+        public BookingPartDto addPart(
                         UUID workerId,
                         UUID bookingId,
                         AddBookingPartDto request) {
@@ -98,7 +98,9 @@ public class BookingPartService {
                         bookingPart.setCreatedAt(
                                         LocalDateTime.now());
 
-                        return bookingPartRepository.save(bookingPart);
+                        BookingPart savedPart = bookingPartRepository.save(bookingPart);
+
+                        return toDto(savedPart);
 
                 } catch (IOException e) {
 
@@ -140,7 +142,9 @@ public class BookingPartService {
         }
 
         @Transactional(readOnly = true)
-        public List<BookingPart> getBookingParts(UUID workerId, UUID bookingId) {
+        public List<BookingPartDto> getBookingParts(
+                        UUID workerId,
+                        UUID bookingId) {
 
                 Booking booking = bookingRepository.findById(bookingId)
                                 .orElseThrow(() -> new RuntimeException("Booking not found"));
@@ -150,7 +154,10 @@ public class BookingPartService {
                         throw new RuntimeException("You are not authorized to view parts for this booking");
                 }
 
-                return bookingPartRepository.findByBookingBookingId(bookingId);
+                return bookingPartRepository.findByBookingBookingId(bookingId)
+                                .stream()
+                                .map(this::toDto)
+                                .toList();
         }
 
         @Transactional(readOnly = true)
@@ -185,29 +192,48 @@ public class BookingPartService {
         }
 
         @Transactional(readOnly = true)
-public BookingPart getBookingPartForPhoto(
-        UUID userId,
-        UUID bookingPartId) {
+        public BookingPart getBookingPartForPhoto(
+                        UUID userId,
+                        UUID bookingPartId) {
 
-    BookingPart part = bookingPartRepository.findById(bookingPartId)
-            .orElseThrow(() ->
-                    new IllegalArgumentException("Part not found."));
+                BookingPart part = bookingPartRepository.findById(bookingPartId)
+                                .orElseThrow(() -> new IllegalArgumentException("Part not found."));
 
-    Booking booking = part.getBooking();
+                Booking booking = part.getBooking();
 
-    boolean isCustomer = booking.getCustomer() != null
-            && booking.getCustomer().getUserId().equals(userId);
+                boolean isCustomer = booking.getCustomer() != null
+                                && booking.getCustomer().getUserId().equals(userId);
 
-    boolean isWorker = booking.getWorker() != null
-            && booking.getWorker().getUserId().equals(userId);
+                boolean isWorker = booking.getWorker() != null
+                                && booking.getWorker().getUserId().equals(userId);
 
-    if (!isCustomer && !isWorker) {
-        throw new IllegalStateException(
-                "You are not authorized to view this part photo.");
-    }
+                if (!isCustomer && !isWorker) {
+                        throw new IllegalStateException(
+                                        "You are not authorized to view this part photo.");
+                }
 
-    return part;
-}
+                return part;
+        }
+
+        @Transactional(readOnly = true)
+        public List<BookingPartDto> getCustomerBookingParts(
+                        UUID customerId,
+                        UUID bookingId) {
+
+                Booking booking = bookingRepository.findById(bookingId)
+                                .orElseThrow(() -> new IllegalArgumentException("Booking not found."));
+
+                if (booking.getCustomer() == null
+                                || !booking.getCustomer().getUserId().equals(customerId)) {
+                        throw new IllegalStateException(
+                                        "You are not the customer for this booking.");
+                }
+
+                return bookingPartRepository.findByBookingBookingId(bookingId)
+                                .stream()
+                                .map(this::toDto)
+                                .toList();
+        }
 
         private BookingPartDto toDto(BookingPart part) {
 

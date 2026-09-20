@@ -80,6 +80,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Invalid or expired JWT.
             // Leave the SecurityContext unauthenticated.
 
+        //     exception.printStackTrace();
+
         }
 
         filterChain.doFilter(request, response);

@@ -111,6 +111,10 @@ const bookingDetailsTimeline = document.getElementById(
   "bookingDetailsTimeline",
 );
 
+const bookingPartsContainer = document.getElementById("bookingPartsContainer");
+
+const customerPartsList = document.getElementById("customerPartsList");
+
 const bookingDetailsNoteContainer = document.getElementById(
   "bookingDetailsNoteContainer",
 );
@@ -894,6 +898,252 @@ function renderBookingTimeline(booking) {
     });
 }
 
+/* Load Customer Part Photo */
+
+async function loadCustomerPartPhoto(partId) {
+  const imageElement = document.getElementById(`customer-part-photo-${partId}`);
+
+  if (!imageElement) {
+    console.error("Part image element not found:", partId);
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/bookings/parts/${partId}/photo`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+
+    if (!response.ok) {
+      console.error(
+        "Part photo request failed:",
+        response.status,
+        response.statusText,
+      );
+      return;
+    }
+
+    const blob = await response.blob();
+
+    if (!blob.type.startsWith("image/")) {
+      console.error("Part photo response is not an image:", blob.type);
+      return;
+    }
+
+    const imageUrl = URL.createObjectURL(blob);
+
+    imageElement.src = imageUrl;
+
+    imageElement.onclick = () => {
+      openCustomerPartImageViewer(partId);
+    };
+  } catch (error) {
+    console.error("Failed to load customer part photo:", error);
+  }
+}
+
+/* Customer Part Image Viewer */
+
+async function openCustomerPartImageViewer(partId) {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/bookings/parts/${partId}/photo`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+
+    if (!response.ok) {
+      console.error(
+        "Viewer photo request failed:",
+        response.status,
+        response.statusText,
+      );
+
+      return;
+    }
+
+    const blob = await response.blob();
+
+    if (!blob.type.startsWith("image/")) {
+      console.error("Viewer response is not an image:", blob.type);
+
+      return;
+    }
+
+    const imageUrl = URL.createObjectURL(blob);
+
+    const oldViewer = document.getElementById("customerPartImageViewer");
+
+    if (oldViewer) {
+      oldViewer.remove();
+    }
+
+    const viewer = document.createElement("div");
+
+    viewer.id = "customerPartImageViewer";
+
+    viewer.className =
+      "fixed inset-0 z-[200] " +
+      "flex items-center justify-center " +
+      "bg-black/80 backdrop-blur-sm " +
+      "px-4 py-8 " +
+      "opacity-0 transition-opacity duration-200";
+
+    viewer.innerHTML = `
+      <div
+        id="customerPartImageCard"
+        class="
+          relative
+          max-w-[78vw]
+          max-h-[80vh]
+          bg-gray-900
+          border border-gray-700
+          rounded-2xl
+          shadow-2xl
+          p-3
+          scale-95
+          opacity-0
+          transition-all
+          duration-200
+        "
+      >
+
+        <button
+          type="button"
+          id="closeCustomerPartImageViewer"
+          class="
+            absolute
+            top-3 right-3
+            w-10 h-10
+            rounded-full
+            bg-gray-800/90
+            border border-gray-700
+            text-gray-300
+            hover:text-white
+            hover:bg-gray-700
+            transition
+            z-10
+          "
+        >
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <img
+          src="${imageUrl}"
+          alt="Part photo"
+          class="
+            block
+            max-w-[74vw]
+            max-h-[72vh]
+            object-contain
+            rounded-xl
+          "
+        >
+
+      </div>
+    `;
+
+    document.body.appendChild(viewer);
+
+    const imageCard = document.getElementById("customerPartImageCard");
+
+    const closeViewer = () => {
+      imageCard.classList.remove("scale-100", "opacity-100");
+
+      imageCard.classList.add("scale-95", "opacity-0");
+
+      viewer.classList.remove("opacity-100");
+
+      viewer.classList.add("opacity-0");
+
+      setTimeout(() => {
+        URL.revokeObjectURL(imageUrl);
+        viewer.remove();
+      }, 200);
+    };
+
+    document
+      .getElementById("closeCustomerPartImageViewer")
+      .addEventListener("click", closeViewer);
+
+    viewer.addEventListener("click", (event) => {
+      if (event.target === viewer) {
+        closeViewer();
+      }
+    });
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        closeViewer();
+
+        document.removeEventListener("keydown", handleEscape);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+
+    requestAnimationFrame(() => {
+      viewer.classList.add("opacity-100");
+
+      imageCard.classList.remove("scale-95", "opacity-0");
+
+      imageCard.classList.add("scale-100", "opacity-100");
+    });
+  } catch (error) {
+    console.error("Failed to open customer part photo:", error);
+  }
+}
+
+/* Approve Customer Part */
+
+async function approveCustomerPart(bookingPartId) {
+  const button = document.querySelector(
+    `.customer-approve-part-button[data-part-id="${bookingPartId}"]`,
+  );
+
+  if (button) {
+    button.disabled = true;
+
+    button.innerHTML = `
+      <i class="fa-solid fa-spinner fa-spin"></i>
+      Approving...
+    `;
+  }
+
+  try {
+    await apiRequest(
+      `${API_BASE_URL}/bookings/parts/${bookingPartId}/approve`,
+      {
+        method: "POST",
+      },
+    );
+
+    await loadCustomerBookingParts(activeBooking.bookingId);
+  } catch (error) {
+    console.error("Failed to approve part:", error);
+
+    alert(error.message || "Unable to approve part.");
+
+    if (button) {
+      button.disabled = false;
+
+      button.innerHTML = `
+        <i class="fa-solid fa-check"></i>
+        Approve Part
+      `;
+    }
+  }
+}
+
 /* Open Booking Details */
 
 function openBookingDetails(booking = activeBooking) {
@@ -919,6 +1169,8 @@ function openBookingDetails(booking = activeBooking) {
 
   renderBookingTimeline(booking);
 
+  loadCustomerBookingParts(booking.bookingId);
+
   if (booking.customerNote) {
     bookingDetailsNote.textContent = booking.customerNote;
 
@@ -937,6 +1189,7 @@ function openBookingDetails(booking = activeBooking) {
 
   if (
     booking.status === "IN_PROGRESS" &&
+    booking.workerConfirmedCompletion &&
     !booking.customerConfirmedCompletion
   ) {
     customerCompletionContainer.classList.remove("hidden");
@@ -1058,13 +1311,15 @@ function getCurrentLocation() {
       (position) => {
         resolve({
           latitude: position.coords.latitude,
-          longitude: position.coords.longitude
+          longitude: position.coords.longitude,
         });
       },
       (error) => {
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            reject(new Error("Location permission is required to book a service."));
+            reject(
+              new Error("Location permission is required to book a service."),
+            );
             break;
 
           case error.POSITION_UNAVAILABLE:
@@ -1082,8 +1337,8 @@ function getCurrentLocation() {
       {
         enableHighAccuracy: true,
         timeout: 10000,
-        maximumAge: 0
-      }
+        maximumAge: 0,
+      },
     );
   });
 }
@@ -1104,25 +1359,23 @@ async function submitBooking() {
     await apiRequest(`${API_BASE_URL}/bookings`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         serviceId: selectedBookingService.serviceId,
         customerNote: customerBookingNote.value.trim() || null,
         latitude: location.latitude,
-        longitude: location.longitude
-      })
+        longitude: location.longitude,
+      }),
     });
 
     closeCreateBooking();
     await loadActiveBooking();
 
     alert("Service request created successfully.");
-
   } catch (error) {
     console.error("Booking creation error:", error);
     alert(error.message);
-
   } finally {
     confirmCreateBookingButton.disabled = false;
     confirmCreateBookingButton.textContent = "Request Service";
@@ -1245,16 +1498,157 @@ async function cancelCustomerBooking() {
   }
 }
 
+// parts
+
+async function loadCustomerBookingParts(bookingId) {
+  const container = document.getElementById("bookingPartsContainer");
+  const list = document.getElementById("customerPartsList");
+
+  if (!container || !list) return;
+
+  try {
+    list.innerHTML = `
+      <div class="text-sm text-gray-400">
+        Loading parts...
+      </div>
+    `;
+
+    const parts = await apiRequest(
+      `${API_BASE_URL}/bookings/${bookingId}/parts`,
+    );
+
+    if (!parts || parts.length === 0) {
+      container.classList.add("hidden");
+      return;
+    }
+
+    container.classList.remove("hidden");
+    renderCustomerBookingParts(parts);
+  } catch (error) {
+    console.error("Failed to load booking parts:", error);
+
+    container.classList.remove("hidden");
+
+    list.innerHTML = `
+      <div class="text-sm text-red-400">
+        Unable to load parts.
+      </div>
+    `;
+  }
+}
+
+function renderCustomerBookingParts(parts) {
+  const list = document.getElementById("customerPartsList");
+
+  if (!list) return;
+
+  list.innerHTML = parts.map((part) => {
+    const isPending = part.status === "PENDING";
+
+    return `
+      <div
+        class="bg-gray-900/60 border border-gray-800 rounded-xl p-4"
+        data-booking-part-id="${part.bookingPartId}"
+      >
+        <div class="flex gap-4">
+
+          <!-- Part Photo -->
+          <div class="w-20 h-20 flex-shrink-0">
+            <img
+              id="customer-part-photo-${part.bookingPartId}"
+              src=""
+              alt="${escapeHtml(part.partName)}"
+              class="w-full h-full object-cover rounded-lg border border-gray-700"
+            >
+          </div>
+
+          <!-- Part Details -->
+          <div class="flex-1 min-w-0">
+
+            <div class="flex items-start justify-between gap-3">
+              <h4 class="font-semibold text-white">
+                ${escapeHtml(part.partName)}
+              </h4>
+
+              <span class="text-xs px-2 py-1 rounded-full ${
+                isPending
+                  ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
+                  : "bg-green-500/10 text-green-400 border border-green-500/20"
+              }">
+                ${isPending ? "Pending Approval" : "Approved"}
+              </span>
+            </div>
+
+            <div class="mt-2 text-sm text-gray-400 space-y-1">
+              <p>
+                Unit Price:
+                <span class="text-gray-200">
+                  ₹${Number(part.unitPrice).toFixed(2)}
+                </span>
+              </p>
+
+              <p>
+                Quantity:
+                <span class="text-gray-200">
+                  ${part.quantity}
+                </span>
+              </p>
+
+              <p>
+                Total:
+                <span class="text-white font-medium">
+                  ₹${Number(part.totalPrice).toFixed(2)}
+                </span>
+              </p>
+            </div>
+
+            ${
+              isPending
+                ? `
+                  <button
+                    type="button"
+                    class="approve-booking-part-btn mt-3 inline-flex items-center px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium transition"
+                    data-booking-part-id="${part.bookingPartId}"
+                  >
+                    Approve Part
+                  </button>
+                `
+                : `
+                  <div class="mt-3 text-sm text-green-400">
+                    ✓ Part approved
+                  </div>
+                `
+            }
+
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  parts.forEach((part) => {
+    loadCustomerPartPhoto(part.bookingPartId);
+  });
+}
+
 /* Event Delegation */
 
 document.addEventListener("click", (event) => {
   const bookButton = event.target.closest(".book-service-button");
 
-  if (!bookButton) {
+  if (bookButton) {
+    openCreateBooking(bookButton.dataset.serviceId);
+
     return;
   }
 
-  openCreateBooking(bookButton.dataset.serviceId);
+  const approvePartButton = event.target.closest(".approve-booking-part-btn");
+
+  if (approvePartButton) {
+    approveCustomerBookingPart(approvePartButton.dataset.bookingPartId);
+
+    return;
+  }
 });
 
 /* Buttons */
