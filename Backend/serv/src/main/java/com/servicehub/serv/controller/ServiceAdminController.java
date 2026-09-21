@@ -7,6 +7,7 @@ import com.servicehub.serv.service.ServiceAdminService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,11 +31,16 @@ public class ServiceAdminController {
         @PostMapping
         public ResponseEntity<ServiceAdminListDto> addService(
                         @RequestParam String serviceName,
-                        @RequestParam UUID categoryId) {
+                        @RequestParam UUID categoryId,
+                        @RequestParam BigDecimal basePricePerHour,
+                        @RequestParam BigDecimal minimumServiceFee) {
+
                 return ResponseEntity.ok(
                                 serviceAdminService.addService(
                                                 serviceName,
-                                                categoryId));
+                                                categoryId,
+                                                basePricePerHour,
+                                                minimumServiceFee));
         }
 
         @PutMapping("/{serviceId}/activate")

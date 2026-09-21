@@ -230,11 +230,13 @@ function initializeAdminLayout() {
 
         logoutButton.addEventListener("click", () => {
 
+            let confirm_logout = confirm("Do you want to end your administrator session?");
+            if(!confirm_logout) return;
             sessionStorage.removeItem("servicehub_access_token");
             sessionStorage.removeItem("servicehub_user_id");
             sessionStorage.removeItem("servicehub_user_email");
             sessionStorage.removeItem("servicehub_user_role");
-
+            
             window.location.href = "AdminLogin.html";
 
         });

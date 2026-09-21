@@ -6,7 +6,6 @@ import com.servicehub.serv.dto.BookingPartDto;
 import com.servicehub.serv.dto.WorkerBookingLocationDto;
 import com.servicehub.serv.dto.WorkerBookingRequestDto;
 import com.servicehub.serv.dto.WorkerCancellationRequestDto;
-import com.servicehub.serv.entity.BookingPart;
 import com.servicehub.serv.service.BookingPartService;
 import com.servicehub.serv.service.BookingService;
 

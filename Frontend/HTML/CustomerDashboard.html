@@ -92,99 +92,22 @@
         ></div>
       </section>
 
-      <!-- Active Booking -->
-
+      <!-- Active Bookings -->
       <section class="mb-14">
         <div class="flex items-center justify-between mb-5">
           <div>
-            <h3 class="text-2xl font-bold">Active Booking</h3>
+            <h3 class="text-2xl font-bold">Active Bookings</h3>
 
             <p class="text-sm text-gray-400 mt-1">
-              Your current service request
+              Your current service requests
             </p>
           </div>
         </div>
 
-        <!-- Active Booking Card -->
+        <!-- Active Bookings List -->
+        <div id="activeBookingsContainer" class="space-y-4"></div>
 
-        <div
-          id="activeBookingCard"
-          class="hidden bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-violet-500/50 transition"
-        >
-          <div
-            class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
-          >
-            <!-- Booking Information -->
-
-            <div class="flex items-start gap-5">
-              <div
-                class="w-14 h-14 rounded-xl bg-violet-900/30 border border-violet-700/40 flex items-center justify-center shrink-0"
-              >
-                <i class="fa-solid fa-wrench text-violet-400 text-xl"></i>
-              </div>
-
-              <div>
-                <div class="flex flex-wrap items-center gap-3 mb-2">
-                  <h4
-                    id="activeBookingService"
-                    class="text-lg font-semibold"
-                  ></h4>
-
-                  <span
-                    id="activeBookingStatus"
-                    class="px-3 py-1 rounded-full text-xs font-medium bg-yellow-900/30 text-yellow-400 border border-yellow-700/30"
-                  >
-                  </span>
-                </div>
-
-                <p
-                  id="activeBookingDescription"
-                  class="text-sm text-gray-400 mb-3"
-                ></p>
-
-                <div
-                  class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-400"
-                >
-                  <span>
-                    <i class="fa-solid fa-user mr-2 text-violet-400"></i>
-
-                    <span id="activeBookingWorker"> </span>
-                  </span>
-
-                  <span>
-                    <i
-                      class="fa-solid fa-calendar-days mr-2 text-violet-400"
-                    ></i>
-
-                    <span id="activeBookingDate"> </span>
-                  </span>
-
-                  <span>
-                    <i class="fa-solid fa-clock mr-2 text-violet-400"></i>
-
-                    <span id="activeBookingTime"> </span>
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <!-- View Details -->
-
-            <div class="lg:text-right shrink-0">
-              <button
-                id="viewActiveBookingButton"
-                class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-violet-600 text-white hover:bg-violet-700 transition font-medium"
-              >
-                <span>View Details</span>
-
-                <i class="fa-solid fa-arrow-right"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- No Active Booking -->
-
+        <!-- No Active Bookings -->
         <div
           id="noActiveBooking"
           class="bg-gray-900 border border-gray-800 rounded-2xl p-10 text-center"

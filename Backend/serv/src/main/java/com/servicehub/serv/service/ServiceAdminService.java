@@ -12,6 +12,7 @@ import com.servicehub.serv.repository.WorkerServiceRepository;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,12 +42,26 @@ public class ServiceAdminService {
         @Transactional
         public ServiceAdminListDto addService(
                         String serviceName,
-                        UUID categoryId) {
+                        UUID categoryId,
+                        BigDecimal basePricePerHour,
+                        BigDecimal minimumServiceFee) {
                 String name = serviceName.trim();
 
                 if (name.isEmpty()) {
                         throw new IllegalArgumentException(
                                         "Service name cannot be empty.");
+                }
+
+                if (basePricePerHour == null
+                                || basePricePerHour.compareTo(BigDecimal.ZERO) <= 0) {
+                        throw new IllegalArgumentException(
+                                        "Price per hour must be greater than zero.");
+                }
+
+                if (minimumServiceFee == null
+                                || minimumServiceFee.compareTo(BigDecimal.ZERO) <= 0) {
+                        throw new IllegalArgumentException(
+                                        "Minimum service fee must be greater than zero.");
                 }
 
                 Category category = categoryRepository.findById(categoryId)
@@ -59,9 +74,12 @@ public class ServiceAdminService {
                 }
 
                 Service service = new Service();
+
                 service.setServiceName(name);
                 service.setCategory(category);
                 service.setActive(true);
+                service.setBasePricePerHour(basePricePerHour);
+                service.setMinimumServiceFee(minimumServiceFee);
 
                 Service savedService = serviceRepository.save(service);
 

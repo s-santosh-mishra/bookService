@@ -11,6 +11,8 @@ const addServiceOverlay = document.getElementById("addServiceOverlay");
 const addServiceForm = document.getElementById("addServiceForm");
 const serviceNameInput = document.getElementById("serviceName");
 const categoryIdInput = document.getElementById("categoryId");
+const basePricePerHourInput = document.getElementById("basePricePerHour");
+const minimumServiceFeeInput = document.getElementById("minimumServiceFee");
 const closeAddService = document.getElementById("closeAddService");
 const cancelAddService = document.getElementById("cancelAddService");
 const categoryFilter = document.getElementById("categoryFilter");
@@ -18,10 +20,8 @@ const categoryFilter = document.getElementById("categoryFilter");
 let services = [];
 let categories = [];
 
-
 async function loadServices() {
-
-    serviceTableBody.innerHTML = `
+  serviceTableBody.innerHTML = `
         <tr>
             <td colspan="5"
                 class="px-6 py-12 text-center text-gray-500">
@@ -30,47 +30,38 @@ async function loadServices() {
         </tr>
     `;
 
-    const token = sessionStorage.getItem(
-        SERVICE_ACCESS_TOKEN_KEY
-    );
+  const token = sessionStorage.getItem(SERVICE_ACCESS_TOKEN_KEY);
 
-    try {
+  try {
+    const response = await fetch(API_BASE_URL, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-        const response = await fetch(API_BASE_URL, {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        });
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        window.location.href = "AdminLogin.html";
+        return;
+      }
 
-        if (!response.ok) {
+      throw new Error("Failed to load services.");
+    }
 
-            if (
-                response.status === 401 ||
-                response.status === 403
-            ) {
-                window.location.href = "AdminLogin.html";
-                return;
-            }
+    services = await response.json();
 
-            throw new Error("Failed to load services.");
-        }
+    serviceCount.textContent = services.length;
 
-        services = await response.json();
+    await loadWorkerCounts();
 
-        serviceCount.textContent = services.length;
+    populateCategoryFilter();
 
-        await loadWorkerCounts();
+    renderServices(services);
+  } catch (error) {
+    console.error(error);
 
-        populateCategoryFilter();
-
-        renderServices(services);
-
-    } catch (error) {
-
-        console.error(error);
-
-        serviceTableBody.innerHTML = `
+    serviceTableBody.innerHTML = `
             <tr>
                 <td colspan="5"
                     class="px-6 py-12 text-center text-red-400">
@@ -78,65 +69,49 @@ async function loadServices() {
                 </td>
             </tr>
         `;
-    }
+  }
 }
-
 
 async function loadWorkerCounts() {
+  const token = sessionStorage.getItem(SERVICE_ACCESS_TOKEN_KEY);
 
-    const token = sessionStorage.getItem(
-        SERVICE_ACCESS_TOKEN_KEY
-    );
+  await Promise.all(
+    services.map(async (service) => {
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/${service.serviceId}/workers`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
 
-    await Promise.all(
-        services.map(async service => {
+        if (response.status === 401 || response.status === 403) {
+          window.location.href = "AdminLogin.html";
+          return;
+        }
 
-            try {
+        if (!response.ok) {
+          throw new Error(`Failed to load workers for ${service.serviceName}.`);
+        }
 
-                const response = await fetch(
-                    `${API_BASE_URL}/${service.serviceId}/workers`,
-                    {
-                        method: "GET",
-                        headers: {
-                            "Authorization": `Bearer ${token}`
-                        }
-                    }
-                );
+        const workers = await response.json();
 
-                if (
-                    response.status === 401 ||
-                    response.status === 403
-                ) {
-                    window.location.href = "AdminLogin.html";
-                    return;
-                }
+        service.workerCount = workers.length;
+      } catch (error) {
+        console.error(error);
 
-                if (!response.ok) {
-                    throw new Error(
-                        `Failed to load workers for ${service.serviceName}.`
-                    );
-                }
-
-                const workers = await response.json();
-
-                service.workerCount = workers.length;
-
-            } catch (error) {
-
-                console.error(error);
-
-                service.workerCount = 0;
-            }
-        })
-    );
+        service.workerCount = 0;
+      }
+    }),
+  );
 }
 
-
-function renderServices(servicesToRender) {
-
-    if (servicesToRender.length === 0) {
-
-        serviceTableBody.innerHTML = `
+function renderServices(servicesToRender, categoryName = "") {
+  if (servicesToRender.length === 0) {
+    serviceTableBody.innerHTML = `
             <tr>
                 <td colspan="5"
                     class="px-6 py-16 text-center">
@@ -154,11 +129,19 @@ function renderServices(servicesToRender) {
                         </div>
 
                         <p class="text-gray-400">
-                            No services found
+                            ${
+                              categoryName
+                                ? `No services in ${escapeHtml(categoryName)}.`
+                                : "No services found"
+                            }
                         </p>
 
                         <p class="text-gray-600 text-sm mt-1">
-                            Add a service to get started.
+                            ${
+                              categoryName
+                                ? "Try selecting another category."
+                                : "Add a service to get started."
+                            }
                         </p>
 
                     </div>
@@ -167,10 +150,12 @@ function renderServices(servicesToRender) {
             </tr>
         `;
 
-        return;
-    }
+    return;
+  }
 
-    serviceTableBody.innerHTML = servicesToRender.map(service => `
+  serviceTableBody.innerHTML = servicesToRender
+    .map(
+      (service) => `
         <tr class="border-b border-gray-800 last:border-0
                    hover:bg-gray-800/40 transition-colors">
 
@@ -234,391 +219,304 @@ function renderServices(servicesToRender) {
                     class="service-status-button
                            px-3 py-2
                            text-sm
-                           ${service.active
-                        ? "text-red-400 hover:bg-red-600/10"
-                        : "text-green-400 hover:bg-green-600/10"}
+                           ${
+                             service.active
+                               ? "text-red-400 hover:bg-red-600/10"
+                               : "text-green-400 hover:bg-green-600/10"
+                           }
                            bg-gray-800
                            rounded-lg
                            transition-colors"
-                    title="${service.active
-                        ? "Deactivate service"
-                        : "Activate service"}"
+                    title="${
+                      service.active ? "Deactivate service" : "Activate service"
+                    }"
                     data-service-id="${escapeHtml(service.serviceId)}"
-                    data-action="${service.active
-                        ? "deactivate"
-                        : "activate"}">
+                    data-action="${service.active ? "deactivate" : "activate"}">
 
                     <i class="fa-solid
-                              ${service.active
-                        ? "fa-eye-slash"
-                        : "fa-eye"}"></i>
+                              ${
+                                service.active ? "fa-eye-slash" : "fa-eye"
+                              }"></i>
 
                 </button>
 
             </td>
 
         </tr>
-    `).join("");
+    `,
+    )
+    .join("");
 }
 
-
 function populateCategoryFilter() {
+  const activeCategories = categories.filter((category) => category.active);
 
-    const uniqueCategories = new Map();
-
-    services.forEach(service => {
-
-        uniqueCategories.set(
-            service.categoryId,
-            service.categoryName
-        );
-
-    });
-
-    categoryFilter.innerHTML = `
+  categoryFilter.innerHTML = `
         <option value="">
             All Categories
         </option>
 
-        ${Array.from(uniqueCategories.entries())
-            .map(([categoryId, categoryName]) => `
-                <option value="${escapeHtml(categoryId)}">
-                    ${escapeHtml(categoryName)}
-                </option>
-            `)
-            .join("")}
+        ${activeCategories
+          .map(
+            (category) => `
+            <option value="${escapeHtml(category.categoryId)}">
+                ${escapeHtml(category.categoryName)}
+            </option>
+        `,
+          )
+          .join("")}
     `;
 }
 
-
 categoryFilter.addEventListener("change", () => {
+  const selectedCategoryId = categoryFilter.value;
 
-    const selectedCategoryId = categoryFilter.value;
+  if (!selectedCategoryId) {
+    renderServices(services);
 
-    if (!selectedCategoryId) {
+    return;
+  }
 
-        renderServices(services);
+  const filteredServices = services.filter(
+    (service) => service.categoryId === selectedCategoryId,
+  );
 
-        return;
-    }
+  const selectedCategory = categories.find(
+    (category) => category.categoryId === selectedCategoryId,
+  );
 
-    const filteredServices = services.filter(
-        service =>
-            service.categoryId === selectedCategoryId
-    );
-
-    renderServices(filteredServices);
+  renderServices(filteredServices, selectedCategory?.categoryName || "");
 });
-
 
 function getStatusClass(active) {
+  if (active) {
+    return "bg-green-500/10 text-green-400";
+  }
 
-    if (active) {
-        return "bg-green-500/10 text-green-400";
-    }
-
-    return "bg-red-500/10 text-red-400";
+  return "bg-red-500/10 text-red-400";
 }
 
+serviceTableBody.addEventListener("click", (event) => {
+  const button = event.target.closest(".service-status-button");
 
-serviceTableBody.addEventListener("click", event => {
+  if (!button) {
+    return;
+  }
 
-    const button = event.target.closest(
-        ".service-status-button"
-    );
+  const serviceId = button.dataset.serviceId;
+  const action = button.dataset.action;
 
-    if (!button) {
-        return;
-    }
-
-    const serviceId = button.dataset.serviceId;
-    const action = button.dataset.action;
-
-    updateServiceStatus(serviceId, action);
+  updateServiceStatus(serviceId, action);
 });
 
-
 async function updateServiceStatus(serviceId, action) {
+  const actionText = action === "activate" ? "activate" : "deactivate";
 
-    const actionText =
-        action === "activate"
-            ? "activate"
-            : "deactivate";
+  const confirmed = confirm(
+    `Are you sure you want to ${actionText} this service?`,
+  );
 
-    const confirmed = confirm(
-        `Are you sure you want to ${actionText} this service?`
-    );
+  if (!confirmed) {
+    return;
+  }
 
-    if (!confirmed) {
+  const token = sessionStorage.getItem(SERVICE_ACCESS_TOKEN_KEY);
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/${serviceId}/${action}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        window.location.href = "AdminLogin.html";
         return;
+      }
+
+      const errorData = await response.json().catch(() => null);
+
+      throw new Error(errorData?.message || `Failed to ${actionText} service.`);
     }
 
-    const token = sessionStorage.getItem(
-        SERVICE_ACCESS_TOKEN_KEY
-    );
+    await loadServices();
 
-    try {
+    alert(`Service ${actionText}d successfully.`);
+  } catch (error) {
+    console.error(error);
 
-        const response = await fetch(
-            `${API_BASE_URL}/${serviceId}/${action}`,
-            {
-                method: "PUT",
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            }
-        );
-
-        if (!response.ok) {
-
-            if (
-                response.status === 401 ||
-                response.status === 403
-            ) {
-                window.location.href = "AdminLogin.html";
-                return;
-            }
-
-            const errorData =
-                await response.json().catch(() => null);
-
-            throw new Error(
-                errorData?.message ||
-                `Failed to ${actionText} service.`
-            );
-        }
-
-        await loadServices();
-
-        alert(
-            `Service ${actionText}d successfully.`
-        );
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert(error.message);
-    }
+    alert(error.message);
+  }
 }
 
-
 async function loadCategories() {
+  const token = sessionStorage.getItem(SERVICE_ACCESS_TOKEN_KEY);
 
-    const token = sessionStorage.getItem(
-        SERVICE_ACCESS_TOKEN_KEY
-    );
-
-    categoryIdInput.innerHTML = `
+  categoryIdInput.innerHTML = `
         <option value="">
             Loading categories...
         </option>
     `;
 
-    try {
+  try {
+    const response = await fetch(CATEGORY_API_URL, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-        const response = await fetch(
-            CATEGORY_API_URL,
-            {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            }
-        );
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        window.location.href = "AdminLogin.html";
+        return;
+      }
 
-        if (!response.ok) {
+      throw new Error("Failed to load categories.");
+    }
 
-            if (
-                response.status === 401 ||
-                response.status === 403
-            ) {
-                window.location.href = "AdminLogin.html";
-                return;
-            }
+    categories = await response.json();
 
-            throw new Error(
-                "Failed to load categories."
-            );
-        }
+    const activeCategories = categories.filter((category) => category.active);
 
-        categories = await response.json();
+    populateCategoryFilter();
 
-        const activeCategories =
-            categories.filter(category => category.active);
-
-        if (activeCategories.length === 0) {
-
-            categoryIdInput.innerHTML = `
+    if (activeCategories.length === 0) {
+      categoryIdInput.innerHTML = `
                 <option value="">
                     No active categories available
                 </option>
             `;
 
-            return;
-        }
+      return;
+    }
 
-        categoryIdInput.innerHTML = `
+    categoryIdInput.innerHTML = `
             <option value="">
                 Select a category
             </option>
 
-            ${activeCategories.map(category => `
+            ${activeCategories
+              .map(
+                (category) => `
                 <option value="${escapeHtml(category.categoryId)}">
                     ${escapeHtml(category.categoryName)}
                 </option>
-            `).join("")}
+            `,
+              )
+              .join("")}
         `;
+  } catch (error) {
+    console.error(error);
 
-    } catch (error) {
-
-        console.error(error);
-
-        categoryIdInput.innerHTML = `
+    categoryIdInput.innerHTML = `
             <option value="">
                 Failed to load categories
             </option>
         `;
-    }
+  }
 }
-
 
 addServiceButton.addEventListener("click", async () => {
+  await loadCategories();
 
-    await loadCategories();
-
-    openAddServiceModal();
+  openAddServiceModal();
 });
 
+addServiceForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
 
-addServiceForm.addEventListener("submit", async event => {
+  const serviceName = serviceNameInput.value.trim();
 
-    event.preventDefault();
+  const categoryId = categoryIdInput.value;
 
-    const serviceName =
-        serviceNameInput.value.trim();
+  const basePricePerHour = basePricePerHourInput.value;
 
-    const categoryId =
-        categoryIdInput.value;
+  const minimumServiceFee = minimumServiceFeeInput.value;
 
-    if (!serviceName || !categoryId) {
-        return;
-    }
+  if (!serviceName || !categoryId || !basePricePerHour || !minimumServiceFee) {
+    return;
+  }
 
-    const token = sessionStorage.getItem(
-        SERVICE_ACCESS_TOKEN_KEY
+  const token = sessionStorage.getItem(SERVICE_ACCESS_TOKEN_KEY);
+
+  const submitButton = addServiceForm.querySelector('button[type="submit"]');
+
+  submitButton.disabled = true;
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}?serviceName=${encodeURIComponent(serviceName)}&categoryId=${encodeURIComponent(categoryId)}&basePricePerHour=${encodeURIComponent(basePricePerHour)}&minimumServiceFee=${encodeURIComponent(minimumServiceFee)}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
     );
 
-    const submitButton =
-        addServiceForm.querySelector(
-            'button[type="submit"]'
-        );
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        window.location.href = "AdminLogin.html";
+        return;
+      }
 
-    submitButton.disabled = true;
+      const errorData = await response.json().catch(() => null);
 
-    try {
-
-        const response = await fetch(
-            `${API_BASE_URL}?serviceName=${encodeURIComponent(serviceName)}&categoryId=${encodeURIComponent(categoryId)}`,
-            {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            }
-        );
-
-        if (!response.ok) {
-
-            if (
-                response.status === 401 ||
-                response.status === 403
-            ) {
-                window.location.href = "AdminLogin.html";
-                return;
-            }
-
-            const errorData =
-                await response.json().catch(() => null);
-
-            throw new Error(
-                errorData?.message ||
-                "Failed to add service."
-            );
-        }
-
-        closeAddServiceModal();
-
-        serviceNameInput.value = "";
-        categoryIdInput.value = "";
-
-        await loadServices();
-
-        alert("Service added successfully.");
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert(error.message);
-
-    } finally {
-
-        submitButton.disabled = false;
+      throw new Error(errorData?.message || "Failed to add service.");
     }
-});
 
-
-function openAddServiceModal() {
-
-    addServiceModal.classList.remove("hidden");
-
-    serviceNameInput.focus();
-}
-
-
-function closeAddServiceModal() {
-
-    addServiceModal.classList.add("hidden");
+    closeAddServiceModal();
 
     serviceNameInput.value = "";
     categoryIdInput.value = "";
+
+    await loadServices();
+
+    alert("Service added successfully.");
+  } catch (error) {
+    console.error(error);
+
+    alert(error.message);
+  } finally {
+    submitButton.disabled = false;
+  }
+});
+
+function openAddServiceModal() {
+  addServiceModal.classList.remove("hidden");
+
+  serviceNameInput.focus();
 }
 
+function closeAddServiceModal() {
+  addServiceModal.classList.add("hidden");
 
-closeAddService.addEventListener(
-    "click",
-    closeAddServiceModal
-);
+  serviceNameInput.value = "";
+  categoryIdInput.value = "";
+  basePricePerHourInput.value = "";
+  minimumServiceFeeInput.value = "";
+}
 
+closeAddService.addEventListener("click", closeAddServiceModal);
 
-cancelAddService.addEventListener(
-    "click",
-    closeAddServiceModal
-);
+cancelAddService.addEventListener("click", closeAddServiceModal);
 
-
-addServiceOverlay.addEventListener(
-    "click",
-    closeAddServiceModal
-);
-
+addServiceOverlay.addEventListener("click", closeAddServiceModal);
 
 function escapeHtml(value) {
+  if (value === null || value === undefined) {
+    return "";
+  }
 
-    if (
-        value === null ||
-        value === undefined
-    ) {
-        return "";
-    }
+  const div = document.createElement("div");
 
-    const div = document.createElement("div");
+  div.textContent = value;
 
-    div.textContent = value;
-
-    return div.innerHTML;
+  return div.innerHTML;
 }
 
-
 loadServices();
+loadCategories();

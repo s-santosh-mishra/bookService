@@ -32,6 +32,9 @@ customerRole.addEventListener("click", () => {
 
   userId.placeholder = "Enter your Email ID";
 
+    const reg_btn = document.querySelector("#reg_btn");
+    reg_btn.classList.remove("hidden");
+
   clearValidation();
 });
 
@@ -40,6 +43,9 @@ workerRole.addEventListener("click", () => {
 
   workerRole.classList.add("active");
   customerRole.classList.remove("active");
+
+  const reg_btn = document.querySelector("#reg_btn");
+  reg_btn.classList.add("hidden");
 
   idLabel.textContent = "Email ID";
 

@@ -43,30 +43,6 @@ const popularServicesContainer = document.getElementById(
   "popularServicesContainer",
 );
 
-/* Active Booking Elements */
-
-const activeBookingCard = document.getElementById("activeBookingCard");
-
-const noActiveBooking = document.getElementById("noActiveBooking");
-
-const activeBookingService = document.getElementById("activeBookingService");
-
-const activeBookingStatus = document.getElementById("activeBookingStatus");
-
-const activeBookingDescription = document.getElementById(
-  "activeBookingDescription",
-);
-
-const activeBookingWorker = document.getElementById("activeBookingWorker");
-
-const activeBookingDate = document.getElementById("activeBookingDate");
-
-const activeBookingTime = document.getElementById("activeBookingTime");
-
-const viewActiveBookingButton = document.getElementById(
-  "viewActiveBookingButton",
-);
-
 /* Create Booking Modal */
 
 const createBookingModal = document.getElementById("createBookingModal");
@@ -689,110 +665,194 @@ async function loadActiveBooking() {
     const bookings = (await apiRequest(`${API_BASE_URL}/bookings`)) || [];
 
     const active = bookings
-      .filter((b) => ["PENDING", "ACCEPTED", "IN_PROGRESS"].includes(b.status))
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      .filter((b) =>
+        ["PENDING", "ACCEPTED", "IN_PROGRESS"].includes(b.status)
+      )
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt) - new Date(a.createdAt)
+      );
 
-    if (active.length > 0) {
-      renderActiveBooking(active[0]);
-    } else {
-      renderActiveBooking(null);
-    }
+    renderActiveBookings(active);
   } catch (error) {
     console.error("Booking loading error:", error);
-    renderActiveBooking(null);
+    renderActiveBookings([]);
   }
 }
 
 /* Render Active Booking */
 
-function renderActiveBooking(booking) {
+function renderActiveBookings(bookings) {
   if (completionTimer) {
     clearInterval(completionTimer);
     completionTimer = null;
   }
 
-  activeBooking = booking;
+  activeBookingsContainer.innerHTML = "";
 
-  if (!booking) {
-    activeBookingCard.classList.add("hidden");
-
+  if (!bookings || bookings.length === 0) {
+    activeBookingsContainer.classList.add("hidden");
     noActiveBooking.classList.remove("hidden");
-
+    activeBooking = null;
     return;
   }
 
   noActiveBooking.classList.add("hidden");
+  activeBookingsContainer.classList.remove("hidden");
 
-  activeBookingCard.classList.remove("hidden");
+  bookings.forEach((booking) => {
+    const card = document.createElement("div");
 
-  activeBookingService.textContent = booking.serviceName || "Service request";
+    card.className =
+      "bg-gray-900 border border-gray-800 rounded-2xl p-6 " +
+      "hover:border-violet-500/50 transition";
 
-  activeBookingStatus.textContent = booking.status || "UNKNOWN";
+    const description =
+      booking.status === "PENDING"
+        ? "Your request is waiting for a worker to accept it."
+        : booking.status === "ACCEPTED"
+          ? "A worker has accepted your booking."
+          : booking.workerConfirmedCompletion
+            ? "The worker has marked the service as finished. Please confirm the work."
+            : "Your service is currently in progress.";
 
-  activeBookingWorker.textContent = booking.workerName || "Worker not assigned";
+    const statusClasses =
+      booking.status === "IN_PROGRESS"
+        ? "bg-blue-900/30 text-blue-400 border border-blue-700/30"
+        : booking.status === "ACCEPTED"
+          ? "bg-green-900/30 text-green-400 border border-green-700/30"
+          : "bg-yellow-900/30 text-yellow-400 border border-yellow-700/30";
 
-  switch (booking.status) {
-    case "PENDING":
-      activeBookingDescription.textContent =
-        "Your request is waiting for a worker to accept it.";
+    const createdAt = new Date(booking.createdAt);
 
-      break;
+    const formattedDate = Number.isNaN(createdAt.getTime())
+      ? "-"
+      : createdAt.toLocaleDateString();
 
-    case "ACCEPTED":
-      activeBookingDescription.textContent =
-        "A worker has accepted your booking.";
+    const formattedTime = Number.isNaN(createdAt.getTime())
+      ? "-"
+      : createdAt.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
 
-      break;
+    card.innerHTML = `
+      <div
+        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
+      >
 
-    case "IN_PROGRESS":
-      if (booking.workerConfirmedCompletion) {
-        activeBookingDescription.innerHTML = `
-                    <span>
-                        The worker has marked the service as finished.
-                        Please confirm the work.
-                    </span>
+        <div class="flex items-start gap-5">
 
-                    <span class="block mt-3">
-                        <span class="block text-sm">
-                            Confirmation window remaining:
-                        </span>
+          <div
+            class="w-14 h-14 rounded-xl
+                   bg-violet-900/30
+                   border border-violet-700/40
+                   flex items-center justify-center
+                   shrink-0"
+          >
+            <i class="fa-solid fa-wrench text-violet-400 text-xl"></i>
+          </div>
 
-                        <span id="completion-countdown"
-                              class="block text-2xl font-semibold">
-                            30:00
-                        </span>
-                    </span>
-                `;
-      } else {
-        activeBookingDescription.textContent =
-          "Your service is currently in progress.";
-      }
+          <div>
 
-      break;
+            <div class="flex flex-wrap items-center gap-3 mb-2">
 
-    case "NO_WORKER":
-      activeBookingDescription.textContent =
-        "No worker accepted your request within 30 minutes. You can try booking this service again.";
+              <h4 class="text-lg font-semibold">
+                ${escapeHtml(
+                  booking.serviceName || "Service request"
+                )}
+              </h4>
 
-      break;
+              <span
+                class="px-3 py-1 rounded-full text-xs font-medium ${statusClasses}"
+              >
+                ${escapeHtml(booking.status || "UNKNOWN")}
+              </span>
 
-    default:
-      activeBookingDescription.textContent =
-        "Your service request status is currently being processed.";
-  }
+            </div>
 
-  const createdAt = new Date(booking.createdAt);
+            <p class="text-sm text-gray-400 mb-3">
+              ${escapeHtml(description)}
+            </p>
 
-  activeBookingDate.textContent = Number.isNaN(createdAt.getTime())
-    ? "-"
-    : createdAt.toLocaleDateString();
+            <div
+              class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-400"
+            >
 
-  activeBookingTime.textContent = Number.isNaN(createdAt.getTime())
-    ? "-"
-    : createdAt.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
+              <span>
+                <i class="fa-solid fa-user mr-2 text-violet-400"></i>
+                ${escapeHtml(
+                  booking.workerName || "Worker not assigned"
+                )}
+              </span>
+
+              <span>
+                <i class="fa-solid fa-calendar-days mr-2 text-violet-400"></i>
+                ${escapeHtml(formattedDate)}
+              </span>
+
+              <span>
+                <i class="fa-solid fa-clock mr-2 text-violet-400"></i>
+                ${escapeHtml(formattedTime)}
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="lg:text-right shrink-0">
+
+          <button
+            type="button"
+            class="view-active-booking-button
+                   inline-flex items-center
+                   justify-center gap-2
+                   px-5 py-3
+                   rounded-xl
+                   bg-violet-600
+                   text-white
+                   hover:bg-violet-700
+                   transition
+                   font-medium"
+            data-booking-id="${booking.bookingId}"
+          >
+            <span>View Details</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+
+        </div>
+
+      </div>
+    `;
+
+    activeBookingsContainer.appendChild(card);
+  });
+
+  // Attach View Details handlers
+
+  activeBookingsContainer
+    .querySelectorAll(".view-active-booking-button")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        const booking = bookings.find(
+          (item) =>
+            String(item.bookingId) ===
+            String(button.dataset.bookingId)
+        );
+
+        if (booking) {
+          activeBooking = booking;
+          openBookingDetails(booking);
+        }
       });
+    });
+
+  /* Keep the most recent active booking as the
+   * current booking for the existing completion logic. */
+
+  activeBooking = bookings[0];
 
   startCompletionCountdown();
 }
@@ -1645,17 +1705,12 @@ document.addEventListener("click", (event) => {
   const approvePartButton = event.target.closest(".approve-booking-part-btn");
 
   if (approvePartButton) {
-    approveCustomerBookingPart(approvePartButton.dataset.bookingPartId);
-
+    approveCustomerPart(approvePartButton.dataset.bookingPartId);
     return;
   }
 });
 
 /* Buttons */
-
-if (viewActiveBookingButton) {
-  viewActiveBookingButton.addEventListener("click", () => openBookingDetails());
-}
 
 if (closeBookingDetailsButton) {
   closeBookingDetailsButton.addEventListener("click", closeBookingDetails);
