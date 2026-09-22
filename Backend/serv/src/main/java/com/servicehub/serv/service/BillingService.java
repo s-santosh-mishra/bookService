@@ -20,8 +20,6 @@ import java.util.UUID;
 @Service
 public class BillingService {
 
-        private static final BigDecimal AUTO_COMPLETION_FEE = BigDecimal.valueOf(100.00);
-
         private static final BigDecimal CANCELLATION_FEE_PER_KM = BigDecimal.valueOf(5.00);
 
         private final BillingRepository billingRepository;
@@ -91,11 +89,6 @@ public class BillingService {
 
                 BigDecimal additionalFees = BigDecimal.ZERO;
 
-                if (booking.getStatus() == BookingStatus.AUTO_COMPLETED) {
-
-                        additionalFees = AUTO_COMPLETION_FEE;
-                }
-
                 BigDecimal finalBilledPrice = labourCharge
                                 .add(travelCharge)
                                 .add(partsCost)
@@ -118,18 +111,6 @@ public class BillingService {
                 return billingRepository.save(billing);
         }
 
-        /*
-         * Customer cancellation billing.
-         *
-         * ACCEPTED:
-         * - Within 5 minutes of acceptance → no charge
-         * - After 5 minutes → distance × ₹5/km
-         *
-         * IN_PROGRESS:
-         * - Actual labour
-         * - Travel
-         * - Approved parts
-         */
         @Transactional
         public Billing createCustomerCancellationBilling(
                         Booking booking,

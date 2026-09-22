@@ -6,6 +6,7 @@ import com.servicehub.serv.dto.BookingPartDto;
 import com.servicehub.serv.dto.WorkerBookingLocationDto;
 import com.servicehub.serv.dto.WorkerBookingRequestDto;
 import com.servicehub.serv.dto.WorkerCancellationRequestDto;
+import com.servicehub.serv.dto.WorkerOtpRequestDto;
 import com.servicehub.serv.service.BookingPartService;
 import com.servicehub.serv.service.BookingService;
 
@@ -44,17 +45,41 @@ public class WorkerBookingController {
                                 bookingService.getWorkerBookingRequests(workerId));
         }
 
+        @PostMapping("/{bookingId}/request-start")
+        public ResponseEntity<BookingDto> requestStart(
+                        @PathVariable UUID bookingId,
+                        Authentication authentication) {
+
+                return ResponseEntity.ok(
+                                bookingService.requestStart(
+                                                UUID.fromString(authentication.getName()),
+                                                bookingId));
+        }
+
         @PostMapping("/{bookingId}/accept")
         public ResponseEntity<BookingDto> acceptBooking(
                         @PathVariable UUID bookingId,
                         @Valid @RequestBody WorkerBookingLocationDto request,
                         Authentication authentication) {
 
+                UUID workerId = UUID.fromString(authentication.getName());
+
                 return ResponseEntity.ok(
                                 bookingService.acceptBooking(
-                                                UUID.fromString(authentication.getName()),
+                                                workerId,
                                                 bookingId,
                                                 request));
+        }
+
+        @PostMapping("/{bookingId}/request-completion")
+        public ResponseEntity<BookingDto> requestCompletion(
+                        @PathVariable UUID bookingId,
+                        Authentication authentication) {
+
+                return ResponseEntity.ok(
+                                bookingService.requestCompletion(
+                                                UUID.fromString(authentication.getName()),
+                                                bookingId));
         }
 
         @PostMapping("/{bookingId}/reject")
@@ -67,17 +92,6 @@ public class WorkerBookingController {
                                 bookingId);
 
                 return ResponseEntity.noContent().build();
-        }
-
-        @PostMapping("/{bookingId}/start")
-        public ResponseEntity<BookingDto> startBooking(
-                        @PathVariable UUID bookingId,
-                        Authentication authentication) {
-
-                return ResponseEntity.ok(
-                                bookingService.startBooking(
-                                                UUID.fromString(authentication.getName()),
-                                                bookingId));
         }
 
         @PostMapping("/{bookingId}/cancel")
@@ -93,15 +107,32 @@ public class WorkerBookingController {
                                                 request));
         }
 
-        @PostMapping("/{bookingId}/complete")
-        public ResponseEntity<BookingDto> workerConfirmCompletion(
+        @PostMapping("/{bookingId}/start")
+        public ResponseEntity<BookingDto> startBooking(
                         @PathVariable UUID bookingId,
+                        @RequestBody WorkerOtpRequestDto request,
+                        Authentication authentication) {
+
+                UUID workerId = UUID.fromString(authentication.getName());
+
+                return ResponseEntity.ok(
+                                bookingService.startBooking(
+                                                workerId,
+                                                bookingId,
+                                                request.getOtp()));
+        }
+
+        @PostMapping("/{bookingId}/complete")
+        public ResponseEntity<BookingDto> completeBooking(
+                        @PathVariable UUID bookingId,
+                        @RequestBody WorkerOtpRequestDto request,
                         Authentication authentication) {
 
                 return ResponseEntity.ok(
-                                bookingService.workerConfirmCompletion(
+                                bookingService.completeBooking(
                                                 UUID.fromString(authentication.getName()),
-                                                bookingId));
+                                                bookingId,
+                                                request.getOtp()));
         }
 
         // BOOKING PARTS

@@ -67,12 +67,6 @@ public class Booking {
     @Column(name = "worker_cancellation_message", length = 1000)
     private String workerCancellationMessage;
 
-    @Column(name = "worker_confirmed_completion", nullable = false)
-    private boolean workerConfirmedCompletion = false;
-
-    @Column(name = "customer_confirmed_completion", nullable = false)
-    private boolean customerConfirmedCompletion = false;
-
     @Column(name = "service_latitude", precision = 10, scale = 7, nullable = false)
     private BigDecimal serviceLatitude;
 
@@ -80,10 +74,22 @@ public class Booking {
     private BigDecimal serviceLongitude;
 
     @Column(name = "worker_acceptance_latitude", nullable = false, precision = 10, scale = 7)
-private BigDecimal workerAcceptanceLatitude;
+    private BigDecimal workerAcceptanceLatitude;
 
-@Column(name = "worker_acceptance_longitude", nullable = false, precision = 10, scale = 7)
-private BigDecimal workerAcceptanceLongitude;
+    @Column(name = "worker_acceptance_longitude", nullable = false, precision = 10, scale = 7)
+    private BigDecimal workerAcceptanceLongitude;
+
+    @Column(name = "start_otp", length = 4)
+    private String startOtp;
+
+    @Column(name = "completion_otp", length = 4)
+    private String completionOtp;
+
+    @Column(name = "completion_otp_requested_at")
+    private LocalDateTime completionOtpRequestedAt;
+
+    @Column(name = "completion_requested", nullable = false)
+    private boolean completionRequested = false;
 
     @PrePersist
     protected void onCreate() {
@@ -227,22 +233,6 @@ private BigDecimal workerAcceptanceLongitude;
         workerCancellationMessage = v;
     }
 
-    public boolean isWorkerConfirmedCompletion() {
-        return workerConfirmedCompletion;
-    }
-
-    public void setWorkerConfirmedCompletion(boolean v) {
-        workerConfirmedCompletion = v;
-    }
-
-    public boolean isCustomerConfirmedCompletion() {
-        return customerConfirmedCompletion;
-    }
-
-    public void setCustomerConfirmedCompletion(boolean v) {
-        customerConfirmedCompletion = v;
-    }
-
     public BigDecimal getServiceLatitude() {
         return serviceLatitude;
     }
@@ -260,18 +250,50 @@ private BigDecimal workerAcceptanceLongitude;
     }
 
     public BigDecimal getWorkerAcceptanceLatitude() {
-    return workerAcceptanceLatitude;
-}
+        return workerAcceptanceLatitude;
+    }
 
-public void setWorkerAcceptanceLatitude(BigDecimal workerAcceptanceLatitude) {
-    this.workerAcceptanceLatitude = workerAcceptanceLatitude;
-}
+    public void setWorkerAcceptanceLatitude(BigDecimal workerAcceptanceLatitude) {
+        this.workerAcceptanceLatitude = workerAcceptanceLatitude;
+    }
 
-public BigDecimal getWorkerAcceptanceLongitude() {
-    return workerAcceptanceLongitude;
-}
+    public BigDecimal getWorkerAcceptanceLongitude() {
+        return workerAcceptanceLongitude;
+    }
 
-public void setWorkerAcceptanceLongitude(BigDecimal workerAcceptanceLongitude) {
-    this.workerAcceptanceLongitude = workerAcceptanceLongitude;
-}
+    public void setWorkerAcceptanceLongitude(BigDecimal workerAcceptanceLongitude) {
+        this.workerAcceptanceLongitude = workerAcceptanceLongitude;
+    }
+
+    public String getStartOtp() {
+        return startOtp;
+    }
+
+    public void setStartOtp(String startOtp) {
+        this.startOtp = startOtp;
+    }
+
+    public String getCompletionOtp() {
+        return completionOtp;
+    }
+
+    public void setCompletionOtp(String completionOtp) {
+        this.completionOtp = completionOtp;
+    }
+
+    public LocalDateTime getCompletionOtpRequestedAt() {
+        return completionOtpRequestedAt;
+    }
+
+    public void setCompletionOtpRequestedAt(LocalDateTime completionOtpRequestedAt) {
+        this.completionOtpRequestedAt = completionOtpRequestedAt;
+    }
+
+    public boolean isCompletionRequested() {
+        return completionRequested;
+    }
+
+    public void setCompletionRequested(boolean completionRequested) {
+        this.completionRequested = completionRequested;
+    }
 }

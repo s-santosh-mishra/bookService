@@ -53,6 +53,11 @@ public class BookingPartService {
                                         "Parts can only be added while the service is in progress.");
                 }
 
+                if (booking.isCompletionRequested()) {
+                        throw new IllegalStateException(
+                                        "Cannot add parts after completion has been requested.");
+                }
+
                 if (request.getPhoto() == null
                                 || request.getPhoto().isEmpty()) {
 
@@ -170,25 +175,6 @@ public class BookingPartService {
                                 .stream()
                                 .map(this::toDto)
                                 .toList();
-        }
-
-        @Transactional
-        public void autoApprovePendingParts(UUID bookingId) {
-
-                List<BookingPart> parts = bookingPartRepository.findByBookingBookingId(bookingId);
-
-                LocalDateTime now = LocalDateTime.now();
-
-                for (BookingPart part : parts) {
-
-                        if (part.getStatus() == PartApprovalStatus.PENDING) {
-
-                                part.setStatus(PartApprovalStatus.APPROVED);
-                                part.setApprovedAt(now);
-                        }
-                }
-
-                bookingPartRepository.saveAll(parts);
         }
 
         @Transactional(readOnly = true)

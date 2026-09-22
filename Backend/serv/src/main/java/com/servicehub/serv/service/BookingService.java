@@ -8,7 +8,10 @@ import com.servicehub.serv.dto.WorkerCancellationRequestDto;
 import com.servicehub.serv.entity.*;
 import com.servicehub.serv.enums.*;
 import com.servicehub.serv.repository.*;
+
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.concurrent.ThreadLocalRandom;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -16,6 +19,7 @@ import java.util.UUID;
 @org.springframework.stereotype.Service
 public class BookingService {
     private final BookingRepository bookingRepository;
+    private final BookingPartRepository bookingPartRepository;
     private final CustomerRepository customerRepository;
     private final ServiceRepository serviceRepository;
     private final WorkerRepository workerRepository;
@@ -25,6 +29,7 @@ public class BookingService {
 
     public BookingService(
             BookingRepository bookingRepository,
+            BookingPartRepository bookingPartRepository,
             CustomerRepository customerRepository,
             ServiceRepository serviceRepository,
             WorkerRepository workerRepository,
@@ -33,6 +38,7 @@ public class BookingService {
             BillingService billingService) {
 
         this.bookingRepository = bookingRepository;
+        this.bookingPartRepository = bookingPartRepository;
         this.customerRepository = customerRepository;
         this.serviceRepository = serviceRepository;
         this.workerRepository = workerRepository;
@@ -143,6 +149,40 @@ public class BookingService {
     }
 
     @Transactional
+    public BookingDto requestStart(UUID workerId, UUID bookingId) {
+        Worker worker = workerRepository.findById(workerId)
+                .orElseThrow(() -> new IllegalArgumentException("Worker not found."));
+
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new IllegalArgumentException("Booking not found."));
+
+        if (booking.getWorker() == null
+                || !booking.getWorker().getUserId().equals(workerId)) {
+            throw new IllegalStateException(
+                    "Booking is not assigned to this worker.");
+        }
+
+        if (worker.getVerificationStatus() != VerificationStatus.VERIFIED) {
+            throw new IllegalStateException(
+                    "Only verified workers can start bookings.");
+        }
+
+        if (booking.getStatus() != BookingStatus.ACCEPTED) {
+            throw new IllegalStateException(
+                    "Booking cannot be started.");
+        }
+
+        if (booking.getStartOtp() != null) {
+            throw new IllegalStateException(
+                    "Start OTP has already been requested. Ask the customer for the OTP.");
+        }
+
+        booking.setStartOtp(generateOtp());
+
+        return toDto(bookingRepository.save(booking));
+    }
+
+    @Transactional
     public BookingDto acceptBooking(
             UUID workerId,
             UUID bookingId,
@@ -179,9 +219,14 @@ public class BookingService {
 
         booking.setWorker(worker);
         booking.setStatus(BookingStatus.ACCEPTED);
+
+        booking.setCompletionOtp(null);
+        booking.setCompletionOtpRequestedAt(null);
+
         booking.setWorkerAcceptanceLatitude(request.getLatitude());
         booking.setWorkerAcceptanceLongitude(request.getLongitude());
         booking.setAcceptedAt(LocalDateTime.now());
+
         worker.setAvailabilityStatus(AvailabilityStatus.BUSY);
 
         return toDto(bookingRepository.save(booking));
@@ -274,19 +319,50 @@ public class BookingService {
     }
 
     @Transactional
-    public BookingDto startBooking(UUID workerId, UUID bookingId) {
+    public BookingDto startBooking(
+            UUID workerId,
+            UUID bookingId,
+            String otp) {
+
         Worker worker = workerRepository.findById(workerId)
                 .orElseThrow(() -> new IllegalArgumentException("Worker not found."));
+
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found."));
-        if (booking.getWorker() == null || !booking.getWorker().getUserId().equals(workerId))
-            throw new IllegalStateException("Booking is not assigned to this worker.");
-        if (booking.getStatus() != BookingStatus.ACCEPTED)
-            throw new IllegalStateException("Booking cannot be started.");
-        if (worker.getVerificationStatus() != VerificationStatus.VERIFIED)
-            throw new IllegalStateException("Only verified workers can start bookings.");
+
+        if (booking.getWorker() == null
+                || !booking.getWorker().getUserId().equals(workerId)) {
+
+            throw new IllegalStateException(
+                    "Booking is not assigned to this worker.");
+        }
+
+        if (booking.getStatus() != BookingStatus.ACCEPTED) {
+            throw new IllegalStateException(
+                    "Booking cannot be started.");
+        }
+
+        if (worker.getVerificationStatus() != VerificationStatus.VERIFIED) {
+            throw new IllegalStateException(
+                    "Only verified workers can start bookings.");
+        }
+
+        if (otp == null || !otp.matches("\\d{4}")) {
+            throw new IllegalArgumentException(
+                    "Please enter a valid 4-digit OTP.");
+        }
+
+        if (booking.getStartOtp() == null
+                || !booking.getStartOtp().equals(otp)) {
+
+            throw new IllegalArgumentException(
+                    "Incorrect OTP. Please ask the customer for the correct Start OTP.");
+        }
+
+        booking.setStartOtp(null);
         booking.setStatus(BookingStatus.IN_PROGRESS);
         booking.setStartedAt(LocalDateTime.now());
+
         return toDto(bookingRepository.save(booking));
     }
 
@@ -377,60 +453,124 @@ public class BookingService {
     }
 
     @Transactional
-    public BookingDto workerConfirmCompletion(UUID workerId, UUID bookingId) {
+    public BookingDto completeBooking(
+            UUID workerId,
+            UUID bookingId,
+            String otp) {
+
         Worker worker = workerRepository.findById(workerId)
                 .orElseThrow(() -> new IllegalArgumentException("Worker not found."));
+
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found."));
-        if (booking.getWorker() == null || !booking.getWorker().getUserId().equals(workerId))
-            throw new IllegalStateException("Booking is not assigned to this worker.");
-        if (booking.getStatus() != BookingStatus.IN_PROGRESS)
-            throw new IllegalStateException("Booking is not in progress.");
-        if (worker.getVerificationStatus() != VerificationStatus.VERIFIED)
-            throw new IllegalStateException("Only verified workers can confirm completion.");
-        booking.setWorkerConfirmedCompletion(true);
-        booking.setWorkerCompletedAt(LocalDateTime.now());
-        completeIfBothConfirmed(booking);
+
+        if (booking.getWorker() == null
+                || !booking.getWorker().getUserId().equals(workerId)) {
+
+            throw new IllegalStateException(
+                    "Booking is not assigned to this worker.");
+        }
+
+        if (worker.getVerificationStatus() != VerificationStatus.VERIFIED) {
+            throw new IllegalStateException(
+                    "Only verified workers can complete bookings.");
+        }
+
+        if (booking.getStatus() != BookingStatus.IN_PROGRESS) {
+            throw new IllegalStateException(
+                    "Booking is not in progress.");
+        }
+
+        if (!booking.isCompletionRequested()) {
+            throw new IllegalStateException(
+                    "Completion has not been requested yet. Ask the customer for the Completion OTP only after requesting completion.");
+        }
+
+        if (otp == null || !otp.matches("\\d{4}")) {
+            throw new IllegalArgumentException(
+                    "Please enter a valid 4-digit Completion OTP.");
+        }
+
+        if (booking.getCompletionOtp() == null
+                || !booking.getCompletionOtp().equals(otp)) {
+
+            throw new IllegalArgumentException(
+                    "Incorrect Completion OTP. Please ask the customer for the correct OTP.");
+        }
+
+        LocalDateTime completionTime = LocalDateTime.now();
+
+        booking.setStatus(BookingStatus.COMPLETED);
+        booking.setCompletedAt(completionTime);
+        booking.setWorkerCompletedAt(completionTime);
+
+        booking.setCompletionOtp(null);
+
+        booking.setCompletionRequested(false);
+
+        billingService.createBilling(booking);
+
+        worker.setAvailabilityStatus(AvailabilityStatus.AVAILABLE);
+
         return toDto(bookingRepository.save(booking));
     }
 
     @Transactional
-    public BookingDto customerConfirmCompletion(UUID customerId, UUID bookingId) {
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new IllegalArgumentException("Customer not found."));
+    public BookingDto requestCompletion(UUID workerId, UUID bookingId) {
+
+        Worker worker = workerRepository.findById(workerId)
+                .orElseThrow(() -> new IllegalArgumentException("Worker not found."));
+
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found."));
-        if (!booking.getCustomer().getUserId().equals(customerId))
-            throw new IllegalStateException("Booking does not belong to this customer.");
-        if (booking.getStatus() != BookingStatus.IN_PROGRESS)
-            throw new IllegalStateException("Booking is not in progress.");
-        if (!booking.isWorkerConfirmedCompletion()) {
-            throw new RuntimeException("Worker has not marked the service as complete yet");
+
+        if (booking.getWorker() == null
+                || !booking.getWorker().getUserId().equals(workerId)) {
+
+            throw new IllegalStateException(
+                    "Booking is not assigned to this worker.");
         }
-        booking.setCustomerConfirmedCompletion(true);
-        completeIfBothConfirmed(booking);
+
+        if (worker.getVerificationStatus() != VerificationStatus.VERIFIED) {
+            throw new IllegalStateException(
+                    "Only verified workers can request completion.");
+        }
+
+        if (booking.getStatus() != BookingStatus.IN_PROGRESS) {
+            throw new IllegalStateException(
+                    "Only an in-progress booking can be completed.");
+        }
+
+        List<BookingPart> parts = bookingPartRepository.findByBookingBookingId(bookingId);
+
+        boolean hasPendingParts = parts.stream()
+                .anyMatch(part -> part.getStatus() == PartApprovalStatus.PENDING);
+
+        if (hasPendingParts) {
+            throw new IllegalStateException(
+                    "All added parts must be approved by the customer before completion can be requested.");
+        }
+
+        if (booking.isCompletionRequested()) {
+            throw new IllegalStateException(
+                    "Completion has already been requested. Please obtain the Completion OTP from the customer.");
+        }
+
+        String completionOtp = generateOtp();
+
+        booking.setCompletionOtp(completionOtp);
+        booking.setCompletionOtpRequestedAt(LocalDateTime.now());
+        booking.setCompletionRequested(true);
+
         return toDto(bookingRepository.save(booking));
     }
 
-    private void completeIfBothConfirmed(Booking booking) {
-
-        if (booking.isWorkerConfirmedCompletion()
-                && booking.isCustomerConfirmedCompletion()) {
-
-            booking.setStatus(BookingStatus.COMPLETED);
-            booking.setCompletedAt(LocalDateTime.now());
-
-            billingService.createBilling(booking);
-
-            if (booking.getWorker() != null) {
-                booking.getWorker()
-                        .setAvailabilityStatus(AvailabilityStatus.AVAILABLE);
-            }
-        }
-    }
-
     public List<BookingDto> getCustomerBookings(UUID customerId) {
-        return bookingRepository.findByCustomerUserId(customerId).stream().map(this::toDto).toList();
+
+        return bookingRepository.findByCustomerUserId(customerId)
+                .stream()
+                .map(this::toCustomerDto)
+                .toList();
     }
 
     public List<BookingDto> getWorkerBookings(UUID workerId) {
@@ -460,8 +600,7 @@ public class BookingService {
         d.setWorkerCancelledAt(b.getWorkerCancelledAt());
         d.setWorkerCancellationReason(b.getWorkerCancellationReason());
         d.setWorkerCancellationMessage(b.getWorkerCancellationMessage());
-        d.setWorkerConfirmedCompletion(b.isWorkerConfirmedCompletion());
-        d.setCustomerConfirmedCompletion(b.isCustomerConfirmedCompletion());
+        d.setCompletionRequested(b.isCompletionRequested());
         d.setCustomerName(b.getCustomer().getUser().getFullName());
         d.setCustomerPhone(b.getCustomer().getUser().getPhone());
         d.setCustomerAddressLine1(b.getCustomer().getUser().getAddressLine1());
@@ -470,6 +609,27 @@ public class BookingService {
         d.setCustomerCity(b.getCustomer().getUser().getCity());
         d.setCustomerState(b.getCustomer().getUser().getState());
         d.setCustomerPinCode(b.getCustomer().getUser().getPinCode());
+        return d;
+    }
+
+    private BookingDto toCustomerDto(Booking b) {
+
+        BookingDto d = toDto(b);
+
+        // Start OTP is available only while the booking is accepted.
+        if (b.getStatus() == BookingStatus.ACCEPTED) {
+            d.setStartOtp(b.getStartOtp());
+        }
+
+        // Completion OTP is available only after the worker
+        // has explicitly requested completion.
+        if (b.getStatus() == BookingStatus.IN_PROGRESS
+                && b.isCompletionRequested()) {
+
+            d.setCompletionOtp(b.getCompletionOtp());
+            d.setCompletionRequested(true);
+        }
+
         return d;
     }
 
@@ -505,5 +665,11 @@ public class BookingService {
                 throw new IllegalArgumentException(
                         "Invalid cancellation reason for an in-progress booking.");
         }
+    }
+
+    private String generateOtp() {
+        return String.format(
+                "%04d",
+                ThreadLocalRandom.current().nextInt(0, 10000));
     }
 }

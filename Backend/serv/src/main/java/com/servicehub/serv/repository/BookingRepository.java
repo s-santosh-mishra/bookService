@@ -43,7 +43,4 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
                         BookingStatus status,
                         LocalDateTime createdAt);
 
-        List<Booking> findByStatusAndWorkerConfirmedCompletionTrueAndCustomerConfirmedCompletionFalseAndWorkerCompletedAtBefore(
-                        BookingStatus status,
-                        LocalDateTime time);
 }

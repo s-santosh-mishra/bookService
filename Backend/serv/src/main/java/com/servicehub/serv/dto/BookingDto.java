@@ -23,10 +23,14 @@ public class BookingDto {
 
     private String workerCancellationMessage;
 
-    private boolean workerConfirmedCompletion, customerConfirmedCompletion;
-
     private String customerName, customerPhone, customerAddressLine1, customerAddressLine2, customerLandmark,
             customerCity, customerState, customerPinCode;
+
+    private String startOtp;
+
+    private String completionOtp;
+
+    private boolean completionRequested;
 
     public UUID getBookingId() {
         return bookingId;
@@ -180,22 +184,6 @@ public class BookingDto {
         workerCancellationMessage = v;
     }
 
-    public boolean isWorkerConfirmedCompletion() {
-        return workerConfirmedCompletion;
-    }
-
-    public void setWorkerConfirmedCompletion(boolean v) {
-        workerConfirmedCompletion = v;
-    }
-
-    public boolean isCustomerConfirmedCompletion() {
-        return customerConfirmedCompletion;
-    }
-
-    public void setCustomerConfirmedCompletion(boolean v) {
-        customerConfirmedCompletion = v;
-    }
-
     public String getCustomerName() {
         return customerName;
     }
@@ -258,5 +246,29 @@ public class BookingDto {
 
     public void setCustomerPinCode(String v) {
         customerPinCode = v;
+    }
+
+    public String getStartOtp() {
+        return startOtp;
+    }
+
+    public void setStartOtp(String startOtp) {
+        this.startOtp = startOtp;
+    }
+
+    public String getCompletionOtp() {
+        return completionOtp;
+    }
+
+    public void setCompletionOtp(String completionOtp) {
+        this.completionOtp = completionOtp;
+    }
+
+    public boolean isCompletionRequested() {
+        return completionRequested;
+    }
+
+    public void setCompletionRequested(boolean completionRequested) {
+        this.completionRequested = completionRequested;
     }
 }

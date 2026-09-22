@@ -233,6 +233,11 @@ function renderWorkerStatus(status) {
   badge.textContent = "Unknown";
 }
 
+let bookingRequestRefreshTimer = null;
+let lastBookingRequestsSnapshot = null;
+let workerPartsRefreshTimer = null;
+let workerPartsBookingId = null;
+
 // Booking Requests
 
 async function loadBookingRequests() {
@@ -243,27 +248,83 @@ async function loadBookingRequests() {
   }
 
   try {
-    container.innerHTML = `
-      <div class="text-center text-gray-400 py-8">
-        Loading booking requests...
-      </div>
-    `;
-
     const requests = await workerApiRequest(
       `${API_BASE_URL}/bookings/requests`,
     );
+
+    const snapshot = JSON.stringify(requests || []);
+
+    // Nothing changed → keep the existing UI
+    if (snapshot === lastBookingRequestsSnapshot) {
+      return;
+    }
+
+    lastBookingRequestsSnapshot = snapshot;
 
     renderBookingRequests(requests);
   } catch (error) {
     console.error("Failed to load booking requests:", error);
 
-    container.innerHTML = `
-      <div class="bg-gray-900 border border-red-900/40 rounded-2xl p-8 text-center">
-        <p class="text-red-400 text-sm">
-          Unable to load booking requests.
-        </p>
-      </div>
-    `;
+    // Only show the error if we don't already have usable content.
+    if (!lastBookingRequestsSnapshot) {
+      container.innerHTML = `
+        <div class="bg-gray-900 border border-red-900/40 rounded-2xl p-8 text-center">
+          <p class="text-red-400 text-sm">
+            Unable to load booking requests.
+          </p>
+        </div>
+      `;
+    }
+  }
+}
+
+function startWorkerPartsPolling(bookingId) {
+  if (workerPartsRefreshTimer) {
+    return;
+  }
+
+  workerPartsBookingId = bookingId;
+
+  workerPartsRefreshTimer = setInterval(async () => {
+    if (!workerPartsBookingId) {
+      return;
+    }
+
+    try {
+      await loadWorkerBookingParts(workerPartsBookingId);
+    } catch (error) {
+      console.error("Worker parts refresh failed:", error);
+    }
+  }, 3000);
+}
+
+function stopWorkerPartsPolling() {
+  if (workerPartsRefreshTimer) {
+    clearInterval(workerPartsRefreshTimer);
+    workerPartsRefreshTimer = null;
+  }
+
+  workerPartsBookingId = null;
+}
+
+function startBookingRequestPolling() {
+  if (bookingRequestRefreshTimer) {
+    return;
+  }
+
+  bookingRequestRefreshTimer = setInterval(async () => {
+    try {
+      await loadBookingRequests();
+    } catch (error) {
+      console.error("Booking request refresh failed:", error);
+    }
+  }, 3000);
+}
+
+function stopBookingRequestPolling() {
+  if (bookingRequestRefreshTimer) {
+    clearInterval(bookingRequestRefreshTimer);
+    bookingRequestRefreshTimer = null;
   }
 }
 
@@ -299,7 +360,7 @@ async function workerApiRequest(url, options = {}) {
 
     try {
       const errorData = await response.json();
-      message = errorData.message || message;
+      message = errorData.message || errorData.error || message;
     } catch (e) {
       // Ignore JSON parsing errors.
     }
@@ -678,14 +739,11 @@ async function acceptBooking(bookingId) {
       }),
     });
 
-    /*
-     * Refresh both sections.
-     *
-     * The accepted booking disappears
-     * from requests and appears in Active Service.
-     */
-
-    await Promise.all([loadBookingRequests(), loadWorkerBookings()]);
+    await Promise.all([
+      loadBookingRequests(),
+      loadWorkerBookings(),
+      loadWorkerStatus(),
+    ]);
   } catch (error) {
     alert(error.message);
   }
@@ -858,112 +916,189 @@ function renderActiveService(bookings) {
 
   let actionButton = "";
 
+  // ACCEPTED
   if (activeBooking.status === "ACCEPTED") {
     actionButton = `
+    <div class="space-y-3">
 
-            <div class="contents">
+      <button
+        class="start-service-btn
+               w-full h-12 px-4
+               rounded-xl
+               bg-violet-600
+               hover:bg-violet-500
+               text-white
+               font-medium
+               transition"
+        data-booking-id="${activeBooking.bookingId}"
+      >
+        <i class="fa-solid fa-play mr-2"></i>
+        Start Service
+      </button>
 
-                <button
-                    class="start-service-btn
-                           w-full h-12 px-4
-                           rounded-xl
-                           bg-violet-600
-                           hover:bg-violet-500
-                           text-white
-                           font-medium
-                           transition"
-                    data-booking-id="${activeBooking.bookingId}">
+      <button
+        class="cancel-service-btn
+               w-full h-12 px-4
+               rounded-xl
+               bg-gray-800
+               hover:bg-gray-700
+               border border-gray-700
+               text-gray-200
+               font-medium
+               transition"
+        data-booking-id="${activeBooking.bookingId}"
+        data-booking-status="ACCEPTED"
+      >
+        <i class="fa-solid fa-xmark mr-2"></i>
+        Cancel
+      </button>
 
-                    <i class="fa-solid fa-play mr-2"></i>
-
-                    Start Service
-
-                </button>
-
-                <button
-                    class="cancel-service-btn
-                           w-full h-12 px-4
-                           rounded-xl
-                           bg-gray-800
-                           hover:bg-gray-700
-                           border border-gray-700
-                           text-gray-200
-                           font-medium
-                           transition"
-                    data-booking-id="${activeBooking.bookingId}"
-                    data-booking-status="ACCEPTED">
-
-                    <i class="fa-solid fa-xmark mr-2"></i>
-
-                    Cancel
-
-                </button>
-
-            </div>
-
-        `;
+    </div>
+  `;
   }
 
+  // IN PROGRESS
   if (activeBooking.status === "IN_PROGRESS") {
-    if (activeBooking.workerConfirmedCompletion) {
+    // Completion OTP has already been requested
+    if (activeBooking.completionRequested) {
       actionButton = `
+      <div class="space-y-3">
 
-                <div class="text-sm
-                            text-yellow-400">
+        <div>
+          <label
+            for="completionServiceOtp"
+            class="block text-sm font-medium text-gray-300 mb-2"
+          >
+            Customer Completion OTP
+          </label>
 
-                    <i class="fa-solid
-                              fa-clock
-                              mr-2"></i>
+          <input
+            type="text"
+            id="completionServiceOtp"
+            maxlength="4"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            placeholder="Enter 4-digit OTP"
+            class="w-full h-12 px-4 rounded-xl
+                   bg-gray-800
+                   border border-gray-700
+                   text-gray-100
+                   placeholder-gray-500
+                   text-center text-lg font-semibold
+                   tracking-[0.35em]
+                   focus:outline-none
+                   focus:border-violet-500"
+          />
+        </div>
 
-                    Waiting for customer confirmation
+        <button
+          class="complete-service-btn
+                 w-full h-12 px-4
+                 rounded-xl
+                 bg-green-600
+                 hover:bg-green-500
+                 text-white
+                 font-medium
+                 transition"
+          data-booking-id="${activeBooking.bookingId}"
+        >
+          <i class="fa-solid fa-check mr-2"></i>
+          Complete Service
+        </button>
 
-                </div>
+        <div
+          class="rounded-xl
+                 bg-violet-950/20
+                 border border-violet-700/30
+                 p-4"
+        >
+          <div class="flex items-start gap-3">
 
-            `;
-    } else {
+            <div
+              class="w-9 h-9 rounded-lg
+                     bg-violet-500/10
+                     flex items-center
+                     justify-center
+                     shrink-0"
+            >
+              <i class="fa-solid fa-key text-violet-400"></i>
+            </div>
+
+            <div>
+              <p class="text-sm font-semibold text-violet-300">
+                Completion OTP Generated
+              </p>
+
+              <p class="text-xs text-gray-400 mt-1 leading-relaxed">
+                The Completion OTP is now visible to the customer.
+                Ask the customer for the OTP only after the service
+                is fully completed and they have checked the work.
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+        <button
+          class="cancel-service-btn
+                 w-full h-12 px-4
+                 rounded-xl
+                 bg-gray-800
+                 hover:bg-gray-700
+                 border border-gray-700
+                 text-gray-200
+                 font-medium
+                 transition"
+          data-booking-id="${activeBooking.bookingId}"
+          data-booking-status="IN_PROGRESS"
+        >
+          <i class="fa-solid fa-xmark mr-2"></i>
+          Cancel Service
+        </button>
+
+      </div>
+    `;
+    }
+
+    // Completion OTP has NOT been requested yet
+    else {
       actionButton = `
+      <div class="space-y-3">
 
-                <div class="contents">
+        <button
+          class="request-completion-btn
+                 w-full h-12 px-4
+                 rounded-xl
+                 bg-violet-600
+                 hover:bg-violet-500
+                 text-white
+                 font-medium
+                 transition"
+          data-booking-id="${activeBooking.bookingId}"
+        >
+          <i class="fa-solid fa-flag-checkered mr-2"></i>
+          Mark Service as Complete
+        </button>
 
-                    <button
-                        class="complete-service-btn
-                               w-full h-12 px-4
-                               rounded-xl
-                               bg-green-600
-                               hover:bg-green-500
-                               text-white
-                               font-medium
-                               transition"
-                        data-booking-id="${activeBooking.bookingId}">
+        <button
+          class="cancel-service-btn
+                 w-full h-12 px-4
+                 rounded-xl
+                 bg-gray-800
+                 hover:bg-gray-700
+                 border border-gray-700
+                 text-gray-200
+                 font-medium
+                 transition"
+          data-booking-id="${activeBooking.bookingId}"
+          data-booking-status="IN_PROGRESS"
+        >
+          <i class="fa-solid fa-xmark mr-2"></i>
+          Cancel Service
+        </button>
 
-                        <i class="fa-solid fa-circle-check mr-2"></i>
-
-                        Mark Service Completed
-
-                    </button>
-
-                    <button
-                        class="cancel-service-btn
-                               w-full h-12 px-4
-                               rounded-xl
-                               bg-gray-800
-                               hover:bg-gray-700
-                               border border-gray-700
-                               text-gray-200
-                               font-medium
-                               transition"
-                        data-booking-id="${activeBooking.bookingId}"
-                        data-booking-status="IN_PROGRESS">
-
-                        <i class="fa-solid fa-xmark mr-2"></i>
-
-                        Cancel
-
-                    </button>
-
-                </div>
-
-            `;
+      </div>
+    `;
     }
   }
 
@@ -1029,41 +1164,53 @@ function renderActiveService(bookings) {
   const partsSection =
     activeBooking.status === "IN_PROGRESS"
       ? `
-          <div id="workerPartsContainer"
+        <div id="workerPartsContainer"
              class="mt-6 pt-6 border-t border-gray-800">
-            <div class="text-left">
-              <div class="flex items-center justify-between mb-4">
-                <div>
-                  <h3 class="text-lg font-semibold text-white">
-                    Parts
-                  </h3>
-                  <p class="text-sm text-gray-400 mt-1">
-                    Add parts used for this service.
-                  </p>
-                </div>
+          <div class="text-left">
 
-                <button
-                  id="addPartButton"
-                  data-booking-id="${activeBooking.bookingId}"
-                  type="button"
-                  class="px-4 py-2 bg-blue-600 hover:bg-blue-700
-                       text-white text-sm font-medium rounded-lg
-                       transition">
-                  + Add Part
-                </button>
-              </div>
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h3 class="text-lg font-semibold text-white">
+                  Parts
+                </h3>
 
-              <div id="workerPartsList"
-                 class="space-y-3">
-                <p class="text-sm text-gray-400">
-                  Loading parts...
+                <p class="text-sm text-gray-400 mt-1">
+                  ${
+                    activeBooking.completionRequested
+                      ? "Completion has been requested. No more parts can be added."
+                      : "Add parts used for this service."
+                  }
                 </p>
               </div>
-            </div>
-          </div>
-          `
-      : "";
 
+              ${
+                !activeBooking.completionRequested
+                  ? `
+                    <button
+                      id="addPartButton"
+                      data-booking-id="${activeBooking.bookingId}"
+                      type="button"
+                      class="px-4 py-2 bg-blue-600 hover:bg-blue-700
+                             text-white text-sm font-medium rounded-lg
+                             transition">
+                      + Add Part
+                    </button>
+                  `
+                  : ""
+              }
+            </div>
+
+            <div id="workerPartsList"
+                 class="space-y-3">
+              <p class="text-sm text-gray-400">
+                Loading parts...
+              </p>
+            </div>
+
+          </div>
+        </div>
+      `
+      : "";
   container.innerHTML = `
 
         <div class="text-left">
@@ -1356,11 +1503,9 @@ function renderActiveService(bookings) {
 
             <!-- Actions -->
 
-            <div class="grid grid-cols-1 md:grid-cols-3
-                        items-stretch
-                        gap-4 mt-6">
-
-                ${callButton}
+            <div class="grid grid-cols-1
+                items-stretch
+                gap-4 mt-6">
 
                 ${actionButton}
 
@@ -1372,6 +1517,9 @@ function renderActiveService(bookings) {
 
   if (activeBooking.status === "IN_PROGRESS") {
     loadWorkerBookingParts(activeBooking.bookingId);
+    startWorkerPartsPolling(activeBooking.bookingId);
+  } else {
+    stopWorkerPartsPolling();
   }
 }
 
@@ -1546,19 +1694,142 @@ async function cancelWorkerBooking(bookingId, bookingStatus) {
 // Start Service
 
 async function startService(bookingId) {
-  const confirmed = confirm("Are you sure you want to start this service?");
+  const startButton = document.querySelector(
+    `.start-service-btn[data-booking-id="${bookingId}"]`,
+  );
+
+  if (!startButton) {
+    alert("Unable to start the service.");
+    return;
+  }
+
+  const actionContainer = startButton.closest(".space-y-3");
+
+  if (!actionContainer) {
+    alert("Unable to open Start Service.");
+    return;
+  }
+
+  const existingOtpInput = document.getElementById("startServiceOtp");
+
+  // --------------------------------------------------
+  // SECOND CLICK → VERIFY OTP AND START SERVICE
+  // --------------------------------------------------
+  if (existingOtpInput) {
+    const otp = existingOtpInput.value.trim();
+
+    if (!otp) {
+      alert("Please enter the 4-digit Start OTP provided by the customer.");
+      existingOtpInput.focus();
+      return;
+    }
+
+    if (!/^\d{4}$/.test(otp)) {
+      alert("Please enter a valid 4-digit Start OTP.");
+      existingOtpInput.focus();
+      existingOtpInput.select();
+      return;
+    }
+
+    try {
+      await workerApiRequest(`${API_BASE_URL}/bookings/${bookingId}/start`, {
+        method: "POST",
+        body: JSON.stringify({
+          otp: otp,
+        }),
+      });
+
+      await Promise.all([loadWorkerBookings(), loadWorkerStatus()]);
+    } catch (error) {
+      alert(error.message);
+      existingOtpInput.focus();
+      existingOtpInput.select();
+    }
+
+    return;
+  }
+
+  // --------------------------------------------------
+  // FIRST CLICK → REQUEST START OTP
+  // --------------------------------------------------
+  try {
+    await workerApiRequest(
+      `${API_BASE_URL}/bookings/${bookingId}/request-start`,
+      {
+        method: "POST",
+      },
+    );
+
+    // Show OTP input only after backend successfully
+    // generates the Start OTP.
+    actionContainer.insertAdjacentHTML(
+      "afterbegin",
+      `
+        <div id="startOtpSection">
+          <label
+            for="startServiceOtp"
+            class="block text-sm font-medium text-gray-300 mb-2"
+          >
+            Customer Start OTP
+          </label>
+
+          <input
+            type="text"
+            id="startServiceOtp"
+            maxlength="4"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            placeholder="Enter 4-digit OTP"
+            class="w-full h-12 px-4 rounded-xl
+                   bg-gray-800
+                   border border-gray-700
+                   text-gray-100
+                   placeholder-gray-500
+                   text-center text-lg font-semibold
+                   tracking-[0.35em]
+                   focus:outline-none
+                   focus:border-violet-500"
+          />
+
+          <p class="text-xs text-gray-500 mt-2">
+            Ask the customer for the Start OTP in person before starting the service.
+          </p>
+        </div>
+      `,
+    );
+
+    document.getElementById("startServiceOtp")?.focus();
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+//request for completion
+
+async function requestCompletion(bookingId) {
+  const confirmed = confirm(
+    "Are you sure the service is fully completed and ready for customer verification?",
+  );
 
   if (!confirmed) {
     return;
   }
 
   try {
-    await workerApiRequest(`${API_BASE_URL}/bookings/${bookingId}/start`, {
-      method: "POST",
-    });
+    await workerApiRequest(
+      `${API_BASE_URL}/bookings/${bookingId}/request-completion`,
+      {
+        method: "POST",
+      },
+    );
 
     await loadWorkerBookings();
   } catch (error) {
+    if (error.message.includes("Completion has already been requested")) {
+      await loadWorkerBookings();
+      return;
+    }
+
     alert(error.message);
   }
 }
@@ -1566,18 +1837,30 @@ async function startService(bookingId) {
 // Complete Service
 
 async function completeService(bookingId) {
-  const confirmed = confirm("Have you finished providing this service?");
+  const otpInput = document.getElementById("completionServiceOtp");
 
-  if (!confirmed) {
+  if (!otpInput) {
+    alert("Completion OTP field is unavailable.");
+    return;
+  }
+
+  const otp = otpInput.value.trim();
+
+  if (!/^\d{4}$/.test(otp)) {
+    alert("Please enter the 4-digit Completion OTP provided by the customer.");
+    otpInput.focus();
     return;
   }
 
   try {
     await workerApiRequest(`${API_BASE_URL}/bookings/${bookingId}/complete`, {
       method: "POST",
+      body: JSON.stringify({
+        otp: otp,
+      }),
     });
 
-    await loadWorkerBookings();
+    await Promise.all([loadWorkerBookings(), loadWorkerStatus()]);
   } catch (error) {
     alert(error.message);
   }
@@ -1606,6 +1889,16 @@ document.addEventListener("click", (event) => {
 
   if (startButton) {
     startService(startButton.dataset.bookingId);
+
+    return;
+  }
+
+  const requestCompletionButton = event.target.closest(
+    ".request-completion-btn",
+  );
+
+  if (requestCompletionButton) {
+    requestCompletion(requestCompletionButton.dataset.bookingId);
 
     return;
   }
@@ -1866,9 +2159,7 @@ async function openWorkerPartImageViewer(partId) {
     const blob = await response.blob();
     const imageUrl = URL.createObjectURL(blob);
 
-    const existingViewer = document.getElementById(
-      "workerPartImageViewer",
-    );
+    const existingViewer = document.getElementById("workerPartImageViewer");
 
     if (existingViewer) {
       existingViewer.remove();
@@ -2763,6 +3054,11 @@ async function submitAddPart(bookingId, modal) {
   }
 }
 
+window.addEventListener("beforeunload", () => {
+  stopBookingRequestPolling();
+  stopWorkerPartsPolling();
+});
+
 // Dashboard Initialisation
 
 if (checkWorkerLogin()) {
@@ -2771,6 +3067,7 @@ if (checkWorkerLogin()) {
   loadWorkerStatus();
 
   loadBookingRequests();
+  startBookingRequestPolling();
 
   loadWorkerBookings();
 }

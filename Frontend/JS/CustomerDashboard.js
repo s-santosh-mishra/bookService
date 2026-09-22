@@ -97,17 +97,7 @@ const bookingDetailsNoteContainer = document.getElementById(
 
 const bookingDetailsNote = document.getElementById("bookingDetailsNote");
 
-const customerCompletionContainer = document.getElementById(
-  "customerCompletionContainer",
-);
-
-const customerCancelContainer = document.getElementById(
-  "customerCancelContainer",
-);
-
-const confirmCustomerCompletionButton = document.getElementById(
-  "confirmCustomerCompletionButton",
-);
+const bookingOtpContainer = document.getElementById("bookingOtpContainer");
 
 /* Dashboard Data */
 
@@ -119,7 +109,7 @@ let selectedBookingService = null;
 
 let activeBooking = null;
 
-let completionTimer = null;
+let bookingRefreshTimer = null;
 
 /* Category Icons */
 
@@ -607,87 +597,54 @@ if (serviceSearch) {
 
 /* Active Booking */
 
-function startCompletionCountdown() {
-  if (completionTimer) {
-    clearInterval(completionTimer);
-    completionTimer = null;
-  }
-
-  if (
-    !activeBooking ||
-    activeBooking.status !== "IN_PROGRESS" ||
-    !activeBooking.workerConfirmedCompletion ||
-    !activeBooking.workerCompletedAt
-  ) {
-    return;
-  }
-
-  const countdownElement = document.getElementById("completion-countdown");
-
-  if (!countdownElement) {
-    return;
-  }
-
-  function updateCountdown() {
-    const completedAt = new Date(activeBooking.workerCompletedAt).getTime();
-
-    const expiryTime = completedAt + 30 * 60 * 1000;
-
-    const remaining = expiryTime - Date.now();
-
-    if (remaining <= 0) {
-      countdownElement.textContent = "Confirmation window expired";
-
-      clearInterval(completionTimer);
-      completionTimer = null;
-
-      setTimeout(() => {
-        loadActiveBooking();
-      }, 2000);
-
-      return;
-    }
-
-    const minutes = Math.floor(remaining / 60000);
-
-    const seconds = Math.floor((remaining % 60000) / 1000);
-
-    countdownElement.textContent = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-  }
-
-  updateCountdown();
-
-  completionTimer = setInterval(updateCountdown, 1000);
-}
-
 async function loadActiveBooking() {
   try {
     const bookings = (await apiRequest(`${API_BASE_URL}/bookings`)) || [];
 
     const active = bookings
-      .filter((b) =>
-        ["PENDING", "ACCEPTED", "IN_PROGRESS"].includes(b.status)
-      )
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt) - new Date(a.createdAt)
-      );
+      .filter((b) => ["PENDING", "ACCEPTED", "IN_PROGRESS"].includes(b.status))
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    if (active.length > 0) {
+      startActiveBookingPolling();
+    } else {
+      stopActiveBookingPolling();
+    }
 
     renderActiveBookings(active);
+
   } catch (error) {
     console.error("Booking loading error:", error);
     renderActiveBookings([]);
   }
 }
 
+//ploong timer
+
+function startActiveBookingPolling() {
+  if (bookingRefreshTimer) {
+    return;
+  }
+
+  bookingRefreshTimer = setInterval(async () => {
+    try {
+      await loadActiveBooking();
+    } catch (error) {
+      console.error("Active booking refresh failed:", error);
+    }
+  }, 3000);
+}
+
+function stopActiveBookingPolling() {
+  if (bookingRefreshTimer) {
+    clearInterval(bookingRefreshTimer);
+    bookingRefreshTimer = null;
+  }
+}
+
 /* Render Active Booking */
 
 function renderActiveBookings(bookings) {
-  if (completionTimer) {
-    clearInterval(completionTimer);
-    completionTimer = null;
-  }
-
   activeBookingsContainer.innerHTML = "";
 
   if (!bookings || bookings.length === 0) {
@@ -712,9 +669,7 @@ function renderActiveBookings(bookings) {
         ? "Your request is waiting for a worker to accept it."
         : booking.status === "ACCEPTED"
           ? "A worker has accepted your booking."
-          : booking.workerConfirmedCompletion
-            ? "The worker has marked the service as finished. Please confirm the work."
-            : "Your service is currently in progress.";
+          : "Your service is currently in progress.";
 
     const statusClasses =
       booking.status === "IN_PROGRESS"
@@ -736,6 +691,122 @@ function renderActiveBookings(bookings) {
           minute: "2-digit",
         });
 
+    const otpSection =
+      booking.status === "ACCEPTED" && booking.startOtp
+        ? `
+          <div class="mt-5 p-4 rounded-xl bg-violet-950/20 border border-violet-700/30">
+
+            <div class="flex items-center gap-3 mb-3">
+
+              <div
+                class="w-9 h-9 rounded-full
+                       bg-violet-500/10
+                       flex items-center justify-center"
+              >
+                <i class="fa-solid fa-key text-violet-400"></i>
+              </div>
+
+              <div>
+                <h4 class="text-white font-semibold text-sm">
+                  Start Work OTP
+                </h4>
+
+                <p class="text-xs text-gray-400">
+                  Give this OTP to the worker when they are ready to start.
+                </p>
+              </div>
+
+            </div>
+
+            <div class="text-center py-2">
+
+              <p
+                class="text-3xl font-bold
+                       tracking-[0.35em]
+                       text-violet-300"
+              >
+                ${escapeHtml(booking.startOtp)}
+              </p>
+
+            </div>
+
+            <div
+              class="mt-3 p-3 rounded-lg
+                     bg-red-950/20
+                     border border-red-700/30"
+            >
+              <p class="text-xs text-red-300 leading-relaxed">
+
+                <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+
+                Never share this OTP over a phone call, text message, or with
+                anyone other than the worker at your location.
+
+              </p>
+            </div>
+
+          </div>
+        `
+        : booking.status === "IN_PROGRESS" &&
+            booking.completionRequested &&
+            booking.completionOtp
+          ? `
+            <div class="mt-5 p-4 rounded-xl bg-violet-950/20 border border-violet-700/30">
+
+              <div class="flex items-center gap-3 mb-3">
+
+                <div
+                  class="w-9 h-9 rounded-full
+                         bg-violet-500/10
+                         flex items-center justify-center"
+                >
+                  <i class="fa-solid fa-lock text-violet-400"></i>
+                </div>
+
+                <div>
+                  <h4 class="text-white font-semibold text-sm">
+                    Completion OTP
+                  </h4>
+
+                  <p class="text-xs text-gray-400">
+                    Give this OTP only after the service is fully complete.
+                  </p>
+                </div>
+
+              </div>
+
+              <div class="text-center py-2">
+
+                <p
+                  class="text-3xl font-bold
+                         tracking-[0.35em]
+                         text-violet-300"
+                >
+                  ${escapeHtml(booking.completionOtp)}
+                </p>
+
+              </div>
+
+              <div
+                class="mt-3 p-3 rounded-lg
+                       bg-red-950/20
+                       border border-red-700/30"
+              >
+                <p class="text-xs text-red-300 leading-relaxed">
+
+                  <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+
+                  Do not give this OTP until the service has been completely
+                  finished and you have checked the work. Never share it over
+                  a phone call or message.
+
+                </p>
+              </div>
+
+            </div>
+          `
+          : "";
+
     card.innerHTML = `
       <div
         class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
@@ -753,14 +824,12 @@ function renderActiveBookings(bookings) {
             <i class="fa-solid fa-wrench text-violet-400 text-xl"></i>
           </div>
 
-          <div>
+          <div class="w-full">
 
             <div class="flex flex-wrap items-center gap-3 mb-2">
 
               <h4 class="text-lg font-semibold">
-                ${escapeHtml(
-                  booking.serviceName || "Service request"
-                )}
+                ${escapeHtml(booking.serviceName || "Service request")}
               </h4>
 
               <span
@@ -781,9 +850,7 @@ function renderActiveBookings(bookings) {
 
               <span>
                 <i class="fa-solid fa-user mr-2 text-violet-400"></i>
-                ${escapeHtml(
-                  booking.workerName || "Worker not assigned"
-                )}
+                ${escapeHtml(booking.workerName || "Worker not assigned")}
               </span>
 
               <span>
@@ -797,6 +864,8 @@ function renderActiveBookings(bookings) {
               </span>
 
             </div>
+
+            ${otpSection}
 
           </div>
 
@@ -837,9 +906,7 @@ function renderActiveBookings(bookings) {
     .forEach((button) => {
       button.addEventListener("click", () => {
         const booking = bookings.find(
-          (item) =>
-            String(item.bookingId) ===
-            String(button.dataset.bookingId)
+          (item) => String(item.bookingId) === String(button.dataset.bookingId),
         );
 
         if (booking) {
@@ -849,12 +916,8 @@ function renderActiveBookings(bookings) {
       });
     });
 
-  /* Keep the most recent active booking as the
-   * current booking for the existing completion logic. */
-
+  // Keep the first active booking as the current booking.
   activeBooking = bookings[0];
-
-  startCompletionCountdown();
 }
 
 /* Booking Status Description */
@@ -872,9 +935,6 @@ function getBookingStatusDescription(status) {
 
     case "COMPLETED":
       return "The service has been completed by both parties.";
-
-    case "AUTO_COMPLETED":
-      return "The service was automatically completed because the 30-minute confirmation window expired.";
 
     case "CANCELLED":
       return "This booking was cancelled.";
@@ -1241,22 +1301,82 @@ function openBookingDetails(booking = activeBooking) {
     bookingDetailsNoteContainer.classList.add("hidden");
   }
 
-  /*
-        Customer can confirm completion
-        only when the booking is IN_PROGRESS
-        and the customer has not already confirmed.
-    */
+  if (bookingOtpContainer) {
+    bookingOtpContainer.classList.add("hidden");
+    bookingOtpContainer.innerHTML = "";
 
-  if (
-    booking.status === "IN_PROGRESS" &&
-    booking.workerConfirmedCompletion &&
-    !booking.customerConfirmedCompletion
-  ) {
-    customerCompletionContainer.classList.remove("hidden");
+    // Start OTP
+    if (booking.status === "ACCEPTED" && booking.startOtp) {
+      bookingOtpContainer.classList.remove("hidden");
 
-    confirmCustomerCompletionButton.disabled = false;
-  } else {
-    customerCompletionContainer.classList.add("hidden");
+      bookingOtpContainer.innerHTML = `
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 rounded-full bg-violet-500/10 flex items-center justify-center">
+          <i class="fa-solid fa-key text-violet-400"></i>
+        </div>
+
+        <div>
+          <h4 class="text-white font-semibold">Start Work OTP</h4>
+          <p class="text-xs text-gray-400">
+            Give this OTP to the worker when they are ready to start.
+          </p>
+        </div>
+      </div>
+
+      <div class="text-center py-3">
+        <p class="text-3xl font-bold tracking-[0.35em] text-violet-300">
+          ${booking.startOtp}
+        </p>
+      </div>
+
+      <div class="mt-3 p-3 rounded-lg bg-red-950/20 border border-red-700/30">
+        <p class="text-xs text-red-300 leading-relaxed">
+          <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+          Never share this OTP over a phone call, text message, or with anyone
+          other than the worker at your location.
+        </p>
+      </div>
+    `;
+    }
+
+    // Completion OTP
+    if (
+      booking.status === "IN_PROGRESS" &&
+      booking.completionRequested &&
+      booking.completionOtp
+    ) {
+      bookingOtpContainer.classList.remove("hidden");
+
+      bookingOtpContainer.innerHTML = `
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 rounded-full bg-violet-500/10 flex items-center justify-center">
+          <i class="fa-solid fa-lock text-violet-400"></i>
+        </div>
+
+        <div>
+          <h4 class="text-white font-semibold">Completion OTP</h4>
+          <p class="text-xs text-gray-400">
+            Give this OTP to the worker only after the service is fully complete.
+          </p>
+        </div>
+      </div>
+
+      <div class="text-center py-3">
+        <p class="text-3xl font-bold tracking-[0.35em] text-violet-300">
+          ${booking.completionOtp}
+        </p>
+      </div>
+
+      <div class="mt-3 p-3 rounded-lg bg-red-950/20 border border-red-700/30">
+        <p class="text-xs text-red-300 leading-relaxed">
+          <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+          Do not give this OTP until the service has been completely finished
+          and you have checked the work. Never share it over a phone call or
+          message.
+        </p>
+      </div>
+    `;
+    }
   }
 
   /* Customer Booking Action */
@@ -1453,58 +1573,6 @@ async function submitBooking() {
     Backend will only mark COMPLETED
     when the worker has also confirmed.
 */
-
-async function confirmCustomerCompletion() {
-  if (!activeBooking || activeBooking.status !== "IN_PROGRESS") {
-    return;
-  }
-
-  if (!activeBooking.workerConfirmedCompletion) {
-    alert("The worker has not marked the service as complete yet.");
-
-    return;
-  }
-
-  const confirmed = window.confirm(
-    "Confirm that the service work has actually been completed?",
-  );
-
-  if (!confirmed) {
-    return;
-  }
-
-  confirmCustomerCompletionButton.disabled = true;
-
-  confirmCustomerCompletionButton.textContent = "Confirming...";
-
-  try {
-    const updatedBooking = await apiRequest(
-      `${API_BASE_URL}/bookings/${activeBooking.bookingId}/complete`,
-      {
-        method: "POST",
-      },
-    );
-
-    activeBooking = updatedBooking;
-
-    closeBookingDetails();
-
-    await loadActiveBooking();
-
-    openBookingDetails(updatedBooking);
-  } catch (error) {
-    console.error("Customer completion error:", error);
-
-    alert(error.message);
-  } finally {
-    confirmCustomerCompletionButton.disabled = false;
-
-    confirmCustomerCompletionButton.innerHTML = `
-            <i class="fa-solid fa-check"></i>
-            Confirm Work Completed
-        `;
-  }
-}
 
 async function cancelCustomerBooking() {
   if (!activeBooking || activeBooking.status !== "PENDING") {
@@ -1728,13 +1796,6 @@ if (confirmCreateBookingButton) {
   confirmCreateBookingButton.addEventListener("click", submitBooking);
 }
 
-if (confirmCustomerCompletionButton) {
-  confirmCustomerCompletionButton.addEventListener(
-    "click",
-    confirmCustomerCompletion,
-  );
-}
-
 /* Close Booking Details Outside */
 
 if (bookingDetailsModal) {
@@ -1792,9 +1853,7 @@ async function initializeDashboard() {
 }
 
 window.addEventListener("beforeunload", () => {
-  if (completionTimer) {
-    clearInterval(completionTimer);
-  }
+  stopActiveBookingPolling();
 });
 
 initializeDashboard();
