@@ -17,6 +17,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.servicehub.serv.dto.PriceEstimateDto;
+import com.servicehub.serv.repository.ServiceRepository;
+
 @Service
 public class BillingService {
 
@@ -24,13 +27,92 @@ public class BillingService {
 
         private final BillingRepository billingRepository;
         private final BookingPartRepository bookingPartRepository;
+        private final ServiceRepository serviceRepository;
 
         public BillingService(
                         BillingRepository billingRepository,
-                        BookingPartRepository bookingPartRepository) {
+                        BookingPartRepository bookingPartRepository,
+                        ServiceRepository serviceRepository) {
 
                 this.billingRepository = billingRepository;
                 this.bookingPartRepository = bookingPartRepository;
+                this.serviceRepository = serviceRepository;
+        }
+
+        public PriceEstimateDto estimatePrice(
+                        UUID serviceId,
+                        BigDecimal customerLatitude,
+                        BigDecimal customerLongitude,
+                        BigDecimal estimatedDurationHours) {
+
+                com.servicehub.serv.entity.Service service = serviceRepository.findById(serviceId)
+                                .orElseThrow(() -> new IllegalArgumentException("Service not found."));
+
+                if (!service.isActive()) {
+                        throw new IllegalArgumentException(
+                                        "This service is currently unavailable.");
+                }
+
+                if (customerLatitude == null || customerLongitude == null
+                                || customerLatitude.compareTo(BigDecimal.valueOf(-90)) < 0
+                                || customerLatitude.compareTo(BigDecimal.valueOf(90)) > 0
+                                || customerLongitude.compareTo(BigDecimal.valueOf(-180)) < 0
+                                || customerLongitude.compareTo(BigDecimal.valueOf(180)) > 0) {
+                        throw new IllegalArgumentException(
+                                        "Valid customer coordinates are required.");
+                }
+
+                if (estimatedDurationHours == null
+                                || estimatedDurationHours.compareTo(BigDecimal.ZERO) <= 0
+                                || estimatedDurationHours.compareTo(BigDecimal.valueOf(24)) > 0) {
+                        throw new IllegalArgumentException(
+                                        "Estimated duration must be greater than zero and at most 24 hours.");
+                }
+
+                BigDecimal hourlyRate = service.getBasePricePerHour();
+                BigDecimal minimumFee = service.getMinimumServiceFee();
+
+                // Round the estimated duration up to 15-minute blocks.
+                BigDecimal quarterHours = estimatedDurationHours
+                                .multiply(BigDecimal.valueOf(4));
+
+                long blocks = quarterHours
+                                .setScale(0, RoundingMode.CEILING)
+                                .longValueExact();
+
+                BigDecimal billableHours = BigDecimal.valueOf(blocks)
+                                .divide(BigDecimal.valueOf(4), 2, RoundingMode.UNNECESSARY);
+
+                // Calculate estimated labour charge.
+                BigDecimal labourCharge = hourlyRate
+                                .multiply(billableHours)
+                                .max(minimumFee)
+                                .setScale(2, RoundingMode.HALF_UP);
+
+                // Calculate straight-line distance using Haversine.
+                double lat1 = Math.toRadians(customerLatitude.doubleValue());
+                double lon1 = Math.toRadians(customerLongitude.doubleValue());
+
+                // Demo travel estimate for V1.
+                // Actual travel charges are calculated separately in final billing.
+                BigDecimal estimatedDistanceKm = BigDecimal.ZERO;
+                BigDecimal travelCharge = BigDecimal.valueOf(30.00);
+
+                BigDecimal estimatedTotal = labourCharge
+                                .add(travelCharge)
+                                .setScale(2, RoundingMode.HALF_UP);
+
+                PriceEstimateDto estimate = new PriceEstimateDto();
+
+                estimate.setBasePricePerHour(hourlyRate);
+                estimate.setMinimumServiceFee(minimumFee);
+                estimate.setEstimatedLabourCharge(labourCharge);
+                estimate.setEstimatedTravelCharge(travelCharge);
+                estimate.setEstimatedTotal(estimatedTotal);
+                estimate.setEstimatedDurationHours(billableHours);
+                estimate.setEstimatedDistanceKm(estimatedDistanceKm);
+
+                return estimate;
         }
 
         @Transactional

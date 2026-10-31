@@ -8,7 +8,8 @@ public class RegisterReqDto {
     private String fullName;
 
     @NotNull(message = "Age is required")
-    @Min(value = 18, message = "You must be at least 18 years old")
+    @Min(value = 18, message = "Age must be between 18 and 100")
+    @Max(value = 100, message = "Age must be between 18 and 100")
     private Integer age;
 
     @NotBlank(message = "Gender is required")
@@ -19,6 +20,7 @@ public class RegisterReqDto {
     private String email;
 
     @NotBlank(message = "Phone number is required")
+    @Pattern(regexp = "^[6-9]\\d{9}$", message = "Please enter a valid 10-digit mobile number")
     private String phone;
 
     @NotBlank(message = "Address is required")
@@ -35,6 +37,7 @@ public class RegisterReqDto {
     private String state;
 
     @NotBlank(message = "PIN code is required")
+    @Pattern(regexp = "^\\d{6}$", message = "Please enter a valid 6-digit PIN code")
     private String pinCode;
 
     @NotBlank(message = "Password is required")

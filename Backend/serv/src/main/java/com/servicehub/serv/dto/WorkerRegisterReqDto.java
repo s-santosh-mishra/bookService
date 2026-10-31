@@ -1,32 +1,69 @@
 package com.servicehub.serv.dto;
 
+import jakarta.validation.constraints.*;
+
 import java.util.List;
 import java.util.UUID;
 
 public class WorkerRegisterReqDto {
 
+    @NotBlank(message = "Full name is required")
     private String fullName;
+
+    @NotNull(message = "Age is required")
+    @Min(value = 18, message = "Age must be between 18 and 100")
+    @Max(value = 100, message = "Age must be between 18 and 100")
     private Integer age;
+
+    @NotBlank(message = "Gender is required")
     private String gender;
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Enter a valid email")
     private String email;
+
+    @NotBlank(message = "Phone number is required")
+    @Pattern(regexp = "^[6-9]\\d{9}$", message = "Please enter a valid 10-digit mobile number")
     private String phone;
 
+    @NotBlank(message = "Address is required")
     private String addressLine1;
+
     private String addressLine2;
+
     private String landmark;
+
+    @NotBlank(message = "City is required")
     private String city;
+
+    @NotBlank(message = "State is required")
     private String state;
+
+    @NotBlank(message = "PIN code is required")
+    @Pattern(regexp = "^\\d{6}$", message = "Please enter a valid 6-digit PIN code")
     private String pinCode;
 
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
+
+    @NotBlank(message = "Please confirm your password")
     private String confirmPassword;
 
+    @NotNull(message = "Years of experience is required")
+    @Min(value = 0, message = "Experience years cannot be negative")
+    @Max(value = 80, message = "Experience years cannot exceed 80")
     private Integer experienceYears;
+
+    @NotBlank(message = "Qualification is required")
     private String qualification;
+
     private String bio;
 
+    @NotEmpty(message = "Please select at least one service")
     private List<UUID> serviceIds;
 
+    @AssertTrue(message = "You must accept the Terms & Conditions")
     private boolean termsAccepted;
 
     public String getFullName() {

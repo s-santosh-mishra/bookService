@@ -1,3 +1,4 @@
+
 package com.servicehub.serv.enums;
 
 public enum BookingStatus {
@@ -5,10 +6,10 @@ public enum BookingStatus {
     ACCEPTED,
     IN_PROGRESS,
     COMPLETED,
+    REVIEWED,
     CANCELLED,
     NO_WORKER,
     FAILED,
     WORKER_CANCELLED,
     WORKER_CANNOT_COMPLETE
-    
 }

@@ -219,10 +219,12 @@
             <label
               for="customerBookingNote"
               class="block text-sm font-medium mb-2"
-              >Note (optional)</label
+              >Note <span class="text-red-500" aria-hidden="true">*</span
+              ><span class="sr-only"> (required)</span></label
             >
             <textarea
               id="customerBookingNote"
+              required
               maxlength="500"
               rows="4"
               placeholder="Add any useful details for the worker..."
@@ -343,8 +345,13 @@
             ></p>
           </div>
 
-          <!-- Customer Cancel Booking -->
+          <!-- Customer Review -->
+          <div
+            id="customerReviewContainer"
+            class="hidden pt-5 border-t border-gray-800"
+          ></div>
 
+          <!-- Customer Cancel Booking -->
           <div
             id="customerCancelContainer"
             class="hidden pt-5 border-t border-gray-800"

@@ -67,6 +67,10 @@ const cancelCreateBookingButton = document.getElementById(
 
 const bookingDetailsModal = document.getElementById("bookingDetailsModal");
 
+const customerReviewContainer = document.getElementById(
+  "customerReviewContainer",
+);
+
 const closeBookingDetailsButton = document.getElementById(
   "closeBookingDetailsButton",
 );
@@ -602,7 +606,11 @@ async function loadActiveBooking() {
     const bookings = (await apiRequest(`${API_BASE_URL}/bookings`)) || [];
 
     const active = bookings
-      .filter((b) => ["PENDING", "ACCEPTED", "IN_PROGRESS"].includes(b.status))
+      .filter((booking) =>
+        ["PENDING", "ACCEPTED", "IN_PROGRESS", "COMPLETED"].includes(
+          booking.status,
+        ),
+      )
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     if (active.length > 0) {
@@ -669,7 +677,9 @@ function renderActiveBookings(bookings) {
         ? "Your request is waiting for a worker to accept it."
         : booking.status === "ACCEPTED"
           ? "A worker has accepted your booking."
-          : "Your service is currently in progress.";
+          : booking.status === "COMPLETED"
+            ? "The service is complete. Please share your experience with the worker."
+            : "Your service is currently in progress.";
 
     const statusClasses =
       booking.status === "IN_PROGRESS"
@@ -873,6 +883,25 @@ function renderActiveBookings(bookings) {
 
         <div class="lg:text-right shrink-0">
 
+          ${
+            booking.status === "COMPLETED"
+              ? `
+                <button
+                  type="button"
+                  class="submit-booking-review-button inline-flex
+                         items-center justify-center gap-2
+                         px-5 py-3 rounded-xl
+                         bg-violet-600 text-white
+                         hover:bg-violet-700 transition font-semibold"
+                  data-booking-id="${escapeHtml(booking.bookingId)}"
+                >
+                  <i class="fa-solid fa-star"></i>
+                  <span>Submit Review</span>
+                </button>
+              `
+              : ""
+          }
+
           <button
             type="button"
             class="view-active-booking-button
@@ -898,6 +927,26 @@ function renderActiveBookings(bookings) {
 
     activeBookingsContainer.appendChild(card);
   });
+
+  activeBookingsContainer
+    .querySelectorAll(".submit-booking-review-button")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        const booking = bookings.find(
+          (item) =>
+            String(item.bookingId) === String(button.dataset.bookingId),
+        );
+
+        if (booking) {
+          activeBooking = booking;
+          openBookingDetails(booking);
+          customerReviewContainer?.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest",
+          });
+        }
+      });
+    });
 
   // Attach View Details handlers
 
@@ -934,7 +983,10 @@ function getBookingStatusDescription(status) {
       return "Your service is currently in progress.";
 
     case "COMPLETED":
-      return "The service has been completed by both parties.";
+      return "The service is complete. Please share your experience with the worker.";
+
+    case "REVIEWED":
+      return "Your review decision has been recorded.";
 
     case "CANCELLED":
       return "This booking was cancelled.";
@@ -1379,6 +1431,17 @@ function openBookingDetails(booking = activeBooking) {
     }
   }
 
+  /* Customer Review Action */
+
+  if (customerReviewContainer) {
+    customerReviewContainer.innerHTML = "";
+    customerReviewContainer.classList.add("hidden");
+
+    if (booking.status === "COMPLETED") {
+      renderCustomerReviewForm(booking);
+    }
+  }
+
   /* Customer Booking Action */
 
   customerCancelContainer.innerHTML = "";
@@ -1438,6 +1501,294 @@ function openBookingDetails(booking = activeBooking) {
   bookingDetailsModal.classList.remove("hidden");
 
   document.body.classList.add("overflow-hidden");
+}
+
+/* Customer Review */
+
+const reviewTagsByRating = {
+  1: [
+    "Very late",
+    "Poor knowledge",
+    "Unprofessional",
+    "Rude behaviour",
+    "Poor work quality",
+    "Poor communication",
+  ],
+  2: [
+    "Very late",
+    "Limited knowledge",
+    "Unprofessional",
+    "Poor work quality",
+    "Poor communication",
+  ],
+  3: [
+    "Slightly late",
+    "Average knowledge",
+    "Could be more professional",
+    "Average work quality",
+    "Communication could improve",
+  ],
+  4: [
+    "Punctual",
+    "Knowledgeable",
+    "Professional",
+    "Good work quality",
+    "Good communication",
+    "Minor improvement needed",
+  ],
+  5: [
+    "Punctual",
+    "Knowledgeable",
+    "Professional",
+    "Polite & respectful",
+    "Quality work",
+    "Good communication",
+  ],
+};
+
+function renderCustomerReviewForm(booking) {
+  if (!customerReviewContainer) return;
+
+  customerReviewContainer.classList.remove("hidden");
+
+  customerReviewContainer.innerHTML = `
+    <div class="mb-5">
+      <h4 class="text-lg font-semibold text-white">
+        How was your experience?
+      </h4>
+
+      <p class="text-sm text-gray-400 mt-1">
+        Rate the service and optionally select what went well.
+      </p>
+    </div>
+
+    <form id="customerReviewForm" class="space-y-5">
+      <fieldset>
+        <legend class="block text-sm font-medium text-gray-300 mb-2">
+          Your rating
+        </legend>
+
+        <div class="flex flex-wrap items-center gap-2">
+          ${[1, 2, 3, 4, 5]
+            .map(
+              (rating) => `
+                <button
+                  type="button"
+                  class="review-star-button text-3xl
+                         text-gray-600 hover:text-amber-400 transition"
+                  data-rating="${rating}"
+                  aria-label="${rating} star${rating > 1 ? "s" : ""}"
+                  aria-pressed="false"
+                >
+                  <i class="fa-solid fa-star"></i>
+                </button>
+              `,
+            )
+            .join("")}
+
+          <span
+            id="customerReviewRatingLabel"
+            class="text-sm text-gray-400"
+          >
+            Choose 1–5 stars
+          </span>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend class="block text-sm font-medium text-gray-300 mb-3">
+          What stood out?
+          <span class="text-gray-500 font-normal">(optional)</span>
+        </legend>
+
+        <div id="customerReviewTags" class="flex flex-wrap gap-2"></div>
+      </fieldset>
+
+      <p
+        id="customerReviewError"
+        class="hidden text-sm text-red-400"
+        role="alert"
+      ></p>
+
+      <button
+        type="submit"
+        class="w-full inline-flex items-center justify-center gap-2
+               rounded-xl bg-violet-600 px-5 py-3 font-semibold
+               text-white transition hover:bg-violet-700"
+      >
+        <i class="fa-solid fa-star"></i>
+        Submit Review
+      </button>
+
+      <div class="text-center">
+        <button
+          type="button"
+          id="skipCustomerReviewButton"
+          class="text-sm text-gray-500 underline-offset-4
+                 hover:text-gray-300 hover:underline transition"
+        >
+          Skip for now
+        </button>
+      </div>
+    </form>
+  `;
+
+  let selectedRating = 0;
+
+  const form = document.getElementById("customerReviewForm");
+  const stars = customerReviewContainer.querySelectorAll(
+    ".review-star-button",
+  );
+  const ratingLabel = document.getElementById(
+    "customerReviewRatingLabel",
+  );
+  const errorElement = document.getElementById("customerReviewError");
+  const submitButton = form.querySelector('button[type="submit"]');
+  const skipButton = document.getElementById("skipCustomerReviewButton");
+
+  function renderReviewTags(rating) {
+    const tagsContainer = customerReviewContainer.querySelector(
+      "#customerReviewTags",
+    );
+
+    const tags = reviewTagsByRating[rating] || [];
+
+    tagsContainer.innerHTML = tags
+      .map(
+        (tag) => `
+          <label class="cursor-pointer">
+            <input
+              type="checkbox"
+              name="reviewTag"
+              value="${escapeHtml(tag)}"
+              class="peer sr-only"
+            >
+
+            <span
+              class="inline-flex rounded-full border border-gray-700
+                     bg-gray-950 px-3 py-2 text-sm text-gray-300
+                     transition peer-checked:border-violet-500
+                     peer-checked:bg-violet-500/15
+                     peer-checked:text-violet-200"
+            >
+              ${escapeHtml(tag)}
+            </span>
+          </label>
+        `,
+      )
+      .join("");
+  }
+
+  function setRating(rating) {
+    selectedRating = rating;
+
+    stars.forEach((star) => {
+      const active = Number(star.dataset.rating) <= rating;
+
+      star.classList.toggle("text-amber-400", active);
+      star.classList.toggle("text-gray-600", !active);
+
+      star.setAttribute(
+        "aria-pressed",
+        String(Number(star.dataset.rating) === rating),
+      );
+    });
+
+    ratingLabel.textContent = `${rating} out of 5`;
+
+    // Refresh the options and clear any previously selected tags.
+    renderReviewTags(rating);
+  }
+
+  function setButtonsDisabled(disabled) {
+    submitButton.disabled = disabled;
+    skipButton.disabled = disabled;
+
+    submitButton.classList.toggle("opacity-60", disabled);
+    submitButton.classList.toggle("cursor-not-allowed", disabled);
+  }
+
+  stars.forEach((star) => {
+    star.addEventListener("click", () => {
+      setRating(Number(star.dataset.rating));
+    });
+  });
+
+  /* Submit Review */
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    errorElement.classList.add("hidden");
+
+    if (!selectedRating) {
+      errorElement.textContent =
+        "Please select a star rating before submitting.";
+
+      errorElement.classList.remove("hidden");
+      return;
+    }
+
+    const tags = Array.from(
+      form.querySelectorAll('input[name="reviewTag"]:checked'),
+    ).map((input) => input.value);
+
+    setButtonsDisabled(true);
+
+    try {
+      await apiRequest(
+        `${API_BASE_URL}/bookings/${encodeURIComponent(
+          booking.bookingId,
+        )}/review`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            rating: selectedRating,
+            feedbackTags: tags,
+          }),
+        },
+      );
+
+      closeBookingDetails();
+      await loadActiveBooking();
+    } catch (error) {
+      errorElement.textContent =
+        error.message || "Unable to submit your review. Please try again.";
+
+      errorElement.classList.remove("hidden");
+      setButtonsDisabled(false);
+    }
+  });
+
+  /* Skip Review */
+
+  skipButton.addEventListener("click", async () => {
+    errorElement.classList.add("hidden");
+    setButtonsDisabled(true);
+
+    try {
+      await apiRequest(
+        `${API_BASE_URL}/bookings/${encodeURIComponent(
+          booking.bookingId,
+        )}/review/skip`,
+        {
+          method: "POST",
+        },
+      );
+
+      closeBookingDetails();
+      await loadActiveBooking();
+    } catch (error) {
+      errorElement.textContent =
+        error.message || "Unable to skip this review right now.";
+
+      errorElement.classList.remove("hidden");
+      setButtonsDisabled(false);
+    }
+  });
 }
 
 /* Close Booking Details */
@@ -1528,6 +1879,12 @@ function getCurrentLocation() {
 async function submitBooking() {
   if (!selectedBookingService) return;
 
+  if (!customerBookingNote.value.trim()) {
+    customerBookingNote.focus();
+    alert("Please provide a note to book a service.");
+    return;
+  }
+
   confirmCreateBookingButton.disabled = true;
   confirmCreateBookingButton.textContent = "Getting location...";
 
@@ -1543,7 +1900,7 @@ async function submitBooking() {
       },
       body: JSON.stringify({
         serviceId: selectedBookingService.serviceId,
-        customerNote: customerBookingNote.value.trim() || null,
+        customerNote: customerBookingNote.value.trim(),
         latitude: location.latitude,
         longitude: location.longitude,
       }),
