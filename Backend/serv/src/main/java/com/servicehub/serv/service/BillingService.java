@@ -140,7 +140,7 @@ public class BillingService {
                 BigDecimal ratingMultiplier = getRatingMultiplier(worker.getRating());
 
                 LocalDateTime startTime = booking.getStartedAt();
-                LocalDateTime endTime = booking.getCompletedAt();
+                LocalDateTime endTime = booking.getWorkerCompletedAt();
 
                 if (startTime == null || endTime == null) {
                         throw new IllegalStateException(

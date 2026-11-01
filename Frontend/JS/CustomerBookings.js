@@ -34,6 +34,8 @@ function getStatusLabel(status) {
 
     IN_PROGRESS: "In Progress",
 
+    WAITING_FOR_PAYMENT: "Waiting for Payment",
+
     AUTO_COMPLETED: "Auto Completed",
 
     COMPLETED: "Completed",
@@ -81,6 +83,9 @@ function getStatusDescription(status) {
     ACCEPTED: "A worker has accepted your booking.",
 
     IN_PROGRESS: "Your service is currently in progress.",
+
+    WAITING_FOR_PAYMENT:
+      "Your service is complete. Please pay the final billed amount.",
 
     AUTO_COMPLETED:
       "The service was automatically completed because the 30-minute confirmation window expired.",

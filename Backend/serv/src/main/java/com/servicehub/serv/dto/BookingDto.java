@@ -1,6 +1,9 @@
 package com.servicehub.serv.dto;
 
 import com.servicehub.serv.enums.BookingStatus;
+import com.servicehub.serv.enums.PaymentMethod;
+import com.servicehub.serv.enums.PaymentStatus;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -31,6 +34,12 @@ public class BookingDto {
     private String completionOtp;
 
     private boolean completionRequested;
+
+    private BigDecimal finalBilledPrice;
+
+    private PaymentStatus paymentStatus;
+
+    private PaymentMethod paymentMethod;
 
     public UUID getBookingId() {
         return bookingId;
@@ -270,5 +279,29 @@ public class BookingDto {
 
     public void setCompletionRequested(boolean completionRequested) {
         this.completionRequested = completionRequested;
+    }
+
+    public BigDecimal getFinalBilledPrice() {
+        return finalBilledPrice;
+    }
+
+    public void setFinalBilledPrice(BigDecimal finalBilledPrice) {
+        this.finalBilledPrice = finalBilledPrice;
+    }
+
+    public PaymentStatus getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(PaymentStatus paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 }

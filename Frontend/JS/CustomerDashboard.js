@@ -235,6 +235,89 @@ async function apiRequest(url, options = {}) {
   return data;
 }
 
+/* Start Razorpay Online Payment */
+
+async function startRazorpayPayment(bookingId, button) {
+  if (typeof Razorpay === "undefined") {
+    alert("Payment gateway failed to load. Please refresh and try again.");
+    return;
+  }
+
+  try {
+    button.disabled = true;
+    button.textContent = "Preparing payment...";
+
+    const order = await apiRequest(
+      `${API_BASE_URL}/payments/razorpay/order/${encodeURIComponent(bookingId)}`,
+      {
+        method: "POST",
+      },
+    );
+
+    const options = {
+      key: order.keyId,
+      amount: order.amount,
+      currency: order.currency,
+      name: "ServiceHub",
+      description: "Service booking payment",
+      order_id: order.orderId,
+
+      handler: async function (response) {
+        try {
+          await apiRequest(`${API_BASE_URL}/payments/razorpay/verify`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+            }),
+          });
+
+          alert("Payment successful! Your booking is completed.");
+          await loadActiveBooking();
+        } catch (error) {
+          alert(
+            error.message ||
+              "Payment verification failed. Please refresh and check your booking status.",
+          );
+          await loadActiveBooking();
+        }
+      },
+
+      modal: {
+        ondismiss: function () {
+          loadActiveBooking();
+        },
+      },
+
+      theme: {
+        color: "#7c3aed",
+      },
+    };
+
+    const checkout = new Razorpay(options);
+
+    checkout.on("payment.failed", function (response) {
+      const message =
+        response.error?.description ||
+        "Payment failed. You can try again or choose cash.";
+
+      alert(message);
+      loadActiveBooking();
+    });
+
+    checkout.open();
+  } catch (error) {
+    alert(error.message || "Unable to start online payment.");
+  } finally {
+    button.disabled = false;
+    button.textContent = "Pay Online";
+  }
+}
+
 /* Load Categories */
 
 async function loadCustomerCategories() {
@@ -607,9 +690,13 @@ async function loadActiveBooking() {
 
     const active = bookings
       .filter((booking) =>
-        ["PENDING", "ACCEPTED", "IN_PROGRESS", "COMPLETED"].includes(
-          booking.status,
-        ),
+        [
+          "PENDING",
+          "ACCEPTED",
+          "IN_PROGRESS",
+          "WAITING_FOR_PAYMENT",
+          "COMPLETED",
+        ].includes(booking.status),
       )
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
@@ -854,6 +941,61 @@ function renderActiveBookings(bookings) {
               ${escapeHtml(description)}
             </p>
 
+            ${
+              booking.status === "WAITING_FOR_PAYMENT"
+                ? `
+                  <div class="mb-4 p-4 rounded-xl
+                              bg-violet-900/20 border border-violet-700/40">
+                    <p class="text-sm text-gray-400 mb-1">
+                      Final amount to pay
+                    </p>
+                    <p class="text-2xl font-bold text-white">
+                      ₹${Number(booking.finalBilledPrice).toFixed(2)}
+                    </p>
+                    <p class="text-xs text-gray-400 mt-2">
+                      Your service is complete. Please complete payment.
+                    </p>
+                  </div>
+                `
+                : ""
+            }
+
+            ${
+              booking.status === "WAITING_FOR_PAYMENT"
+                ? booking.paymentMethod === "CASH" &&
+                  booking.paymentStatus === "PENDING"
+                  ? `
+                    <div class="mt-4 mb-4">
+                      <p class="text-sm text-gray-400 mb-3">
+                        Cash payment selected. Please pay the worker directly.
+                      </p>
+                      <button
+                        class="change-payment-method-button px-5 py-2.5 rounded-lg bg-gray-700 hover:bg-gray-600 text-white font-semibold transition"
+                        data-booking-id="${booking.bookingId}"
+                      >
+                        Change payment method
+                      </button>
+                    </div>
+                  `
+                  : `
+                    <div class="flex flex-wrap gap-3 mt-4 mb-4">
+                      <button
+                        class="pay-online-button px-5 py-2.5 rounded-lg bg-violet-600 hover:bg-violet-500 text-white font-semibold transition"
+                        data-booking-id="${booking.bookingId}"
+                      >
+                        Pay Online
+                      </button>
+                      <button
+                        class="pay-cash-button px-5 py-2.5 rounded-lg bg-gray-700 hover:bg-gray-600 text-white font-semibold transition"
+                        data-booking-id="${booking.bookingId}"
+                      >
+                        Pay by Cash
+                      </button>
+                    </div>
+                  `
+                : ""
+            }
+
             <div
               class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-400"
             >
@@ -881,7 +1023,7 @@ function renderActiveBookings(bookings) {
 
         </div>
 
-        <div class="lg:text-right shrink-0">
+        <div class="text-center lg:text-right shrink-0">
 
           ${
             booking.status === "COMPLETED"
@@ -962,6 +1104,86 @@ function renderActiveBookings(bookings) {
           activeBooking = booking;
           openBookingDetails(booking);
         }
+      });
+    });
+
+  // Attach Pay by Cash handlers
+  activeBookingsContainer
+    .querySelectorAll(".pay-cash-button")
+    .forEach((button) => {
+      button.addEventListener("click", async () => {
+        const bookingId = button.dataset.bookingId;
+
+        if (!confirm("Have you agreed to pay the worker in cash?")) {
+          return;
+        }
+
+        try {
+          button.disabled = true;
+
+          await apiRequest(
+            `${API_BASE_URL}/payments/cash/${encodeURIComponent(bookingId)}`,
+            {
+              method: "POST",
+            },
+          );
+
+          alert(
+            "Cash payment selected. Please pay the worker directly. The booking will be completed after the worker confirms receipt.",
+          );
+
+          await loadActiveBooking();
+        } catch (error) {
+          alert(error.message || "Unable to select cash payment.");
+        } finally {
+          button.disabled = false;
+        }
+      });
+    });
+
+  // Attach Change Payment Method handlers
+  activeBookingsContainer
+    .querySelectorAll(".change-payment-method-button")
+    .forEach((button) => {
+      button.addEventListener("click", async () => {
+        const bookingId = button.dataset.bookingId;
+
+        if (!confirm("Do you want to change your payment method?")) {
+          return;
+        }
+
+        try {
+          button.disabled = true;
+
+          await apiRequest(
+            `${API_BASE_URL}/payments/cancel/${encodeURIComponent(bookingId)}`,
+            {
+              method: "POST",
+            },
+          );
+
+          alert(
+            "Payment method selection cancelled. You can now choose another method.",
+          );
+
+          await loadActiveBooking();
+        } catch (error) {
+          alert(error.message || "Unable to change payment method.");
+        } finally {
+          button.disabled = false;
+        }
+      });
+    });
+
+  // Attach Pay Online handlers
+  activeBookingsContainer
+    .querySelectorAll(".pay-online-button")
+    .forEach((button) => {
+      button.addEventListener("click", async () => {
+        await startRazorpayPayment(
+          button.dataset.bookingId,
+          button,
+        );
       });
     });
 

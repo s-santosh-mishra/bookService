@@ -3,6 +3,10 @@ const ROLE_KEY = "servicehub_user_role";
 const USER_NAME_KEY = "servicehub_user_name";
 
 const API_BASE_URL = "http://localhost:8080/api/worker";
+let workerBookingRefreshTimer = null;
+let lastWorkerBookingsSnapshot = null;
+const razorpayConfirmationCountdowns = new Map();
+const dismissedRazorpayBookingIds = new Set();
 
 // Authentication
 
@@ -325,6 +329,28 @@ function stopBookingRequestPolling() {
   if (bookingRequestRefreshTimer) {
     clearInterval(bookingRequestRefreshTimer);
     bookingRequestRefreshTimer = null;
+  }
+}
+
+function startWorkerBookingPolling() {
+  if (workerBookingRefreshTimer) {
+    return;
+  }
+
+  workerBookingRefreshTimer = setInterval(async () => {
+    try {
+      await loadWorkerBookings();
+      await loadWorkerStatus();
+    } catch (error) {
+      console.error("Worker booking refresh failed:", error);
+    }
+  }, 3000);
+}
+
+function stopWorkerBookingPolling() {
+  if (workerBookingRefreshTimer) {
+    clearInterval(workerBookingRefreshTimer);
+    workerBookingRefreshTimer = null;
   }
 }
 
@@ -788,71 +814,174 @@ async function loadWorkerBookings() {
   try {
     const bookings = await workerApiRequest(`${API_BASE_URL}/bookings`);
 
+    if (razorpayConfirmationCountdowns.size > 0) {
+      const [bookingId, countdown] =
+        razorpayConfirmationCountdowns.entries().next().value;
+      renderRazorpayPaymentConfirmation(bookingId, countdown);
+      return;
+    }
+
+    const confirmedRazorpayBooking = bookings.find(
+      (booking) =>
+        booking.status === "COMPLETED" &&
+        booking.paymentMethod === "RAZORPAY" &&
+        booking.paymentStatus === "SUCCESS" &&
+        !dismissedRazorpayBookingIds.has(String(booking.bookingId)) &&
+        sessionStorage.getItem(
+          `servicehub_razorpay_confirmation_dismissed_${booking.bookingId}`,
+        ) !== "true",
+    );
+
+    if (confirmedRazorpayBooking) {
+      lastWorkerBookingsSnapshot = JSON.stringify(bookings);
+      if (startRazorpayPaymentConfirmation(confirmedRazorpayBooking.bookingId)) {
+        return;
+      }
+    }
+
+    const startOtpInput = document.getElementById("startServiceOtp");
+    const startOtpBooking = startOtpInput
+      ? bookings.find(
+          (booking) =>
+            String(booking.bookingId) ===
+            String(startOtpInput.dataset.bookingId),
+        )
+      : null;
+
+    if (startOtpInput && startOtpBooking?.status === "ACCEPTED") {
+      return;
+    }
+
+    // Avoid rebuilding the card when the booking data is unchanged.
+    const snapshot = JSON.stringify(bookings);
+
+    if (snapshot === lastWorkerBookingsSnapshot) {
+      return;
+    }
+
+    // Save the snapshot before rendering.
+    lastWorkerBookingsSnapshot = snapshot;
+
     renderActiveService(bookings);
   } catch (error) {
     console.error("Failed to load worker bookings:", error);
 
-    container.innerHTML = `
-
-            <div class="text-center">
-
-                <div class="w-16 h-16
-                            mx-auto mb-5
-                            rounded-full
-                            bg-red-900/20
-                            flex items-center
-                            justify-center">
-
-                    <i class="fa-solid
-                              fa-triangle-exclamation
-                              text-red-400
-                              text-2xl"></i>
-
-                </div>
-
-
-                <h4 class="text-lg
-                           font-semibold
-                           mb-2">
-
-                    Unable to load active service
-
-                </h4>
-
-
-                <p class="text-gray-400
-                          text-sm
-                          mb-5">
-
-                    ${escapeHtml(error.message)}
-
-                </p>
-
-
-                <button
-                    id="retryWorkerBookings"
-                    class="px-5 py-2.5
-                           rounded-xl
-                           bg-violet-600
-                           hover:bg-violet-500
-                           text-white
-                           text-sm
-                           font-medium
-                           transition">
-
-                    Retry
-
-                </button>
-
-            </div>
-        `;
-
-    const retryButton = document.getElementById("retryWorkerBookings");
-
-    if (retryButton) {
-      retryButton.addEventListener("click", loadWorkerBookings);
+    // Keep the existing dashboard content visible on refresh failures.
+    if (!container.innerHTML.trim()) {
+      container.innerHTML = `
+        <div class="bg-gray-900 border border-red-900/40
+                    rounded-2xl p-8 text-center">
+          <p class="text-red-400 text-sm">
+            Unable to load active service.
+          </p>
+        </div>
+      `;
     }
   }
+}
+
+function renderRazorpayPaymentConfirmation(bookingId, countdown) {
+  const container = document.getElementById("activeServiceContainer");
+
+  if (!container) {
+    return;
+  }
+
+  countdown.secondsRemaining = Math.max(
+    1,
+    Math.ceil((countdown.deadline - Date.now()) / 1000),
+  );
+
+  container.innerHTML = `
+    <div
+      class="rounded-2xl border border-green-700/40
+             bg-green-900/20 p-8 text-center"
+      role="status"
+      aria-live="polite"
+    >
+      <div
+        class="mx-auto mb-4 flex h-14 w-14 items-center justify-center
+               rounded-full bg-green-500/20 text-4xl font-bold text-green-400"
+        aria-hidden="true"
+      >
+        ✓
+      </div>
+      <p class="text-lg font-semibold text-green-300">
+        Payment Confirmed — Closing this work in
+        <span id="razorpayPaymentCountdown">${countdown.secondsRemaining}</span>
+        seconds
+      </p>
+    </div>
+  `;
+}
+
+function startRazorpayPaymentConfirmation(bookingId) {
+  const bookingKey = String(bookingId);
+  const deadlineKey =
+    `servicehub_razorpay_confirmation_deadline_${bookingKey}`;
+  const dismissedKey =
+    `servicehub_razorpay_confirmation_dismissed_${bookingKey}`;
+  let countdown = razorpayConfirmationCountdowns.get(bookingKey);
+
+  if (!countdown) {
+    let deadline = Number(sessionStorage.getItem(deadlineKey));
+    if (!deadline) {
+      deadline = Date.now() + 5000;
+      sessionStorage.setItem(deadlineKey, String(deadline));
+    }
+
+    const secondsRemaining = Math.ceil((deadline - Date.now()) / 1000);
+    if (secondsRemaining <= 0) {
+      dismissedRazorpayBookingIds.add(bookingKey);
+      sessionStorage.setItem(dismissedKey, "true");
+      sessionStorage.removeItem(deadlineKey);
+      return false;
+    }
+
+    countdown = {
+      deadline,
+      secondsRemaining,
+      timerId: null,
+    };
+    razorpayConfirmationCountdowns.set(bookingKey, countdown);
+  }
+
+  renderRazorpayPaymentConfirmation(bookingKey, countdown);
+
+  if (countdown.timerId !== null) {
+    return;
+  }
+
+  countdown.timerId = setInterval(() => {
+    countdown.secondsRemaining = Math.ceil(
+      (countdown.deadline - Date.now()) / 1000,
+    );
+
+    if (countdown.secondsRemaining <= 0) {
+      clearInterval(countdown.timerId);
+      countdown.timerId = null;
+      razorpayConfirmationCountdowns.delete(bookingKey);
+      dismissedRazorpayBookingIds.add(bookingKey);
+      sessionStorage.setItem(dismissedKey, "true");
+      sessionStorage.removeItem(deadlineKey);
+      lastWorkerBookingsSnapshot = null;
+      const container = document.getElementById("activeServiceContainer");
+      if (container) {
+        container.innerHTML = "";
+      }
+      loadWorkerBookings();
+      return;
+    }
+
+    const countdownElement = document.getElementById(
+      "razorpayPaymentCountdown",
+    );
+    if (countdownElement) {
+      countdownElement.textContent = String(countdown.secondsRemaining);
+    }
+  }, 1000);
+
+  return true;
 }
 
 // Render Active Service
@@ -864,7 +993,11 @@ function renderActiveService(bookings) {
     return;
   }
 
-  const activeStatuses = ["ACCEPTED", "IN_PROGRESS"];
+  const activeStatuses = [
+    "ACCEPTED",
+    "IN_PROGRESS",
+    "WAITING_FOR_PAYMENT",
+  ];
 
   const activeBooking = bookings.find((booking) =>
     activeStatuses.includes(booking.status),
@@ -915,6 +1048,7 @@ function renderActiveService(bookings) {
   const statusInfo = getBookingStatusInfo(activeBooking.status);
 
   let actionButton = "";
+  let paymentSection = "";
 
   // ACCEPTED
   if (activeBooking.status === "ACCEPTED") {
@@ -1100,6 +1234,76 @@ function renderActiveService(bookings) {
       </div>
     `;
     }
+  }
+
+  // WAITING FOR PAYMENT
+  if (activeBooking.status === "WAITING_FOR_PAYMENT") {
+    const method = activeBooking.paymentMethod;
+    const paymentStatus = activeBooking.paymentStatus;
+
+    let message = "Waiting for the customer to select a payment method.";
+    let button = "";
+
+    if (method === "RAZORPAY") {
+      if (paymentStatus === "SUCCESS") {
+        message =
+          "Razorpay has verified the payment. The booking will be completed automatically.";
+      } else if (paymentStatus === "FAILED") {
+        message =
+          "The online payment failed. Ask the customer to retry or choose cash.";
+      } else if (paymentStatus === "CANCELLED") {
+        message =
+          "The online payment was cancelled. Waiting for the customer to retry or choose cash.";
+      } else {
+        message =
+          "Waiting for the customer to complete online payment. Confirmation is unavailable until payment succeeds.";
+      }
+    } else if (method === "CASH") {
+      if (paymentStatus === "PENDING") {
+        message =
+          "Collect the cash from the customer before confirming receipt.";
+
+        button = `
+          <button
+            type="button"
+            class="confirm-worker-payment-btn w-full h-12 px-4
+                   rounded-xl bg-green-600 hover:bg-green-500
+                   text-white font-medium transition"
+            data-booking-id="${activeBooking.bookingId}"
+            data-payment-method="CASH"
+          >
+            <i class="fa-solid fa-money-bill-wave mr-2"></i>
+            Confirm Cash Received
+          </button>
+        `;
+      } else {
+        message = "Cash payment is not awaiting confirmation.";
+      }
+    }
+
+    paymentSection = `
+      <div class="rounded-xl border border-gray-700
+                  bg-gray-800/50 p-5 mb-6">
+        <h3 class="font-semibold text-white mb-2">
+          <i class="fa-solid fa-wallet mr-2 text-violet-400"></i>
+          Payment Method: ${
+            method === "CASH"
+              ? "Cash"
+              : method === "RAZORPAY"
+                ? "Razorpay"
+                : "Not selected"
+          }
+        </h3>
+        <p class="text-sm text-gray-400 mb-2">
+          Payment Status: ${escapeHtml(paymentStatus || "NOT_STARTED")}
+        </p>
+        <p class="text-sm text-gray-300 leading-relaxed">
+          ${message}
+        </p>
+      </div>
+    `;
+
+    actionButton = button;
   }
 
   /*
@@ -1500,6 +1704,7 @@ function renderActiveService(bookings) {
 
               ${partsSection}
 
+              ${paymentSection}
 
             <!-- Actions -->
 
@@ -1776,6 +1981,7 @@ async function startService(bookingId) {
           <input
             type="text"
             id="startServiceOtp"
+            data-booking-id="${bookingId}"
             maxlength="4"
             inputmode="numeric"
             autocomplete="one-time-code"
@@ -1866,9 +2072,49 @@ async function completeService(bookingId) {
   }
 }
 
+// Confirm Cash Payment
+
+async function confirmWorkerPayment(bookingId, paymentMethod) {
+  if (paymentMethod !== "CASH") {
+    return;
+  }
+
+  const message = "Confirm that you have actually received the cash from the customer?";
+
+  if (!confirm(message)) {
+    return;
+  }
+
+  try {
+    await workerApiRequest(
+      `${API_BASE_URL}/payments/cash/${encodeURIComponent(bookingId)}/confirm`,
+      {
+        method: "POST",
+      },
+    );
+
+    await Promise.all([loadWorkerBookings(), loadWorkerStatus()]);
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
 // Event Delegation
 
 document.addEventListener("click", (event) => {
+  const confirmPaymentButton = event.target.closest(
+    ".confirm-worker-payment-btn",
+  );
+
+  if (confirmPaymentButton) {
+    confirmWorkerPayment(
+      confirmPaymentButton.dataset.bookingId,
+      confirmPaymentButton.dataset.paymentMethod,
+    );
+
+    return;
+  }
+
   const acceptButton = event.target.closest(".accept-booking-btn");
 
   if (acceptButton) {
@@ -3057,6 +3303,13 @@ async function submitAddPart(bookingId, modal) {
 window.addEventListener("beforeunload", () => {
   stopBookingRequestPolling();
   stopWorkerPartsPolling();
+  stopWorkerBookingPolling();
+  for (const countdown of razorpayConfirmationCountdowns.values()) {
+    if (countdown.timerId !== null) {
+      clearInterval(countdown.timerId);
+    }
+  }
+  razorpayConfirmationCountdowns.clear();
 });
 
 // Dashboard Initialisation
@@ -3070,4 +3323,5 @@ if (checkWorkerLogin()) {
   startBookingRequestPolling();
 
   loadWorkerBookings();
+  startWorkerBookingPolling();
 }

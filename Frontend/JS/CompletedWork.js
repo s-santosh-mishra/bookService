@@ -87,7 +87,10 @@ async function loadCompletedWork() {
     const bookings = await workerApiRequest(`${API_BASE_URL}/bookings`);
 
     const completedBookings = (bookings || [])
-      .filter((booking) => booking.status === "COMPLETED")
+      .filter(
+        (booking) =>
+          booking.status === "COMPLETED" || booking.status === "REVIEWED",
+      )
       .sort(
         (a, b) =>
           new Date(b.completedAt || b.updatedAt) -
@@ -239,6 +242,20 @@ function createCompletedBookingCard(booking) {
   const requestedDateTime = formatDateTime(booking.createdAt);
 
   const completedDateTime = formatDateTime(booking.completedAt);
+
+  const finalBilledPrice =
+    booking.finalBilledPrice !== null &&
+    booking.finalBilledPrice !== undefined &&
+    Number.isFinite(Number(booking.finalBilledPrice))
+      ? `₹${Number(booking.finalBilledPrice).toFixed(2)}`
+      : "Amount unavailable";
+
+  const paymentMethod =
+    booking.paymentMethod === "RAZORPAY"
+      ? "Razorpay"
+      : booking.paymentMethod === "CASH"
+        ? "Cash"
+        : "Payment method unavailable";
 
   return `
 
@@ -456,13 +473,9 @@ function createCompletedBookingCard(booking) {
                     class="pt-4 border-t border-gray-800"
                 >
 
-                    <div
-                        class="flex items-center justify-between gap-4"
-                    >
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-                        <div
-                            class="flex items-center gap-2"
-                        >
+                        <div class="flex items-center gap-2">
 
                             <i
                                 class="fa-solid fa-credit-card text-gray-500"
@@ -474,14 +487,20 @@ function createCompletedBookingCard(booking) {
                                 Payment
                             </span>
 
+                            <span class="text-sm text-gray-200">
+                                ${escapeHtml(paymentMethod)}
+                            </span>
+
                         </div>
 
-
-                        <span
-                            class="text-sm text-gray-500"
-                        >
-                            Not available yet
-                        </span>
+                        <div class="flex items-center justify-between gap-4">
+                            <span class="text-sm text-gray-400">
+                                Final amount
+                            </span>
+                            <span class="text-sm font-semibold text-gray-200">
+                                ${escapeHtml(finalBilledPrice)}
+                            </span>
+                        </div>
 
                     </div>
 

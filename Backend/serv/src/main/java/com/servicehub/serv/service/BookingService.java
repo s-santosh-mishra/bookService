@@ -26,6 +26,8 @@ public class BookingService {
     private final WorkerServiceRepository workerServiceRepository;
     private final WorkerBookingRejectionRepository workerBookingRejectionRepository;
     private final BillingService billingService;
+    private final BillingRepository billingRepository;
+    private final PaymentRepository paymentRepository;
 
     public BookingService(
             BookingRepository bookingRepository,
@@ -35,7 +37,9 @@ public class BookingService {
             WorkerRepository workerRepository,
             WorkerServiceRepository workerServiceRepository,
             WorkerBookingRejectionRepository workerBookingRejectionRepository,
-            BillingService billingService) {
+            BillingService billingService,
+            BillingRepository billingRepository,
+            PaymentRepository paymentRepository) {
 
         this.bookingRepository = bookingRepository;
         this.bookingPartRepository = bookingPartRepository;
@@ -45,6 +49,8 @@ public class BookingService {
         this.workerServiceRepository = workerServiceRepository;
         this.workerBookingRejectionRepository = workerBookingRejectionRepository;
         this.billingService = billingService;
+        this.billingRepository = billingRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     private List<BookingStatus> customerActiveStatuses() {
@@ -213,7 +219,10 @@ public class BookingService {
             throw new IllegalStateException("Worker does not provide this service.");
 
         if (bookingRepository.existsByWorkerUserIdAndStatusIn(workerId,
-                List.of(BookingStatus.ACCEPTED, BookingStatus.IN_PROGRESS)))
+                List.of(
+                        BookingStatus.ACCEPTED,
+                        BookingStatus.IN_PROGRESS,
+                        BookingStatus.WAITING_FOR_PAYMENT)))
             throw new IllegalStateException(
                     "You can't accept another booking until you finish your current booking.");
 
@@ -498,19 +507,17 @@ public class BookingService {
                     "Incorrect Completion OTP. Please ask the customer for the correct OTP.");
         }
 
-        LocalDateTime completionTime = LocalDateTime.now();
+        // Record when the worker completed the service.
+        booking.setWorkerCompletedAt(LocalDateTime.now());
 
-        booking.setStatus(BookingStatus.COMPLETED);
-        booking.setCompletedAt(completionTime);
-        booking.setWorkerCompletedAt(completionTime);
+        booking.setStatus(BookingStatus.WAITING_FOR_PAYMENT);
 
         booking.setCompletionOtp(null);
 
         booking.setCompletionRequested(false);
 
+        // Create the final bill after OTP verification.
         billingService.createBilling(booking);
-
-        worker.setAvailabilityStatus(AvailabilityStatus.AVAILABLE);
 
         return toDto(bookingRepository.save(booking));
     }
@@ -609,6 +616,20 @@ public class BookingService {
         d.setCustomerCity(b.getCustomer().getUser().getCity());
         d.setCustomerState(b.getCustomer().getUser().getState());
         d.setCustomerPinCode(b.getCustomer().getUser().getPinCode());
+
+        // Include the final billed amount, if a bill exists.
+        billingRepository.findByBookingBookingId(b.getBookingId())
+                .ifPresent(billing ->
+                        d.setFinalBilledPrice(billing.getFinalBilledPrice()));
+
+        // Include the latest payment details, if a payment exists.
+        paymentRepository.findFirstByBookingBookingIdOrderByCreatedAtDesc(
+                b.getBookingId()
+        ).ifPresent(payment -> {
+            d.setPaymentStatus(payment.getStatus());
+            d.setPaymentMethod(payment.getPaymentMethod());
+        });
+
         return d;
     }
 
