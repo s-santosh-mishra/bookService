@@ -247,6 +247,16 @@ async function startRazorpayPayment(bookingId, button) {
     button.disabled = true;
     button.textContent = "Preparing payment...";
 
+    const profile = await apiRequest(`${API_BASE_URL}/profile`);
+    const email = profile?.email?.trim();
+    const contact = profile?.phone?.trim();
+
+    if (!email || !contact) {
+      throw new Error(
+        "Add your email and phone number to your customer profile before paying online.",
+      );
+    }
+
     const order = await apiRequest(
       `${API_BASE_URL}/payments/razorpay/order/${encodeURIComponent(bookingId)}`,
       {
@@ -261,6 +271,11 @@ async function startRazorpayPayment(bookingId, button) {
       name: "ServiceHub",
       description: "Service booking payment",
       order_id: order.orderId,
+      prefill: {
+        name: profile.fullName?.trim() || undefined,
+        email,
+        contact,
+      },
 
       handler: async function (response) {
         try {
@@ -1294,207 +1309,94 @@ function renderBookingTimeline(booking) {
 
 /* Load Customer Part Photo */
 
-async function loadCustomerPartPhoto(partId) {
-  const imageElement = document.getElementById(`customer-part-photo-${partId}`);
+function loadCustomerPartPhoto(part) {
+  const imageElement = document.getElementById(
+    `customer-part-photo-${part.bookingPartId}`,
+  );
 
   if (!imageElement) {
-    console.error("Part image element not found:", partId);
+    console.error("Part image element not found:", part.bookingPartId);
     return;
   }
 
-  try {
-    const response = await fetch(
-      `${API_BASE_URL}/bookings/parts/${partId}/photo`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
-    );
-
-    if (!response.ok) {
-      console.error(
-        "Part photo request failed:",
-        response.status,
-        response.statusText,
-      );
-      return;
-    }
-
-    const blob = await response.blob();
-
-    if (!blob.type.startsWith("image/")) {
-      console.error("Part photo response is not an image:", blob.type);
-      return;
-    }
-
-    const imageUrl = URL.createObjectURL(blob);
-
-    imageElement.src = imageUrl;
-
-    imageElement.onclick = () => {
-      openCustomerPartImageViewer(partId);
-    };
-  } catch (error) {
-    console.error("Failed to load customer part photo:", error);
+  if (!part.photoUrl) {
+    imageElement.alt = "Part photo unavailable";
+    imageElement.classList.add("hidden");
+    return;
   }
+
+  imageElement.src = part.photoUrl;
+  imageElement.classList.remove("hidden");
+
+  imageElement.onclick = () => {
+    openCustomerPartImageViewer(part.photoUrl, part.partName);
+  };
 }
 
 /* Customer Part Image Viewer */
 
-async function openCustomerPartImageViewer(partId) {
-  try {
-    const response = await fetch(
-      `${API_BASE_URL}/bookings/parts/${partId}/photo`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
-    );
+function openCustomerPartImageViewer(photoUrl, partName) {
+  if (!photoUrl) return;
 
-    if (!response.ok) {
-      console.error(
-        "Viewer photo request failed:",
-        response.status,
-        response.statusText,
-      );
+  const oldViewer = document.getElementById("customerPartImageViewer");
 
-      return;
-    }
-
-    const blob = await response.blob();
-
-    if (!blob.type.startsWith("image/")) {
-      console.error("Viewer response is not an image:", blob.type);
-
-      return;
-    }
-
-    const imageUrl = URL.createObjectURL(blob);
-
-    const oldViewer = document.getElementById("customerPartImageViewer");
-
-    if (oldViewer) {
-      oldViewer.remove();
-    }
-
-    const viewer = document.createElement("div");
-
-    viewer.id = "customerPartImageViewer";
-
-    viewer.className =
-      "fixed inset-0 z-[200] " +
-      "flex items-center justify-center " +
-      "bg-black/80 backdrop-blur-sm " +
-      "px-4 py-8 " +
-      "opacity-0 transition-opacity duration-200";
-
-    viewer.innerHTML = `
-      <div
-        id="customerPartImageCard"
-        class="
-          relative
-          max-w-[78vw]
-          max-h-[80vh]
-          bg-gray-900
-          border border-gray-700
-          rounded-2xl
-          shadow-2xl
-          p-3
-          scale-95
-          opacity-0
-          transition-all
-          duration-200
-        "
-      >
-
-        <button
-          type="button"
-          id="closeCustomerPartImageViewer"
-          class="
-            absolute
-            top-3 right-3
-            w-10 h-10
-            rounded-full
-            bg-gray-800/90
-            border border-gray-700
-            text-gray-300
-            hover:text-white
-            hover:bg-gray-700
-            transition
-            z-10
-          "
-        >
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-
-        <img
-          src="${imageUrl}"
-          alt="Part photo"
-          class="
-            block
-            max-w-[74vw]
-            max-h-[72vh]
-            object-contain
-            rounded-xl
-          "
-        >
-
-      </div>
-    `;
-
-    document.body.appendChild(viewer);
-
-    const imageCard = document.getElementById("customerPartImageCard");
-
-    const closeViewer = () => {
-      imageCard.classList.remove("scale-100", "opacity-100");
-
-      imageCard.classList.add("scale-95", "opacity-0");
-
-      viewer.classList.remove("opacity-100");
-
-      viewer.classList.add("opacity-0");
-
-      setTimeout(() => {
-        URL.revokeObjectURL(imageUrl);
-        viewer.remove();
-      }, 200);
-    };
-
-    document
-      .getElementById("closeCustomerPartImageViewer")
-      .addEventListener("click", closeViewer);
-
-    viewer.addEventListener("click", (event) => {
-      if (event.target === viewer) {
-        closeViewer();
-      }
-    });
-
-    const handleEscape = (event) => {
-      if (event.key === "Escape") {
-        closeViewer();
-
-        document.removeEventListener("keydown", handleEscape);
-      }
-    };
-
-    document.addEventListener("keydown", handleEscape);
-
-    requestAnimationFrame(() => {
-      viewer.classList.add("opacity-100");
-
-      imageCard.classList.remove("scale-95", "opacity-0");
-
-      imageCard.classList.add("scale-100", "opacity-100");
-    });
-  } catch (error) {
-    console.error("Failed to open customer part photo:", error);
+  if (oldViewer) {
+    oldViewer.remove();
   }
+
+  const viewer = document.createElement("div");
+  viewer.id = "customerPartImageViewer";
+  viewer.className =
+    "fixed inset-0 z-[200] flex items-center justify-center " +
+    "bg-black/80 backdrop-blur-sm px-4 py-8";
+
+  viewer.innerHTML = `
+    <div
+      id="customerPartImageCard"
+      class="relative max-w-[78vw] max-h-[80vh] bg-gray-900
+             border border-gray-700 rounded-2xl shadow-2xl p-3"
+    >
+      <button
+        type="button"
+        id="closeCustomerPartImageViewer"
+        class="absolute top-3 right-3 w-10 h-10 rounded-full
+               bg-gray-800/90 border border-gray-700 text-gray-300
+               hover:text-white hover:bg-gray-700 transition z-10"
+        aria-label="Close image viewer"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <img
+        src="${escapeHtml(photoUrl)}"
+        alt="${escapeHtml(partName || "Part photo")}"
+        class="block max-w-[74vw] max-h-[72vh] object-contain rounded-xl"
+      >
+    </div>
+  `;
+
+  document.body.appendChild(viewer);
+
+  const closeViewer = () => viewer.remove();
+
+  document
+    .getElementById("closeCustomerPartImageViewer")
+    .addEventListener("click", closeViewer);
+
+  viewer.addEventListener("click", (event) => {
+    if (event.target === viewer) {
+      closeViewer();
+    }
+  });
+
+  const handleEscape = (event) => {
+    if (event.key === "Escape") {
+      closeViewer();
+      document.removeEventListener("keydown", handleEscape);
+    }
+  };
+
+  document.addEventListener("keydown", handleEscape);
 }
 
 /* Approve Customer Part */
@@ -2334,7 +2236,7 @@ function renderCustomerBookingParts(parts) {
   });
 
   parts.forEach((part) => {
-    loadCustomerPartPhoto(part.bookingPartId);
+    loadCustomerPartPhoto(part);
   });
 }
 

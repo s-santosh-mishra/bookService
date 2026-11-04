@@ -493,7 +493,7 @@ function createCompletedBookingCard(booking) {
 
                         </div>
 
-                        <div class="flex items-center justify-between gap-4">
+                        <div class="flex items-center justify-end gap-2">
                             <span class="text-sm text-gray-400">
                                 Final amount
                             </span>

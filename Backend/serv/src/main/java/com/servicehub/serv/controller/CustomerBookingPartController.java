@@ -3,11 +3,12 @@ package com.servicehub.serv.controller;
 import com.servicehub.serv.dto.BookingPartDto;
 import com.servicehub.serv.entity.BookingPart;
 import com.servicehub.serv.service.BookingPartService;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -60,7 +61,7 @@ public class CustomerBookingPartController {
     }
 
     @GetMapping("/parts/{bookingPartId}/photo")
-    public ResponseEntity<byte[]> getPartPhoto(
+    public ResponseEntity<Void> getPartPhoto(
             @PathVariable UUID bookingPartId,
             Authentication authentication) {
 
@@ -71,17 +72,9 @@ public class CustomerBookingPartController {
                         userId,
                         bookingPartId);
 
-        MediaType mediaType;
-
-        try {
-            mediaType = MediaType.parseMediaType(
-                    part.getPhotoContentType());
-        } catch (Exception e) {
-            mediaType = MediaType.APPLICATION_OCTET_STREAM;
-        }
-
-        return ResponseEntity.ok()
-                .contentType(mediaType)
-                .body(part.getPhoto());
+        return ResponseEntity
+                .status(HttpStatus.FOUND)
+                .location(URI.create(part.getPhotoUrl()))
+                .build();
     }
 }

@@ -32,11 +32,8 @@ public class BookingPart {
     @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalPrice;
 
-    @Column(name = "photo", nullable = false, columnDefinition = "BYTEA")
-    private byte[] photo;
-
-    @Column(name = "photo_content_type", nullable = false, length = 100)
-    private String photoContentType;
+    @Column(name = "photo_url", nullable = false, length = 1000)
+    private String photoUrl;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
@@ -96,20 +93,12 @@ public class BookingPart {
         this.totalPrice = totalPrice;
     }
 
-    public byte[] getPhoto() {
-        return photo;
+    public String getPhotoUrl() {
+        return photoUrl;
     }
 
-    public void setPhoto(byte[] photo) {
-        this.photo = photo;
-    }
-
-    public String getPhotoContentType() {
-        return photoContentType;
-    }
-
-    public void setPhotoContentType(String photoContentType) {
-        this.photoContentType = photoContentType;
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 
     public PartApprovalStatus getStatus() {

@@ -12,7 +12,6 @@ import com.servicehub.serv.repository.BookingRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -22,13 +21,16 @@ public class BookingPartService {
 
         private final BookingPartRepository bookingPartRepository;
         private final BookingRepository bookingRepository;
+        private final CloudinaryImageService cloudinaryImageService;
 
         public BookingPartService(
                         BookingPartRepository bookingPartRepository,
-                        BookingRepository bookingRepository) {
+                        BookingRepository bookingRepository,
+                        CloudinaryImageService cloudinaryImageService) {
 
                 this.bookingPartRepository = bookingPartRepository;
                 this.bookingRepository = bookingRepository;
+                this.cloudinaryImageService = cloudinaryImageService;
         }
 
         @Transactional
@@ -58,60 +60,35 @@ public class BookingPartService {
                                         "Cannot add parts after completion has been requested.");
                 }
 
-                if (request.getPhoto() == null
-                                || request.getPhoto().isEmpty()) {
+                BookingPart bookingPart = new BookingPart();
 
-                        throw new IllegalArgumentException(
-                                        "A photo of the part is required.");
-                }
+                bookingPart.setBooking(booking);
+                bookingPart.setPartName(
+                                request.getPartName().trim());
 
-                String contentType = request.getPhoto().getContentType();
+                bookingPart.setUnitPrice(request.getPrice());
 
-                if (contentType == null
-                                || !contentType.startsWith("image/")) {
+                bookingPart.setQuantity(request.getQuantity());
 
-                        throw new IllegalArgumentException(
-                                        "Only image files are allowed.");
-                }
+                bookingPart.setTotalPrice(
+                                request.getPrice()
+                                                .multiply(
+                                                                java.math.BigDecimal.valueOf(
+                                                                                request.getQuantity())));
 
-                try {
+                bookingPart.setPhotoUrl(
+                                cloudinaryImageService.uploadBookingPartPhoto(
+                                                request.getPhoto()));
 
-                        BookingPart bookingPart = new BookingPart();
+                bookingPart.setStatus(
+                                PartApprovalStatus.PENDING);
 
-                        bookingPart.setBooking(booking);
-                        bookingPart.setPartName(
-                                        request.getPartName().trim());
+                bookingPart.setCreatedAt(
+                                LocalDateTime.now());
 
-                        bookingPart.setUnitPrice(request.getPrice());
+                BookingPart savedPart = bookingPartRepository.save(bookingPart);
 
-                        bookingPart.setQuantity(request.getQuantity());
-
-                        bookingPart.setTotalPrice(
-                                        request.getPrice()
-                                                        .multiply(
-                                                                        java.math.BigDecimal.valueOf(
-                                                                                        request.getQuantity())));
-
-                        bookingPart.setPhoto(
-                                        request.getPhoto().getBytes());
-
-                        bookingPart.setPhotoContentType(contentType);
-
-                        bookingPart.setStatus(
-                                        PartApprovalStatus.PENDING);
-
-                        bookingPart.setCreatedAt(
-                                        LocalDateTime.now());
-
-                        BookingPart savedPart = bookingPartRepository.save(bookingPart);
-
-                        return toDto(savedPart);
-
-                } catch (IOException e) {
-
-                        throw new IllegalStateException(
-                                        "Unable to process part photo.", e);
-                }
+                return toDto(savedPart);
         }
 
         @Transactional
@@ -231,6 +208,7 @@ public class BookingPartService {
                                 part.getTotalPrice(),
                                 part.getStatus(),
                                 part.getCreatedAt(),
-                                part.getApprovedAt());
+                                part.getApprovedAt(),
+                                part.getPhotoUrl());
         }
 }

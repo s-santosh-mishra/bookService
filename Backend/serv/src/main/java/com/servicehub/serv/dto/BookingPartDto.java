@@ -16,6 +16,7 @@ public class BookingPartDto {
     private PartApprovalStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime approvedAt;
+    private String photoUrl;
 
     public BookingPartDto() {
     }
@@ -28,7 +29,8 @@ public class BookingPartDto {
             BigDecimal totalPrice,
             PartApprovalStatus status,
             LocalDateTime createdAt,
-            LocalDateTime approvedAt) {
+            LocalDateTime approvedAt,
+            String photoUrl) {
 
         this.bookingPartId = bookingPartId;
         this.partName = partName;
@@ -38,6 +40,7 @@ public class BookingPartDto {
         this.status = status;
         this.createdAt = createdAt;
         this.approvedAt = approvedAt;
+        this.photoUrl = photoUrl;
     }
 
     public UUID getBookingPartId() {
@@ -102,5 +105,13 @@ public class BookingPartDto {
 
     public void setApprovedAt(LocalDateTime approvedAt) {
         this.approvedAt = approvedAt;
+    }
+
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 }

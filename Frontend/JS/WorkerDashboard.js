@@ -2247,9 +2247,20 @@ async function loadWorkerBookingParts(bookingId) {
       `${API_BASE_URL}/bookings/${bookingId}/parts`,
     );
 
-    renderWorkerParts(parts || []);
+    const currentParts = parts || [];
+    const snapshot = JSON.stringify(currentParts);
+
+    if (partsList.dataset.partsSnapshot === snapshot) {
+      return;
+    }
+
+    partsList.dataset.partsSnapshot = snapshot;
+
+    renderWorkerParts(currentParts);
   } catch (error) {
     console.error("Failed to load booking parts:", error);
+
+    partsList.dataset.partsSnapshot = "";
 
     partsList.innerHTML = `
             <p class="text-sm text-red-400">
