@@ -86,7 +86,7 @@ public class BookingService {
     @Transactional
     public BookingDto cancelBooking(UUID customerId, UUID bookingId) {
 
-        Customer customer = customerRepository.findById(customerId)
+        customerRepository.findById(customerId)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Customer not found."));
 

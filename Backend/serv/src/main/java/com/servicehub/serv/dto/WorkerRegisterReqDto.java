@@ -3,6 +3,7 @@ package com.servicehub.serv.dto;
 import jakarta.validation.constraints.*;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public class WorkerRegisterReqDto {
@@ -42,6 +43,22 @@ public class WorkerRegisterReqDto {
     @NotBlank(message = "PIN code is required")
     @Pattern(regexp = "^\\d{6}$", message = "Please enter a valid 6-digit PIN code")
     private String pinCode;
+
+    @NotBlank(message = "Account holder name is required")
+    @Size(max = 150)
+    private String bankAccountHolderName;
+
+    @NotBlank(message = "Bank account number is required")
+    @Size(max = 30)
+    private String bankAccountNumber;
+
+    @NotBlank(message = "IFSC code is required")
+    @Pattern(regexp = "^[A-Z]{4}0[A-Z0-9]{6}$", message = "Enter a valid IFSC code")
+    private String bankIfscCode;
+
+    @NotBlank(message = "Bank name is required")
+    @Size(max = 150)
+    private String bankName;
 
     @NotBlank(message = "Password is required")
     @Size(min = 8, message = "Password must be at least 8 characters")
@@ -200,6 +217,40 @@ public class WorkerRegisterReqDto {
 
     public void setServiceIds(List<UUID> serviceIds) {
         this.serviceIds = serviceIds;
+    }
+
+    public String getBankAccountHolderName() {
+        return bankAccountHolderName;
+    }
+
+    public void setBankAccountHolderName(String bankAccountHolderName) {
+        this.bankAccountHolderName = bankAccountHolderName;
+    }
+
+    public String getBankAccountNumber() {
+        return bankAccountNumber;
+    }
+
+    public void setBankAccountNumber(String bankAccountNumber) {
+        this.bankAccountNumber = bankAccountNumber;
+    }
+
+    public String getBankIfscCode() {
+        return bankIfscCode;
+    }
+
+    public void setBankIfscCode(String bankIfscCode) {
+        this.bankIfscCode = bankIfscCode == null
+                ? null
+                : bankIfscCode.trim().toUpperCase(Locale.ROOT);
+    }
+
+    public String getBankName() {
+        return bankName;
+    }
+
+    public void setBankName(String bankName) {
+        this.bankName = bankName;
     }
 
     public boolean isTermsAccepted() {

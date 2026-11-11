@@ -67,6 +67,9 @@ public class Booking {
     @Column(name = "worker_cancellation_message", length = 1000)
     private String workerCancellationMessage;
 
+    @Column(name = "admin_cancellation_reason", length = 1000)
+    private String adminCancellationReason;
+
     @Column(name = "service_latitude", precision = 10, scale = 7, nullable = false)
     private BigDecimal serviceLatitude;
 
@@ -231,6 +234,14 @@ public class Booking {
 
     public void setWorkerCancellationMessage(String v) {
         workerCancellationMessage = v;
+    }
+
+    public String getAdminCancellationReason() {
+        return adminCancellationReason;
+    }
+
+    public void setAdminCancellationReason(String adminCancellationReason) {
+        this.adminCancellationReason = adminCancellationReason;
     }
 
     public BigDecimal getServiceLatitude() {

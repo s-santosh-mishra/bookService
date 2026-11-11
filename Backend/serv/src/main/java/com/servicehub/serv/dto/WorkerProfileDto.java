@@ -28,6 +28,11 @@ public class WorkerProfileDto {
     private AvailabilityStatus availabilityStatus;
     private List<String> services;
 
+    private String bankAccountHolderName;
+    private String maskedBankAccountNumber;
+    private String bankIfscCode;
+    private String bankName;
+
     public WorkerProfileDto(
             String fullName,
             String email,
@@ -45,7 +50,11 @@ public class WorkerProfileDto {
             String bio,
             VerificationStatus verificationStatus,
             AvailabilityStatus availabilityStatus,
-            List<String> services) {
+            List<String> services,
+            String bankAccountHolderName,
+            String bankAccountNumber,
+            String bankIfscCode,
+            String bankName) {
 
         this.fullName = fullName;
         this.email = email;
@@ -67,6 +76,10 @@ public class WorkerProfileDto {
         this.verificationStatus = verificationStatus;
         this.availabilityStatus = availabilityStatus;
         this.services = services;
+        this.bankAccountHolderName = bankAccountHolderName;
+        this.maskedBankAccountNumber = BankAccountMasker.mask(bankAccountNumber);
+        this.bankIfscCode = bankIfscCode;
+        this.bankName = bankName;
     }
 
     public String getFullName() {
@@ -135,5 +148,37 @@ public class WorkerProfileDto {
 
     public List<String> getServices() {
         return services;
+    }
+
+    public String getBankAccountHolderName() {
+        return bankAccountHolderName;
+    }
+
+    public void setBankAccountHolderName(String bankAccountHolderName) {
+        this.bankAccountHolderName = bankAccountHolderName;
+    }
+
+    public String getMaskedBankAccountNumber() {
+        return maskedBankAccountNumber;
+    }
+
+    public void setMaskedBankAccountNumber(String maskedBankAccountNumber) {
+        this.maskedBankAccountNumber = maskedBankAccountNumber;
+    }
+
+    public String getBankIfscCode() {
+        return bankIfscCode;
+    }
+
+    public void setBankIfscCode(String bankIfscCode) {
+        this.bankIfscCode = bankIfscCode;
+    }
+
+    public String getBankName() {
+        return bankName;
+    }
+
+    public void setBankName(String bankName) {
+        this.bankName = bankName;
     }
 }

@@ -89,10 +89,6 @@ public class BillingService {
                                 .max(minimumFee)
                                 .setScale(2, RoundingMode.HALF_UP);
 
-                // Calculate straight-line distance using Haversine.
-                double lat1 = Math.toRadians(customerLatitude.doubleValue());
-                double lon1 = Math.toRadians(customerLongitude.doubleValue());
-
                 // Demo travel estimate for V1.
                 // Actual travel charges are calculated separately in final billing.
                 BigDecimal estimatedDistanceKm = BigDecimal.ZERO;

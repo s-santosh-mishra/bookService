@@ -24,8 +24,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -37,6 +39,7 @@ public class PaymentService {
     private final BookingRepository bookingRepository;
     private final BillingRepository billingRepository;
     private final WorkerRepository workerRepository;
+    private final Clock settlementClock;
 
     @Value("${razorpay.key.id}")
     private String razorpayKeyId;
@@ -49,13 +52,15 @@ public class PaymentService {
             PaymentRepository paymentRepository,
             BookingRepository bookingRepository,
             BillingRepository billingRepository,
-            WorkerRepository workerRepository) {
+            WorkerRepository workerRepository,
+            Clock settlementClock) {
 
         this.razorpayClient = razorpayClient;
         this.paymentRepository = paymentRepository;
         this.bookingRepository = bookingRepository;
         this.billingRepository = billingRepository;
         this.workerRepository = workerRepository;
+        this.settlementClock = settlementClock;
     }
 
     // Create a Razorpay order using the final bill calculated by the backend.
@@ -219,7 +224,10 @@ public class PaymentService {
 
         payment.setRazorpayPaymentId(razorpayPaymentId);
         payment.setStatus(PaymentStatus.SUCCESS);
-        payment.setPaidAt(LocalDateTime.now());
+
+        payment.setPaidAt(LocalDateTime.now(
+                settlementClock.withZone(
+                        SettlementBusinessDateCalculator.SETTLEMENT_ZONE)));
 
         paymentRepository.save(payment);
         completeBookingAfterPayment(booking);
@@ -323,7 +331,9 @@ public class PaymentService {
                                 "No pending cash payment exists for this booking."));
 
         payment.setStatus(PaymentStatus.SUCCESS);
-        payment.setPaidAt(LocalDateTime.now());
+        payment.setPaidAt(LocalDateTime.now(
+        settlementClock.withZone(
+                SettlementBusinessDateCalculator.SETTLEMENT_ZONE)));
 
         paymentRepository.save(payment);
         completeBookingAfterPayment(booking);
@@ -402,6 +412,16 @@ public class PaymentService {
         }
 
         bookingRepository.save(booking);
+
+        List<Payment> pendingPayments =
+                paymentRepository.findByBookingBookingIdAndStatus(
+                        booking.getBookingId(),
+                        PaymentStatus.PENDING);
+        pendingPayments.forEach(
+                payment -> payment.setStatus(PaymentStatus.CANCELLED));
+        if (!pendingPayments.isEmpty()) {
+            paymentRepository.saveAll(pendingPayments);
+        }
 
         if (completingBooking) {
             Worker worker = workerRepository.findById(

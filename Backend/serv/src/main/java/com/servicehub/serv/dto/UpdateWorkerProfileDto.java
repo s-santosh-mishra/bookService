@@ -121,4 +121,5 @@ public class UpdateWorkerProfileDto {
     public void setBio(String bio) {
         this.bio = bio;
     }
+
 }

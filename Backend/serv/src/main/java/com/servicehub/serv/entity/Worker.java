@@ -40,6 +40,18 @@ public class Worker {
     @Column(nullable = false, precision = 2, scale = 1)
     private BigDecimal rating = BigDecimal.valueOf(5.0);
 
+    @Column(name = "bank_account_holder_name", length = 150)
+    private String bankAccountHolderName;
+
+    @Column(name = "bank_account_number", length = 30)
+    private String bankAccountNumber;
+
+    @Column(name = "bank_ifsc_code", length = 11)
+    private String bankIfscCode;
+
+    @Column(name = "bank_name", length = 150)
+    private String bankName;
+
     // Getters and Setters
 
     public UUID getUserId() {
@@ -104,5 +116,37 @@ public class Worker {
 
     public void setRating(BigDecimal rating) {
         this.rating = rating;
+    }
+
+    public String getBankAccountHolderName() {
+        return bankAccountHolderName;
+    }
+
+    public void setBankAccountHolderName(String bankAccountHolderName) {
+        this.bankAccountHolderName = bankAccountHolderName;
+    }
+
+    public String getBankAccountNumber() {
+        return bankAccountNumber;
+    }
+
+    public void setBankAccountNumber(String bankAccountNumber) {
+        this.bankAccountNumber = bankAccountNumber;
+    }
+
+    public String getBankIfscCode() {
+        return bankIfscCode;
+    }
+
+    public void setBankIfscCode(String bankIfscCode) {
+        this.bankIfscCode = bankIfscCode;
+    }
+
+    public String getBankName() {
+        return bankName;
+    }
+
+    public void setBankName(String bankName) {
+        this.bankName = bankName;
     }
 }

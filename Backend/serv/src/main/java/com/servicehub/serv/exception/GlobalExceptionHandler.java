@@ -51,6 +51,42 @@ public class GlobalExceptionHandler {
                                 .body(response);
         }
 
+        @ExceptionHandler(ResourceNotFoundException.class)
+        public ResponseEntity<Map<String, String>> handleResourceNotFound(
+                        ResourceNotFoundException exception) {
+
+                Map<String, String> response = new HashMap<>();
+                response.put("error", exception.getMessage());
+
+                return ResponseEntity
+                                .status(HttpStatus.NOT_FOUND)
+                                .body(response);
+        }
+
+        @ExceptionHandler(SettlementConflictException.class)
+        public ResponseEntity<Map<String, String>> handleSettlementConflict(
+                        SettlementConflictException exception) {
+
+                Map<String, String> response = new HashMap<>();
+                response.put("error", exception.getMessage());
+
+                return ResponseEntity
+                                .status(HttpStatus.CONFLICT)
+                                .body(response);
+        }
+
+        @ExceptionHandler(BookingConflictException.class)
+        public ResponseEntity<Map<String, String>> handleBookingConflict(
+                        BookingConflictException exception) {
+
+                Map<String, String> response = new HashMap<>();
+                response.put("error", exception.getMessage());
+
+                return ResponseEntity
+                                .status(HttpStatus.CONFLICT)
+                                .body(response);
+        }
+
         @ExceptionHandler(MethodArgumentNotValidException.class)
         public ResponseEntity<Map<String, Object>> handleValidationErrors(
                         MethodArgumentNotValidException exception) {

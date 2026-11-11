@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
@@ -60,8 +61,7 @@ public class WorkerRegisterService {
         // 2. Check duplicate email
         if (credentialsRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException(
-                    "An account with this email already exists"
-            );
+                    "An account with this email already exists");
         }
 
         // 3. Validate selected services
@@ -69,8 +69,7 @@ public class WorkerRegisterService {
 
         if (serviceIds == null || serviceIds.isEmpty()) {
             throw new IllegalArgumentException(
-                    "At least one service must be selected"
-            );
+                    "At least one service must be selected");
         }
 
         // Remove duplicate service IDs
@@ -78,18 +77,15 @@ public class WorkerRegisterService {
 
         if (uniqueServiceIds.size() != serviceIds.size()) {
             throw new IllegalArgumentException(
-                    "Duplicate services are not allowed"
-            );
+                    "Duplicate services are not allowed");
         }
 
         // Find all selected services
-        List<Service> services =
-                serviceRepository.findAllById(uniqueServiceIds);
+        List<Service> services = serviceRepository.findAllById(uniqueServiceIds);
 
         if (services.size() != uniqueServiceIds.size()) {
             throw new IllegalArgumentException(
-                    "One or more selected services do not exist"
-            );
+                    "One or more selected services do not exist");
         }
 
         // 4. Check maximum 3 categories
@@ -97,14 +93,12 @@ public class WorkerRegisterService {
 
         for (Service service : services) {
             categoryIds.add(
-                    service.getCategory().getCategoryId()
-            );
+                    service.getCategory().getCategoryId());
         }
 
         if (categoryIds.size() > 3) {
             throw new IllegalArgumentException(
-                    "A worker can select services from a maximum of 3 categories"
-            );
+                    "A worker can select services from a maximum of 3 categories");
         }
 
         // 5. Create credentials
@@ -112,8 +106,7 @@ public class WorkerRegisterService {
 
         credentials.setEmail(request.getEmail());
         credentials.setPasswordHash(
-                passwordEncoder.encode(request.getPassword())
-        );
+                passwordEncoder.encode(request.getPassword()));
         credentials.setRole(UserRole.WORKER);
 
         credentialsRepository.save(credentials);
@@ -150,6 +143,12 @@ public class WorkerRegisterService {
         worker.setVerificationStatus(VerificationStatus.PENDING);
         worker.setAvailabilityStatus(AvailabilityStatus.UNAVAILABLE);
 
+        worker.setBankAccountHolderName(request.getBankAccountHolderName().trim());
+        worker.setBankAccountNumber(request.getBankAccountNumber().trim());
+        worker.setBankIfscCode(
+                request.getBankIfscCode().trim().toUpperCase(Locale.ROOT));
+        worker.setBankName(request.getBankName().trim());
+
         workerRepository.save(worker);
 
         // 8. Create WorkerService mappings
@@ -160,9 +159,7 @@ public class WorkerRegisterService {
             workerService.setId(
                     new WorkerServiceId(
                             worker.getUserId(),
-                            service.getServiceId()
-                    )
-            );
+                            service.getServiceId()));
 
             workerService.setWorker(worker);
             workerService.setService(service);
