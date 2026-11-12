@@ -26,24 +26,24 @@ public class BookingDiscoveryService {
     private final BookingRepository bookingRepository;
     private final WorkerServiceRepository workerServiceRepository;
     private final BookingOfferRepository bookingOfferRepository;
-    private final Clock locationClock;
+    private final Clock clock;
 
     public BookingDiscoveryService(
             BookingRepository bookingRepository,
             WorkerServiceRepository workerServiceRepository,
             BookingOfferRepository bookingOfferRepository,
-            Clock locationClock) {
+            Clock clock) {
         this.bookingRepository = bookingRepository;
         this.workerServiceRepository = workerServiceRepository;
         this.bookingOfferRepository = bookingOfferRepository;
-        this.locationClock = locationClock;
+        this.clock = clock;
     }
 
     @Transactional
     public int discoverBooking(UUID bookingId) {
         Booking booking = bookingRepository.findByBookingIdForUpdate(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found."));
-        LocalDateTime bookingNow = LocalDateTime.now();
+        LocalDateTime bookingNow = LocalDateTime.now(clock);
         if (booking.getStatus() != BookingStatus.PENDING
                 || booking.getWorker() != null
                 || booking.getCreatedAt() == null
@@ -51,7 +51,7 @@ public class BookingDiscoveryService {
             return 0;
         }
 
-        LocalDateTime locationNow = LocalDateTime.now(locationClock);
+        LocalDateTime locationNow = LocalDateTime.now(clock);
         double radiusKm = discoveryRadiusKm(booking.getCreatedAt(), bookingNow);
         double latitude = booking.getServiceLatitude().doubleValue();
         double longitude = booking.getServiceLongitude().doubleValue();
@@ -86,7 +86,8 @@ public class BookingDiscoveryService {
             }
         }
 
-        eligibleWorkers.sort(Comparator.comparingDouble(WorkerDistance::distanceKm));
+        eligibleWorkers.sort(Comparator.comparingDouble(
+            (WorkerDistance candidate) -> candidate.distanceKm()));
         List<BookingOffer> offers = eligibleWorkers.stream()
                 .map(candidate -> new BookingOffer(booking, candidate.worker()))
                 .toList();
