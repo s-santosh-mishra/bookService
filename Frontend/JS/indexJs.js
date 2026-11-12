@@ -11,13 +11,13 @@ function redirectLoggedInUser() {
   }
 
   if (role === "USER") {
-    window.location.href = "../HTML/CustomerDashboard.html";
+    window.location.href = "/HTML/CustomerDashboard.html";
 
     return;
   }
 
   if (role === "WORKER") {
-    window.location.href = "../HTML/WorkerDashboard.html";
+    window.location.href = "/HTML/WorkerDashboard.html";
 
     return;
   }

@@ -1,4 +1,5 @@
-const API_BASE_URL = "http://localhost:8080/api/admin/payments";
+const API_ROOT = window.SERVICEHUB_CONFIG ? window.SERVICEHUB_CONFIG.API_BASE_URL : "http://localhost:8080";
+const API_BASE_URL = `${API_ROOT}/api/admin/payments`;
 const PAYMENT_ACCESS_TOKEN_KEY = "servicehub_access_token";
 
 const paymentTableBody = document.getElementById("paymentTableBody");
@@ -645,7 +646,7 @@ function handleAuthorizationFailure(response) {
   sessionStorage.removeItem("servicehub_user_id");
   sessionStorage.removeItem("servicehub_user_email");
   sessionStorage.removeItem("servicehub_user_role");
-  window.location.href = "AdminLogin.html";
+  window.location.href = "/Admin/adminLogin.html";
   return true;
 }
 

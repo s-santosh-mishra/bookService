@@ -2,7 +2,8 @@ const ACCESS_TOKEN_KEY = "servicehub_access_token";
 const ROLE_KEY = "servicehub_user_role";
 const USER_NAME_KEY = "servicehub_user_name";
 
-const API_BASE_URL = "http://localhost:8080/api/worker";
+const API_ROOT = window.SERVICEHUB_CONFIG ? window.SERVICEHUB_CONFIG.API_BASE_URL : "http://localhost:8080";
+const API_BASE_URL = `${API_ROOT}/api/worker`;
 let workerBookingRefreshTimer = null;
 let lastWorkerBookingsSnapshot = null;
 let currentWorkerStatus = null;
@@ -27,7 +28,7 @@ function checkWorkerLogin() {
 
   const role = localStorage.getItem(ROLE_KEY);
   if (!token || role !== "WORKER") {
-    window.location.href = "../HTML/login.html";
+    window.location.href = "/HTML/login.html";
 
     return false;
   }
@@ -758,7 +759,7 @@ async function workerApiRequest(url, options = {}) {
   if (response.status === 401) {
     localStorage.removeItem(ACCESS_TOKEN_KEY);
     localStorage.removeItem(ROLE_KEY);
-    window.location.href = "/bookService/Frontend/HTML/login.html";
+    window.location.href = "/HTML/login.html";
     return;
   }
 
@@ -2750,7 +2751,7 @@ async function loadWorkerPartPhoto(partId, imageElement) {
     const token = localStorage.getItem(ACCESS_TOKEN_KEY);
 
     const response = await fetch(
-      `http://localhost:8080/api/customer/bookings/parts/${partId}/photo`,
+      `${API_ROOT}/api/customer/bookings/parts/${partId}/photo`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -2782,7 +2783,7 @@ async function openWorkerPartImageViewer(partId) {
 
   try {
     const response = await fetch(
-      `http://localhost:8080/api/customer/bookings/parts/${partId}/photo`,
+      `${API_ROOT}/api/customer/bookings/parts/${partId}/photo`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

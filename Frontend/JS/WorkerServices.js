@@ -9,7 +9,7 @@ function checkWorkerLogin() {
   const role = localStorage.getItem(ROLE_KEY);
 
   if (!token || role !== "WORKER") {
-    window.location.href = "../HTML/login.html";
+    window.location.href = "/HTML/login.html";
 
     return false;
   }
@@ -30,8 +30,9 @@ async function loadWorkerServices() {
   }
 
   try {
+    const apiBase = window.SERVICEHUB_CONFIG ? window.SERVICEHUB_CONFIG.API_BASE_URL : "http://localhost:8080";
     const response = await fetch(
-      `http://localhost:8080/api/worker/services/${workerId}`,
+      `${apiBase}/api/worker/services/${workerId}`,
       {
         method: "GET",
 
@@ -46,7 +47,7 @@ async function loadWorkerServices() {
       localStorage.removeItem(USER_ID_KEY);
       localStorage.removeItem(ROLE_KEY);
 
-      window.location.href = "../HTML/login.html";
+      window.location.href = "/HTML/login.html";
 
       return;
     }

@@ -1,4 +1,5 @@
-const API_BASE_URL = "http://localhost:8080/api/admin/customers";
+const API_ROOT = window.SERVICEHUB_CONFIG ? window.SERVICEHUB_CONFIG.API_BASE_URL : "http://localhost:8080";
+const API_BASE_URL = `${API_ROOT}/api/admin/customers`;
 const CUSTOMER_ACCESS_TOKEN_KEY = "servicehub_access_token";
 
 let customers = [];
@@ -28,7 +29,7 @@ async function loadCustomers() {
         });
 
         if (response.status === 401 || response.status === 403) {
-            window.location.href = "AdminLogin.html";
+            window.location.href = "/Admin/adminLogin.html";
             return;
         }
 
@@ -60,7 +61,7 @@ async function viewCustomer(customerId) {
         });
 
         if (response.status === 401 || response.status === 403) {
-            window.location.href = "AdminLogin.html";
+            window.location.href = "/Admin/adminLogin.html";
             return;
         }
 
@@ -110,7 +111,7 @@ async function changeCustomerStatus(customerId, action) {
         );
 
         if (response.status === 401 || response.status === 403) {
-            window.location.href = "AdminLogin.html";
+            window.location.href = "/Admin/adminLogin.html";
             return;
         }
 

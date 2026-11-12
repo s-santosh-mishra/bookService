@@ -1,6 +1,6 @@
 // ServiceHub Worker Registration
 
-const API_BASE = "http://localhost:8080";
+const API_BASE = window.SERVICEHUB_CONFIG ? window.SERVICEHUB_CONFIG.API_BASE_URL : "http://localhost:8080";
 
 const registerForm = document.getElementById("workerRegisterForm");
 
@@ -760,7 +760,7 @@ function showSuccess() {
     if (countdown <= 0) {
       clearInterval(countdownTimer);
 
-      window.location.href = "../HTML/login.html";
+      window.location.href = "/HTML/login.html";
     }
   }, 1000);
 }

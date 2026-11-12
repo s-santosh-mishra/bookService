@@ -1,5 +1,6 @@
-const API_BASE_URL = "http://localhost:8080/api/admin/bookings";
-const SERVICE_API_URL = "http://localhost:8080/api/admin/services";
+const API_ROOT = window.SERVICEHUB_CONFIG ? window.SERVICEHUB_CONFIG.API_BASE_URL : "http://localhost:8080";
+const API_BASE_URL = `${API_ROOT}/api/admin/bookings`;
+const SERVICE_API_URL = `${API_ROOT}/api/admin/services`;
 const BOOKING_ACCESS_TOKEN_KEY = "servicehub_access_token";
 
 const bookingTableBody = document.getElementById("bookingTableBody");
@@ -980,7 +981,7 @@ function handleAuthorizationFailure(response) {
     return false;
   }
 
-  window.location.href = "AdminLogin.html";
+  window.location.href = "/Admin/adminLogin.html";
   return true;
 }
 

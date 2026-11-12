@@ -7,7 +7,7 @@ const customerHeader = `
         <div class="flex items-center justify-between">
 
             <!-- Logo + Company -->
-            <a href="CustomerDashboard.html" class="flex items-center gap-3">
+            <a href="/HTML/CustomerDashboard.html" class="flex items-center gap-3">
 
                 <div class="w-12 h-12 rounded-xl border-2 border-violet-500
                             flex items-center justify-center overflow-hidden">
@@ -34,22 +34,22 @@ const customerHeader = `
             <!-- Desktop Navigation -->
             <div class="hidden lg:flex items-center gap-3">
 
-                <a href="CustomerDashboard.html"
+                <a href="/HTML/CustomerDashboard.html"
                    class="nav-btn">
                     Home
                 </a>
 
-                <a href="CustomerBookings.html"
+                <a href="/HTML/CustomerBookings.html"
                    class="nav-btn">
                     My Bookings
                 </a>
 
-                <a href="CustomerProfile.html"
+                <a href="/HTML/CustomerProfile.html"
                    class="nav-btn">
                     Profile
                 </a>
 
-                <a href="ContactFaq.html"
+                <a href="/HTML/ContactFaq.html"
                    class="nav-btn">
                     Contact & FAQ
                 </a>
@@ -79,22 +79,22 @@ const customerHeader = `
                     overflow-hidden transition-all duration-300
                     ease-in-out">
 
-            <a href="CustomerDashboard.html"
+            <a href="/HTML/CustomerDashboard.html"
                class="mobile-nav-btn">
                 Home
             </a>
 
-            <a href="CustomerBookings.html"
+            <a href="/HTML/CustomerBookings.html"
                class="mobile-nav-btn">
                 My Bookings
             </a>
 
-            <a href="CustomerProfile.html"
+            <a href="/HTML/CustomerProfile.html"
                class="mobile-nav-btn">
                 Profile
             </a>
 
-            <a href="ContactFaq.html"
+            <a href="/HTML/ContactFaq.html"
                class="mobile-nav-btn">
                 Contact & FAQ
             </a>
@@ -126,7 +126,7 @@ const currentPage = window.location.pathname.split("/").pop();
 document.querySelectorAll(".nav-btn, .mobile-nav-btn").forEach((link) => {
   const linkPage = link.getAttribute("href");
 
-  if (linkPage === currentPage) {
+  if (linkPage === currentPage || linkPage.endsWith("/" + currentPage)) {
     link.classList.add("active");
   }
 });
@@ -164,7 +164,7 @@ function customerLogout() {
   localStorage.removeItem("servicehub_user_email");
   localStorage.removeItem("servicehub_user_role");
 
-  window.location.href = "login.html";
+  window.location.href = "/HTML/login.html";
 }
 
 const logoutButton = document.getElementById("logoutButton");

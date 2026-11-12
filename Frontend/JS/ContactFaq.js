@@ -11,7 +11,7 @@ if (role === "USER") {
 } else if (role === "WORKER") {
   document.getElementById("workerHeader").classList.remove("hidden");
 } else {
-  window.location.href = "login.html";
+  window.location.href = "/HTML/login.html";
 }
 
 const customerFaqs = [

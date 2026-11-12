@@ -106,7 +106,8 @@ loginForm.addEventListener("submit", async (event) => {
     `;
 
   try {
-    const response = await fetch("http://localhost:8080/api/auth/login", {
+    const apiBase = window.SERVICEHUB_CONFIG ? window.SERVICEHUB_CONFIG.API_BASE_URL : "http://localhost:8080";
+    const response = await fetch(`${apiBase}/api/auth/login`, {
       method: "POST",
 
       headers: {
@@ -165,9 +166,9 @@ loginForm.addEventListener("submit", async (event) => {
     loginForm.reset();
 
     if (role === "USER" && selectedRole === "customer") {
-      window.location.href = "CustomerDashboard.html";
+      window.location.href = "/HTML/CustomerDashboard.html";
     } else if (role === "WORKER" && selectedRole === "worker") {
-      window.location.href = "WorkerDashboard.html";
+      window.location.href = "/HTML/WorkerDashboard.html";
     } else {
       localStorage.removeItem("servicehub_access_token");
       localStorage.removeItem("servicehub_user_id");

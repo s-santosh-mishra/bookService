@@ -109,8 +109,9 @@ adminLoginForm.addEventListener(
 
         try {
 
+            const apiBase = window.SERVICEHUB_CONFIG ? window.SERVICEHUB_CONFIG.API_BASE_URL : "http://localhost:8080";
             const response = await fetch(
-                "http://localhost:8080/api/auth/login",
+                `${apiBase}/api/auth/login`,
                 {
                     method: "POST",
 
@@ -213,7 +214,7 @@ adminLoginForm.addEventListener(
             setTimeout(() => {
 
                 window.location.href =
-                    "AdminDashboard.html";
+                    "/Admin/AdminDashboard.html";
 
             }, 500);
 

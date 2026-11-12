@@ -108,7 +108,8 @@ registerForm.addEventListener("submit", async (event) => {
   setLoading(true);
 
   try {
-    const response = await fetch("http://localhost:8080/api/user/register", {
+    const apiBase = window.SERVICEHUB_CONFIG ? window.SERVICEHUB_CONFIG.API_BASE_URL : "http://localhost:8080";
+    const response = await fetch(`${apiBase}/api/user/register`, {
       method: "POST",
 
       headers: {
@@ -334,7 +335,7 @@ function showSuccess() {
             <p class="mt-1">
                 You can now
                 <a
-                    href="../HTML/login.html"
+                    href="/HTML/login.html"
                     class="text-purple-400 hover:text-purple-300 font-medium"
                 >
                     Login
@@ -365,7 +366,7 @@ function showSuccess() {
     if (countdown <= 0) {
       clearInterval(countdownTimer);
 
-      window.location.href = "../HTML/login.html";
+      window.location.href = "/HTML/login.html";
     }
   }, 1000);
 }

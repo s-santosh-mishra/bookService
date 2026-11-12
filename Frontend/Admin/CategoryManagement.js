@@ -1,4 +1,5 @@
-const API_BASE_URL = "http://localhost:8080/api/admin/categories";
+const API_ROOT = window.SERVICEHUB_CONFIG ? window.SERVICEHUB_CONFIG.API_BASE_URL : "http://localhost:8080";
+const API_BASE_URL = `${API_ROOT}/api/admin/categories`;
 const CATEGORY_ACCESS_TOKEN_KEY = "servicehub_access_token";
 
 const categoryTableBody = document.getElementById("categoryTableBody");
@@ -42,7 +43,7 @@ async function loadCategories() {
             if (response.status === 401 ||
                 response.status === 403) {
 
-                window.location.href = "AdminLogin.html";
+                window.location.href = "/Admin/adminLogin.html";
                 return;
             }
 
@@ -263,7 +264,7 @@ async function updateCategoryStatus(categoryId, action) {
             if (response.status === 401 ||
                 response.status === 403) {
 
-                window.location.href = "AdminLogin.html";
+                window.location.href = "/Admin/adminLogin.html";
                 return;
             }
 
@@ -336,7 +337,7 @@ addCategoryForm.addEventListener("submit", async event => {
             if (response.status === 401 ||
                 response.status === 403) {
 
-                window.location.href = "AdminLogin.html";
+                window.location.href = "/Admin/adminLogin.html";
                 return;
             }
 

@@ -1,7 +1,8 @@
 const ACCESS_TOKEN_KEY = "servicehub_access_token";
 const ROLE_KEY = "servicehub_user_role";
 
-const API_BASE_URL = "http://localhost:8080/api/worker";
+const API_ROOT = window.SERVICEHUB_CONFIG ? window.SERVICEHUB_CONFIG.API_BASE_URL : "http://localhost:8080";
+const API_BASE_URL = `${API_ROOT}/api/worker`;
 
 // Authentication
 
@@ -11,7 +12,7 @@ function checkWorkerLogin() {
   const role = localStorage.getItem(ROLE_KEY);
 
   if (!token || role !== "WORKER") {
-    window.location.href = "../HTML/login.html";
+    window.location.href = "/HTML/login.html";
 
     return false;
   }
@@ -46,7 +47,7 @@ async function workerApiRequest(url, options = {}) {
 
     localStorage.removeItem(ROLE_KEY);
 
-    window.location.href = "../HTML/login.html";
+    window.location.href = "/HTML/login.html";
 
     throw new Error("Unauthorized");
   }

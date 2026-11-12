@@ -4,10 +4,11 @@ const userId = localStorage.getItem("servicehub_user_id");
 const userRole = localStorage.getItem("servicehub_user_role");
 
 if (!accessToken || !userId || userRole !== "USER") {
-  window.location.href = "login.html";
+  window.location.href = "/HTML/login.html";
 }
 
-const API_BASE_URL = "http://localhost:8080/api/customer";
+const API_ROOT = window.SERVICEHUB_CONFIG ? window.SERVICEHUB_CONFIG.API_BASE_URL : "http://localhost:8080";
+const API_BASE_URL = `${API_ROOT}/api/customer`;
 
 /* Dashboard Elements */
 
@@ -1606,7 +1607,7 @@ function openBookingDetails(booking = activeBooking) {
                 Need to cancel this booking?
 
                 <a
-                    href="ContactFaq.html"
+                    href="/HTML/ContactFaq.html"
                     class="text-violet-400
                            hover:text-violet-300
                            transition"
@@ -2320,7 +2321,7 @@ function handleUnauthorized() {
     "servicehub_user_role",
   ].forEach((key) => localStorage.removeItem(key));
 
-  window.location.href = "login.html";
+  window.location.href = "/HTML/login.html";
 }
 
 /* Initialize Dashboard */

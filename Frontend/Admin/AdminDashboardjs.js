@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:8080/api";
+const API_BASE_URL = `${window.SERVICEHUB_CONFIG ? window.SERVICEHUB_CONFIG.API_BASE_URL : "http://localhost:8080"}/api`;
 // Update Status Display
 
 function updateStatus(elementId, dotId, status, successStatus) {
@@ -70,7 +70,7 @@ async function loadDashboardData() {
 
     if (!token) {
 
-        window.location.href = "AdminLogin.html";
+        window.location.href = "/Admin/adminLogin.html";
         return;
 
     }
@@ -99,7 +99,7 @@ async function loadDashboardData() {
 
             sessionStorage.clear();
 
-            window.location.href = "AdminLogin.html";
+            window.location.href = "/Admin/adminLogin.html";
 
             return;
         }

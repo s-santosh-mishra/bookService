@@ -32,7 +32,7 @@ const adminSidebarHTML = `
 
     <nav class="p-4 space-y-2">
 
-        <a href="AdminDashboard.html"
+        <a href="/Admin/AdminDashboard.html"
            data-page="AdminDashboard.html"
            class="admin-nav-link flex items-center gap-3 px-4 py-3
                   text-gray-400 hover:text-white hover:bg-gray-800
@@ -43,7 +43,7 @@ const adminSidebarHTML = `
 
         </a>
 
-        <a href="BookingManagement.html"
+        <a href="/Admin/BookingManagement.html"
            data-page="BookingManagement.html"
            class="admin-nav-link flex items-center gap-3 px-4 py-3
                   text-gray-400 hover:text-white hover:bg-gray-800
@@ -54,7 +54,7 @@ const adminSidebarHTML = `
 
         </a>
 
-        <a href="PaymentManagement.html"
+        <a href="/Admin/PaymentManagement.html"
            data-page="PaymentManagement.html"
            class="admin-nav-link flex items-center gap-3 px-4 py-3
                   text-gray-400 hover:text-white hover:bg-gray-800
@@ -65,7 +65,7 @@ const adminSidebarHTML = `
 
         </a>
 
-        <a href="WorkerSettlementManagement.html"
+        <a href="/Admin/WorkerSettlementManagement.html"
            data-page="WorkerSettlementManagement.html"
            class="admin-nav-link flex items-center gap-3 px-4 py-3
                   text-gray-400 hover:text-white hover:bg-gray-800
@@ -76,7 +76,7 @@ const adminSidebarHTML = `
 
         </a>
 
-        <a href="CustomerManagement.html"
+        <a href="/Admin/CustomerManagement.html"
            data-page="CustomerManagement.html"
            class="admin-nav-link flex items-center gap-3 px-4 py-3
                   text-gray-400 hover:text-white hover:bg-gray-800
@@ -87,7 +87,7 @@ const adminSidebarHTML = `
 
         </a>
 
-        <a href="WorkerManagement.html"
+        <a href="/Admin/WorkerManagement.html"
            data-page="WorkerManagement.html"
            class="admin-nav-link flex items-center gap-3 px-4 py-3
                   text-gray-400 hover:text-white hover:bg-gray-800
@@ -98,7 +98,7 @@ const adminSidebarHTML = `
 
         </a>
 
-        <a href="SystemManagement.html"
+        <a href="/Admin/SystemManagement.html"
            data-page="SystemManagement.html"
            class="admin-nav-link flex items-center gap-3 px-4 py-3
                   text-gray-400 hover:text-white hover:bg-gray-800
@@ -208,7 +208,7 @@ function checkAdminAuthentication() {
     const role = sessionStorage.getItem(ROLE_KEY);
 
     if (!token || role !== "ADMIN") {
-        window.location.href = "AdminLogin.html";
+        window.location.href = "/Admin/adminLogin.html";
         return false;
     }
 
@@ -277,7 +277,7 @@ function initializeAdminLayout() {
             sessionStorage.removeItem("servicehub_user_email");
             sessionStorage.removeItem("servicehub_user_role");
             
-            window.location.href = "AdminLogin.html";
+            window.location.href = "/Admin/adminLogin.html";
 
         });
 

@@ -1,5 +1,6 @@
-const API_BASE_URL = "http://localhost:8080/api/admin/services";
-const CATEGORY_API_URL = "http://localhost:8080/api/admin/categories";
+const API_ROOT = window.SERVICEHUB_CONFIG ? window.SERVICEHUB_CONFIG.API_BASE_URL : "http://localhost:8080";
+const API_BASE_URL = `${API_ROOT}/api/admin/services`;
+const CATEGORY_API_URL = `${API_ROOT}/api/admin/categories`;
 const SERVICE_ACCESS_TOKEN_KEY = "servicehub_access_token";
 
 const serviceTableBody = document.getElementById("serviceTableBody");
@@ -42,7 +43,7 @@ async function loadServices() {
 
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
-        window.location.href = "AdminLogin.html";
+        window.location.href = "/Admin/adminLogin.html";
         return;
       }
 
@@ -89,7 +90,7 @@ async function loadWorkerCounts() {
         );
 
         if (response.status === 401 || response.status === 403) {
-          window.location.href = "AdminLogin.html";
+          window.location.href = "/Admin/adminLogin.html";
           return;
         }
 
@@ -332,7 +333,7 @@ async function updateServiceStatus(serviceId, action) {
 
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
-        window.location.href = "AdminLogin.html";
+        window.location.href = "/Admin/adminLogin.html";
         return;
       }
 
@@ -370,7 +371,7 @@ async function loadCategories() {
 
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
-        window.location.href = "AdminLogin.html";
+        window.location.href = "/Admin/adminLogin.html";
         return;
       }
 
@@ -459,7 +460,7 @@ addServiceForm.addEventListener("submit", async (event) => {
 
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
-        window.location.href = "AdminLogin.html";
+        window.location.href = "/Admin/adminLogin.html";
         return;
       }
 

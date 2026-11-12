@@ -1,4 +1,5 @@
-const API_BASE_URL = "http://localhost:8080/api/customer";
+const API_ROOT = window.SERVICEHUB_CONFIG ? window.SERVICEHUB_CONFIG.API_BASE_URL : "http://localhost:8080";
+const API_BASE_URL = `${API_ROOT}/api/customer`;
 
 const accessToken = localStorage.getItem("servicehub_access_token");
 
@@ -7,7 +8,7 @@ const userRole = localStorage.getItem("servicehub_user_role");
 /* AUTH GUARD */
 
 if (!accessToken || userRole !== "USER") {
-  window.location.href = "../HTML/login.html";
+  window.location.href = "/HTML/login.html";
 }
 
 /* ELEMENTS*/
@@ -499,7 +500,7 @@ function handleUnauthorized() {
 
   localStorage.removeItem("servicehub_user_role");
 
-  window.location.href = "../HTML/login.html";
+  window.location.href = "/HTML/login.html";
 }
 
 /* RETRY*/

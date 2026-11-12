@@ -1,4 +1,5 @@
-const API_BASE_URL = "http://localhost:8080/api/admin/workers";
+const API_ROOT = window.SERVICEHUB_CONFIG ? window.SERVICEHUB_CONFIG.API_BASE_URL : "http://localhost:8080";
+const API_BASE_URL = `${API_ROOT}/api/admin/workers`;
 const WORKER_ACCESS_TOKEN_KEY = "servicehub_access_token";
 
 const tabs = document.querySelectorAll(".worker-tab");
@@ -59,7 +60,7 @@ async function loadWorkers(status) {
         if (!response.ok) {
 
             if (response.status === 401 || response.status === 403) {
-                window.location.href = "AdminLogin.html";
+                window.location.href = "/Admin/adminLogin.html";
                 return;
             }
 
@@ -376,7 +377,7 @@ async function loadWorkerDetails(workerId) {
         if (!response.ok) {
 
             if (response.status === 401 || response.status === 403) {
-                window.location.href = "AdminLogin.html";
+                window.location.href = "/Admin/adminLogin.html";
                 return;
             }
 
@@ -777,7 +778,7 @@ async function updateWorkerStatus(action) {
         if (!response.ok) {
 
             if (response.status === 401 || response.status === 403) {
-                window.location.href = "AdminLogin.html";
+                window.location.href = "/Admin/adminLogin.html";
                 return;
             }
 

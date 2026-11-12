@@ -11,7 +11,7 @@ const workerHeader = `
 
             <!-- Logo + Company -->
 
-            <a href="WorkerDashboard.html"
+            <a href="/HTML/WorkerDashboard.html"
                class="flex items-center gap-3">
 
                 <div class="w-12 h-12 rounded-xl border-2 border-violet-500
@@ -46,7 +46,7 @@ const workerHeader = `
 
             <div class="hidden lg:flex items-center gap-3">
 
-                <a href="WorkerDashboard.html"
+                <a href="/HTML/WorkerDashboard.html"
                    class="worker-nav-btn">
 
                     Home
@@ -54,7 +54,7 @@ const workerHeader = `
                 </a>
 
 
-                <a href="CompletedWork.html"
+                <a href="/HTML/CompletedWork.html"
                    class="worker-nav-btn">
 
                     Completed Work
@@ -62,14 +62,14 @@ const workerHeader = `
                 </a>
 
 
-                <a href="WorkerProfile.html"
+                <a href="/HTML/WorkerProfile.html"
                    class="worker-nav-btn">
 
                     Profile
 
                 </a>
 
-                <a href="ContactFaq.html"
+                <a href="/HTML/ContactFaq.html"
                    class="worker-nav-btn">
                     Contact & FAQ
                 </a>
@@ -111,24 +111,24 @@ const workerHeader = `
                     overflow-hidden transition-all duration-300
                     ease-in-out">
 
-            <a href="WorkerDashboard.html"
+            <a href="/HTML/WorkerDashboard.html"
                class="worker-mobile-nav-btn">
                 Home
             </a>
 
 
-            <a href="CompletedWork.html"
+            <a href="/HTML/CompletedWork.html"
                class="worker-mobile-nav-btn">
                 Completed Work
             </a>
 
 
-            <a href="WorkerProfile.html"
+            <a href="/HTML/WorkerProfile.html"
                class="worker-mobile-nav-btn">
                 Profile
             </a>
 
-            <a href="ContactFaq.html"
+            <a href="/HTML/ContactFaq.html"
                class="worker-mobile-nav-btn">
                 Contact & FAQ
             </a>
@@ -168,7 +168,7 @@ document
   .forEach((link) => {
     const linkPage = link.getAttribute("href");
 
-    if (linkPage === currentWorkerPage) {
+    if (linkPage === currentWorkerPage || linkPage.endsWith("/" + currentWorkerPage)) {
       link.classList.add("active");
     }
   });
@@ -214,7 +214,7 @@ function workerLogout() {
   localStorage.removeItem("servicehub_user_role");
   localStorage.removeItem("servicehub_user_name");
 
-  window.location.href = "login.html";
+  window.location.href = "/HTML/login.html";
 }
 
 const workerLogoutButton = document.getElementById("workerLogoutButton");

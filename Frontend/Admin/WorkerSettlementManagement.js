@@ -1,4 +1,5 @@
-const SETTLEMENT_API_URL = "http://localhost:8080/api/admin/settlements";
+const API_ROOT = window.SERVICEHUB_CONFIG ? window.SERVICEHUB_CONFIG.API_BASE_URL : "http://localhost:8080";
+const SETTLEMENT_API_URL = `${API_ROOT}/api/admin/settlements`;
 const SETTLEMENT_ACCESS_TOKEN_KEY = "servicehub_access_token";
 
 const batchTableBody = document.getElementById("settlementBatchTableBody");
@@ -1090,7 +1091,7 @@ async function settlementRequest(path, options = {}) {
     sessionStorage.removeItem("servicehub_user_id");
     sessionStorage.removeItem("servicehub_user_email");
     sessionStorage.removeItem("servicehub_user_role");
-    window.location.href = "AdminLogin.html";
+    window.location.href = "/Admin/adminLogin.html";
     throw new Error("Your administrator session has expired.");
   }
 
