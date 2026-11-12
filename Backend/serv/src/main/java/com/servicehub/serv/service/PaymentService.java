@@ -9,7 +9,6 @@ import com.servicehub.serv.entity.Billing;
 import com.servicehub.serv.entity.Booking;
 import com.servicehub.serv.entity.Payment;
 import com.servicehub.serv.entity.Worker;
-import com.servicehub.serv.enums.AvailabilityStatus;
 import com.servicehub.serv.enums.BookingStatus;
 import com.servicehub.serv.enums.PaymentMethod;
 import com.servicehub.serv.enums.PaymentStatus;
@@ -424,13 +423,13 @@ public class PaymentService {
         }
 
         if (completingBooking) {
-            Worker worker = workerRepository.findById(
+            Worker worker = workerRepository.findByUserIdForUpdate(
                     booking.getWorker().getUserId())
                     .orElseThrow(() ->
                             new IllegalStateException(
                                     "Assigned worker not found."));
 
-            worker.setAvailabilityStatus(AvailabilityStatus.AVAILABLE);
+            worker.markAvailableAfterBooking();
             workerRepository.save(worker);
         }
     }

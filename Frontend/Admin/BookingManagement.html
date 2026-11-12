@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Booking Management | ServiceHub</title>
+
+    <link rel="stylesheet" href="../CSS/output.css" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../Images/favicon-32x32.png?v=3"
+    />
+  </head>
+
+  <body class="min-h-screen bg-gray-950 text-white">
+    <div class="min-h-screen">
+      <div id="adminSidebar"></div>
+
+      <main class="min-h-screen lg:ml-64">
+        <div id="adminHeader"></div>
+
+        <section class="px-4 py-8 sm:px-6 lg:px-8">
+          <div class="mx-auto max-w-7xl">
+            <div class="mb-8">
+              <div class="mb-2 flex items-center gap-2 text-sm text-gray-500">
+                <a
+                  href="AdminDashboard.html"
+                  class="transition-colors hover:text-violet-400"
+                >
+                  Dashboard
+                </a>
+
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+
+                <span class="text-gray-400">Booking Management</span>
+              </div>
+
+              <h1 class="text-2xl font-bold sm:text-3xl">
+                Booking Management
+              </h1>
+
+              <p class="mt-2 text-gray-400">
+                Review booking history, details, payments, and lifecycle status.
+              </p>
+            </div>
+
+            <div
+              id="bookingMessage"
+              class="mb-5 hidden rounded-lg border px-4 py-3 text-sm"
+              role="alert"
+            ></div>
+
+            <div
+              class="mb-6 rounded-xl border border-gray-800 bg-gray-900 p-5"
+            >
+              <div
+                class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div class="relative w-full sm:max-w-xl">
+                  <i
+                    class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
+                  ></i>
+
+                  <input
+                    type="search"
+                    id="bookingSearch"
+                    placeholder="Search ID, customer, worker, phone, or service..."
+                    class="w-full rounded-lg border border-gray-800 bg-gray-950 py-3 pl-11 pr-4 text-white placeholder-gray-500 transition-colors focus:border-gray-600 focus:outline-none"
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  id="clearSearchButton"
+                  class="rounded-lg border border-gray-800 bg-gray-950 px-4 py-3 text-sm text-gray-300 transition-colors hover:bg-gray-800 hover:text-white"
+                >
+                  Clear Search
+                </button>
+              </div>
+
+              <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <label class="text-sm text-gray-400">
+                  Booking Status
+                  <select
+                    id="statusFilter"
+                    class="mt-2 w-full rounded-lg border border-gray-800 bg-gray-950 px-3 py-3 text-white focus:border-gray-600 focus:outline-none"
+                  >
+                    <option value="">All Statuses</option>
+                    <option value="PENDING">Pending</option>
+                    <option value="ACCEPTED">Accepted</option>
+                    <option value="IN_PROGRESS">In Progress</option>
+                    <option value="WAITING_FOR_PAYMENT">
+                      Waiting for Payment
+                    </option>
+                    <option value="COMPLETED">Completed</option>
+                    <option value="REVIEWED">Reviewed</option>
+                    <option value="CANCELLED">Cancelled</option>
+                    <option value="NO_WORKER">No Worker</option>
+                    <option value="FAILED">Failed</option>
+                    <option value="WORKER_CANCELLED">Worker Cancelled</option>
+                    <option value="WORKER_CANNOT_COMPLETE">
+                      Worker Cannot Complete
+                    </option>
+                  </select>
+                </label>
+
+                <label class="text-sm text-gray-400">
+                  Service
+                  <select
+                    id="serviceFilter"
+                    class="mt-2 w-full rounded-lg border border-gray-800 bg-gray-950 px-3 py-3 text-white focus:border-gray-600 focus:outline-none"
+                  >
+                    <option value="">All Services</option>
+                  </select>
+                </label>
+
+                <label class="text-sm text-gray-400">
+                  Customer
+                  <select
+                    id="customerFilter"
+                    class="mt-2 w-full rounded-lg border border-gray-800 bg-gray-950 px-3 py-3 text-white focus:border-gray-600 focus:outline-none"
+                  >
+                    <option value="">All Customers</option>
+                  </select>
+                </label>
+
+                <label class="text-sm text-gray-400">
+                  Worker
+                  <select
+                    id="workerFilter"
+                    class="mt-2 w-full rounded-lg border border-gray-800 bg-gray-950 px-3 py-3 text-white focus:border-gray-600 focus:outline-none"
+                  >
+                    <option value="">All Workers</option>
+                    <option value="unassigned">Unassigned</option>
+                  </select>
+                </label>
+
+                <label class="text-sm text-gray-400">
+                  Created From
+                  <input
+                    type="date"
+                    id="createdFromFilter"
+                    class="mt-2 w-full rounded-lg border border-gray-800 bg-gray-950 px-3 py-3 text-white focus:border-gray-600 focus:outline-none"
+                  />
+                </label>
+
+                <label class="text-sm text-gray-400">
+                  Created To
+                  <input
+                    type="date"
+                    id="createdToFilter"
+                    class="mt-2 w-full rounded-lg border border-gray-800 bg-gray-950 px-3 py-3 text-white focus:border-gray-600 focus:outline-none"
+                  />
+                </label>
+
+                <label class="text-sm text-gray-400">
+                  Payment Method
+                  <select
+                    id="paymentMethodFilter"
+                    class="mt-2 w-full rounded-lg border border-gray-800 bg-gray-950 px-3 py-3 text-white focus:border-gray-600 focus:outline-none"
+                  >
+                    <option value="">All Payment Methods</option>
+                    <option value="RAZORPAY">Razorpay</option>
+                    <option value="CASH">Cash</option>
+                    <option value="none">No Payment Record</option>
+                  </select>
+                </label>
+
+                <label class="text-sm text-gray-400">
+                  Payment Status
+                  <select
+                    id="paymentStatusFilter"
+                    class="mt-2 w-full rounded-lg border border-gray-800 bg-gray-950 px-3 py-3 text-white focus:border-gray-600 focus:outline-none"
+                  >
+                    <option value="">All Payment Statuses</option>
+                    <option value="CREATED">Created</option>
+                    <option value="PENDING">Pending</option>
+                    <option value="SUCCESS">Success</option>
+                    <option value="FAILED">Failed</option>
+                    <option value="CANCELLED">Cancelled</option>
+                    <option value="REFUNDED">Refunded</option>
+                    <option value="none">No Payment Record</option>
+                  </select>
+                </label>
+
+                <label class="text-sm text-gray-400 sm:col-span-2">
+                  Sort By
+                  <select
+                    id="sortFilter"
+                    class="mt-2 w-full rounded-lg border border-gray-800 bg-gray-950 px-3 py-3 text-white focus:border-gray-600 focus:outline-none"
+                  >
+                    <option value="created-desc">Newest booking created</option>
+                    <option value="created-asc">Oldest booking created</option>
+                    <option value="customer-asc">Customer name A–Z</option>
+                    <option value="customer-desc">Customer name Z–A</option>
+                    <option value="amount-desc">Highest amount</option>
+                    <option value="amount-asc">Lowest amount</option>
+                  </select>
+                </label>
+
+                <div class="flex items-end sm:col-span-2">
+                  <button
+                    type="button"
+                    id="clearFiltersButton"
+                    class="w-full rounded-lg border border-gray-800 bg-gray-950 px-4 py-3 text-sm text-gray-300 transition-colors hover:bg-gray-800 hover:text-white sm:w-auto"
+                  >
+                    Clear Filters
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="overflow-hidden rounded-xl border border-gray-800 bg-gray-900"
+            >
+              <div
+                class="flex flex-col gap-2 border-b border-gray-800 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <h2 class="font-semibold">All Bookings</h2>
+                <span
+                  id="bookingCount"
+                  class="text-sm text-gray-500"
+                  aria-live="polite"
+                >
+                  0 bookings
+                </span>
+              </div>
+
+              <div class="overflow-x-auto">
+                <table class="w-full min-w-[900px]">
+                  <thead>
+                    <tr
+                      class="border-b border-gray-800 text-left text-xs uppercase tracking-wider text-gray-500"
+                    >
+                      <th class="px-5 py-4">Booking ID</th>
+                      <th class="px-5 py-4">Customer</th>
+                      <th class="px-5 py-4">Worker</th>
+                      <th class="px-5 py-4">Service</th>
+                      <th class="px-5 py-4">Booking Created Date</th>
+                      <th class="px-5 py-4">Amount</th>
+                      <th class="px-5 py-4">Status</th>
+                      <th class="px-5 py-4 text-right">Action</th>
+                    </tr>
+                  </thead>
+
+                  <tbody id="bookingTableBody">
+                    <tr>
+                      <td
+                        colspan="8"
+                        class="px-6 py-16 text-center text-gray-500"
+                      >
+                        Loading bookings...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div
+      id="bookingDetailsModal"
+      class="fixed inset-0 z-50 hidden overflow-hidden"
+    >
+      <div
+        id="bookingDetailsOverlay"
+        class="absolute inset-0 bg-black/70 backdrop-blur-sm"
+      ></div>
+
+      <div
+        class="relative flex h-full min-h-0 items-center justify-center overflow-hidden p-3 sm:p-5"
+      >
+        <section
+          class="flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-gray-900 shadow-2xl"
+          style="max-height: 92vh"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="bookingDetailsTitle"
+        >
+          <header
+            class="flex shrink-0 items-center justify-between border-b border-gray-800 px-5 py-4 sm:px-6"
+          >
+            <div>
+              <h2 id="bookingDetailsTitle" class="text-xl font-semibold">
+                Booking Details
+              </h2>
+              <p id="bookingDetailsStatus" class="mt-2"></p>
+            </div>
+
+            <button
+              type="button"
+              id="closeBookingDetails"
+              class="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-800 text-gray-400 transition-colors hover:text-white"
+              aria-label="Close booking details"
+            >
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </header>
+
+          <div
+            id="bookingDetailsContent"
+            class="min-h-0 flex-1 overflow-y-auto p-5 sm:p-6"
+          >
+            <p class="py-12 text-center text-gray-400">
+              Select a booking to view details.
+            </p>
+          </div>
+
+          <footer
+            class="flex shrink-0 flex-wrap justify-end gap-3 border-t border-gray-800 px-5 py-4 sm:px-6"
+          >
+            <button
+              type="button"
+              id="cancelBookingButton"
+              class="hidden rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-red-700"
+            >
+              <i class="fa-solid fa-ban mr-2"></i>
+              Cancel Booking
+            </button>
+
+            <button
+              type="button"
+              id="closeBookingDetailsFooter"
+              class="rounded-lg bg-gray-800 px-4 py-2.5 text-sm text-gray-300 transition-colors hover:bg-gray-700 hover:text-white"
+            >
+              Close
+            </button>
+          </footer>
+        </section>
+      </div>
+    </div>
+
+    <div
+      id="cancelBookingModal"
+      class="fixed inset-0 hidden"
+      style="z-index: 60"
+    >
+      <div
+        id="cancelBookingOverlay"
+        class="absolute inset-0 bg-black/75 backdrop-blur-sm"
+      ></div>
+
+      <div class="relative flex min-h-screen items-center justify-center p-4">
+        <section
+          class="w-full max-w-lg rounded-2xl border border-white/10 bg-gray-900 p-6 shadow-2xl"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="cancelBookingTitle"
+        >
+          <div class="mb-5 flex items-start justify-between gap-4">
+            <div>
+              <h2 id="cancelBookingTitle" class="text-xl font-semibold">
+                Confirm Booking Cancellation
+              </h2>
+              <p class="mt-2 text-sm text-gray-400">
+                Booking
+                <span id="cancelBookingId" class="break-all text-gray-200"></span>
+              </p>
+              <p class="mt-1 text-sm text-gray-400">
+                Current status:
+                <span id="cancelBookingStatus" class="text-gray-200"></span>
+              </p>
+            </div>
+
+            <button
+              type="button"
+              id="closeCancelBooking"
+              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-800 text-gray-400 hover:text-white"
+              aria-label="Close cancellation dialog"
+            >
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <form id="cancelBookingForm">
+            <label for="cancellationReason" class="text-sm text-gray-300">
+              Cancellation reason <span class="text-red-400">*</span>
+            </label>
+            <textarea
+              id="cancellationReason"
+              rows="4"
+              maxlength="1000"
+              required
+              class="mt-2 w-full resize-y rounded-lg border border-gray-800 bg-gray-950 px-3 py-3 text-white placeholder-gray-500 focus:border-gray-600 focus:outline-none"
+              placeholder="Enter the reason for cancelling this booking"
+            ></textarea>
+
+            <p id="cancelBookingError" class="mt-2 hidden text-sm text-red-400"></p>
+
+            <div class="mt-6 flex flex-wrap justify-end gap-3">
+              <button
+                type="button"
+                id="dismissCancelBooking"
+                class="rounded-lg bg-gray-800 px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
+              >
+                Keep Booking
+              </button>
+              <button
+                type="submit"
+                id="confirmCancelBooking"
+                class="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-700"
+              >
+                Confirm Cancellation
+              </button>
+            </div>
+          </form>
+        </section>
+      </div>
+    </div>
+
+    <script src="Components/AdminLayout.js"></script>
+    <script src="BookingManagement.js"></script>
+  </body>
+</html>

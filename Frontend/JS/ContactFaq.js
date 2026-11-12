@@ -22,6 +22,30 @@ const customerFaqs = [
   },
 
   {
+    question: "Is ServiceHub available outside Odisha?",
+    answer:
+      "Currently, ServiceHub registration and services are restricted to Odisha, India. Customers must register with Odisha as their state, and booking locations outside Odisha are not accepted.",
+  },
+
+  {
+    question: "Why must I provide my service location?",
+    answer:
+      "Your service location helps ServiceHub identify suitable available workers near you. The location is associated with your booking and is used for booking coordination and worker discovery.",
+  },
+
+  {
+    question: "How does ServiceHub find workers near me?",
+    answer:
+      "ServiceHub automatically searches for eligible workers near your booking location. The search radius gradually expands from 2 km to 5 km, 8 km and finally 10 km if nobody accepts the booking.",
+  },
+
+  {
+    question: "Can I see the worker's exact live location?",
+    answer:
+      "No. ServiceHub uses worker location internally to identify nearby available workers and coordinate bookings. The worker's exact current GPS coordinates are not displayed in the customer-facing booking interface.",
+  },
+
+  {
     question: "Can I choose a specific worker?",
     answer:
       "No. ServiceHub matches your request with workers who provide the requested service and are currently available. A suitable worker can then accept the request.",
@@ -224,6 +248,42 @@ const workerFaqs = [
     question: "How do I become a ServiceHub worker?",
     answer:
       "Register as a worker and provide the required personal and professional information. Your account must be verified by ServiceHub before you can receive and accept service requests.",
+  },
+
+  {
+    question: "Can I register as a worker from another state?",
+    answer:
+      "Currently, ServiceHub registration is restricted to Odisha, India. Odisha is the only state available during worker registration.",
+  },
+
+  {
+    question: "Why does ServiceHub need my location?",
+    answer:
+      "ServiceHub uses your GPS location to identify nearby booking requests that match your registered services. Your location helps the platform determine whether you are eligible to receive a booking request.",
+  },
+
+  {
+    question: "When is my location updated?",
+    answer:
+      "Your location is periodically updated while you are online and available, depending on your device permissions and browser functionality. Updates may stop when you go offline, become busy, leave the relevant dashboard, or when your browser or device prevents further updates.",
+  },
+
+  {
+    question: "Can I receive booking requests with an outdated location?",
+    answer:
+      "Your location must be recent to qualify for location-based booking discovery. ServiceHub uses a three-minute location freshness requirement. If your location becomes outdated, you may stop receiving new booking requests until it is updated.",
+  },
+
+  {
+    question: "How does ServiceHub distribute booking requests?",
+    answer:
+      "ServiceHub initially searches within 2 km of the customer's booking location. If nobody accepts, the search expands to 5 km after 3 minutes, 8 km after 6 minutes and 10 km after 9 minutes. The system continues checking for newly eligible workers within 10 km until the booking expires or a worker accepts it.",
+  },
+
+  {
+    question: "Does going online guarantee that I will receive bookings?",
+    answer:
+      "No. You must be verified, available, have a recent location update, and provide the requested service. Booking requests also depend on customer demand and your distance from the service location.",
   },
 
   {

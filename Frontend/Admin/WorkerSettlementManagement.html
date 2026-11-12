@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Worker Settlement Management | ServiceHub</title>
+
+    <link rel="stylesheet" href="../CSS/output.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../Images/favicon-32x32.png?v=3"
+    />
+  </head>
+
+  <body class="min-h-screen bg-gray-950 text-white">
+    <div class="min-h-screen">
+      <div id="adminSidebar"></div>
+
+      <main class="min-h-screen lg:ml-64">
+        <div id="adminHeader"></div>
+
+        <section class="px-4 py-8 sm:px-6 lg:px-8">
+          <div class="mx-auto max-w-7xl">
+            <div class="mb-8">
+              <div class="mb-2 flex items-center gap-2 text-sm text-gray-500">
+                <a
+                  href="AdminDashboard.html"
+                  class="transition-colors hover:text-violet-400"
+                >
+                  Dashboard
+                </a>
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+                <span class="text-gray-400">Worker Settlement Management</span>
+              </div>
+              <h1 class="text-2xl font-bold sm:text-3xl">
+                Worker Settlement Management
+              </h1>
+              <p class="mt-2 text-gray-400">
+                Select eligible payments and record manually completed bank transfers.
+              </p>
+            </div>
+
+            <div
+              id="settlementMessage"
+              class="mb-5 hidden rounded-lg border px-4 py-3 text-sm"
+              role="alert"
+              aria-live="polite"
+            ></div>
+
+            <section
+              aria-label="Settlement summary"
+              class="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
+            >
+              <article class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+                <div class="flex items-center justify-between">
+                  <p class="text-sm text-gray-400">Workers in Closed Batches</p>
+                  <i class="fa-solid fa-user-check text-violet-400"></i>
+                </div>
+                <p id="summaryEligibleWorkers" class="mt-3 text-2xl font-semibold">—</p>
+              </article>
+              <article class="rounded-xl border border-violet-500/20 bg-violet-500/5 p-5">
+                <div class="flex items-center justify-between">
+                  <p class="text-sm text-gray-400">Available in Closed Batches</p>
+                  <i class="fa-solid fa-indian-rupee-sign text-violet-400"></i>
+                </div>
+                <p id="summaryEligibleAmount" class="mt-3 text-2xl font-semibold">—</p>
+              </article>
+              <article class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+                <div class="flex items-center justify-between">
+                  <p class="text-sm text-gray-400">Pending Settlements</p>
+                  <i class="fa-solid fa-clock text-amber-400"></i>
+                </div>
+                <p id="summaryPending" class="mt-3 text-2xl font-semibold">—</p>
+              </article>
+              <article class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+                <div class="flex items-center justify-between">
+                  <p class="text-sm text-gray-400">Processing Settlements</p>
+                  <i class="fa-solid fa-arrows-rotate text-sky-400"></i>
+                </div>
+                <p id="summaryProcessing" class="mt-3 text-2xl font-semibold">—</p>
+              </article>
+              <article class="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-5">
+                <div class="flex items-center justify-between">
+                  <p class="text-sm text-gray-400">Currently Settled in Closed Batches</p>
+                  <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                </div>
+                <p id="summarySettledAmount" class="mt-3 text-2xl font-semibold">—</p>
+              </article>
+              <article class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+                <div class="flex items-center justify-between">
+                  <p class="text-sm text-gray-400">Failed Settlements</p>
+                  <i class="fa-solid fa-circle-xmark text-red-400"></i>
+                </div>
+                <p id="summaryFailed" class="mt-3 text-2xl font-semibold">—</p>
+              </article>
+            </section>
+
+            <section class="mb-8 overflow-hidden rounded-xl border border-gray-800 bg-gray-900">
+              <div
+                class="flex flex-col gap-3 border-b border-gray-800 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div>
+                  <h2 class="font-semibold">Settlement Batches by Business Date</h2>
+                  <p class="mt-1 text-sm text-gray-500">
+                    Payments are grouped by their 8:00 PM IST business-date cutoff. Open and future batches cannot be settled.
+                  </p>
+                </div>
+                <label class="relative w-full sm:max-w-sm">
+                  <span class="sr-only">Search batches and workers</span>
+                  <i
+                    class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
+                  ></i>
+                  <input
+                    id="workerSearch"
+                    type="search"
+                    placeholder="Search dates or workers..."
+                    class="w-full rounded-lg border border-gray-800 bg-gray-950 py-3 pl-11 pr-4 text-white placeholder-gray-500 focus:border-gray-600 focus:outline-none"
+                  />
+                </label>
+              </div>
+              <p id="settlementCutoffNotice" class="border-b border-gray-800 px-5 py-3 text-sm text-gray-400" aria-live="polite">
+                Batch cutoff time: 8:00 PM Asia/Kolkata.
+              </p>
+              <div id="unclassifiedBatchNotice" class="hidden border-b border-amber-500/30 bg-amber-500/10 px-5 py-4 text-sm text-amber-100"></div>
+              <div class="overflow-x-auto">
+                <table class="w-full" style="min-width: 1320px">
+                  <thead>
+                    <tr class="border-b border-gray-800 text-left text-xs uppercase tracking-wider text-gray-500">
+                      <th class="px-5 py-4">Business Date (IST)</th>
+                      <th class="px-5 py-4">Batch State</th>
+                      <th class="px-5 py-4">Payments / Workers</th>
+                      <th class="px-5 py-4">Batch Amount</th>
+                      <th class="px-5 py-4">Eligible Now</th>
+                      <th class="px-5 py-4">Settlements</th>
+                      <th class="px-5 py-4">Settled</th>
+                      <th class="px-5 py-4">Failed / Retry</th>
+                      <th class="px-5 py-4">Processing</th>
+                      <th class="px-5 py-4">Remaining</th>
+                      <th class="px-5 py-4 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="settlementBatchTableBody">
+                    <tr>
+                      <td colspan="11" class="px-6 py-12 text-center text-gray-500">
+                        Loading settlement batches...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="overflow-hidden rounded-xl border border-gray-800 bg-gray-900">
+              <div class="border-b border-gray-800 px-5 py-4">
+                <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h2 class="font-semibold">Settlement History</h2>
+                    <p class="mt-1 text-sm text-gray-500">
+                      Failed settlements remain as historical records. Retry by creating a new settlement.
+                    </p>
+                  </div>
+                  <span id="settlementCount" class="text-sm text-gray-500" aria-live="polite">
+                    Loading...
+                  </span>
+                </div>
+                <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  <label class="text-sm text-gray-400">
+                    Worker
+                    <select
+                      id="historyWorkerFilter"
+                      class="mt-2 w-full rounded-lg border border-gray-800 bg-gray-950 px-3 py-3 text-white focus:border-gray-600 focus:outline-none"
+                    >
+                      <option value="">All workers</option>
+                    </select>
+                  </label>
+                  <label class="text-sm text-gray-400">
+                    Status
+                    <select
+                      id="historyStatusFilter"
+                      class="mt-2 w-full rounded-lg border border-gray-800 bg-gray-950 px-3 py-3 text-white focus:border-gray-600 focus:outline-none"
+                    >
+                      <option value="">All statuses</option>
+                      <option value="PENDING">Pending</option>
+                      <option value="PROCESSING">Processing</option>
+                      <option value="SETTLED">Settled</option>
+                      <option value="FAILED">Failed</option>
+                    </select>
+                  </label>
+                  <div class="flex items-end">
+                    <button
+                      type="button"
+                      id="clearHistoryFilters"
+                      class="w-full rounded-lg border border-gray-800 bg-gray-950 px-4 py-3 text-sm text-gray-300 transition-colors hover:bg-gray-800 hover:text-white sm:w-auto"
+                    >
+                      Clear Filters
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full" style="min-width: 900px">
+                  <thead>
+                    <tr class="border-b border-gray-800 text-left text-xs uppercase tracking-wider text-gray-500">
+                      <th class="px-5 py-4">Settlement ID</th>
+                      <th class="px-5 py-4">Business Date</th>
+                      <th class="px-5 py-4">Worker</th>
+                      <th class="px-5 py-4">Payments</th>
+                      <th class="px-5 py-4">Amount</th>
+                      <th class="px-5 py-4">Status</th>
+                      <th class="px-5 py-4">Created</th>
+                      <th class="px-5 py-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="settlementHistoryTableBody">
+                    <tr>
+                      <td colspan="8" class="px-6 py-12 text-center text-gray-500">
+                        Loading settlement history...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="settlementBatchDetailsModal" data-modal class="fixed inset-0 z-50 hidden overflow-hidden">
+      <div data-modal-overlay="settlementBatchDetailsModal" class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+      <div class="relative flex h-full min-h-0 items-center justify-center overflow-hidden p-3 sm:p-5">
+        <section class="flex w-full max-w-6xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-gray-900 shadow-2xl" style="max-height: 94vh" role="dialog" aria-modal="true" aria-labelledby="settlementBatchDetailsTitle">
+          <header class="flex shrink-0 items-center justify-between border-b border-gray-800 px-5 py-4 sm:px-6">
+            <div class="min-w-0">
+              <h2 id="settlementBatchDetailsTitle" class="text-xl font-semibold">Settlement Batch</h2>
+              <p id="settlementBatchDetailsStatus" class="mt-1 text-sm text-gray-400"></p>
+            </div>
+            <button type="button" data-close-modal="settlementBatchDetailsModal" class="ml-4 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-800 text-gray-400 hover:text-white" aria-label="Close batch details">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </header>
+          <div id="settlementBatchDetailsContent" class="min-h-0 flex-1 overflow-y-auto p-5 sm:p-6">
+            <p class="py-12 text-center text-gray-400">Loading batch payments...</p>
+          </div>
+          <footer class="flex shrink-0 justify-end border-t border-gray-800 px-5 py-4 sm:px-6">
+            <button type="button" data-close-modal="settlementBatchDetailsModal" class="rounded-lg bg-gray-800 px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Close</button>
+          </footer>
+        </section>
+      </div>
+    </div>
+
+    <div id="paymentSelectionModal" data-modal class="fixed inset-0 z-[55] hidden overflow-hidden">
+      <div data-modal-overlay="paymentSelectionModal" class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+      <div class="relative flex h-full min-h-0 items-center justify-center overflow-hidden p-3 sm:p-5">
+        <section
+          class="flex w-full max-w-6xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-gray-900 shadow-2xl"
+          style="max-height: 94vh"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="paymentSelectionTitle"
+        >
+          <header class="flex shrink-0 items-center justify-between border-b border-gray-800 px-5 py-4 sm:px-6">
+            <div class="min-w-0">
+              <h2 id="paymentSelectionTitle" class="text-xl font-semibold">Select Eligible Payments</h2>
+              <p id="paymentSelectionWorkerName" class="mt-1 text-sm text-gray-400"></p>
+            </div>
+            <button type="button" data-close-modal="paymentSelectionModal" class="ml-4 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-800 text-gray-400 hover:text-white" aria-label="Close payment selection">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </header>
+          <div id="paymentSelectionContent" class="min-h-0 flex-1 overflow-y-auto p-5 sm:p-6">
+            <p class="py-12 text-center text-gray-400">Loading eligible payments...</p>
+          </div>
+          <footer class="flex shrink-0 flex-col gap-3 border-t border-gray-800 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+            <p id="selectionTotal" class="text-sm text-gray-300">0 payments selected · ₹0.00</p>
+            <div class="flex flex-col-reverse gap-2 sm:flex-row">
+              <button type="button" data-close-modal="paymentSelectionModal" class="rounded-lg bg-gray-800 px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Cancel</button>
+              <button type="button" id="reviewSettlementButton" disabled class="rounded-lg bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50">
+                Review Settlement
+              </button>
+            </div>
+          </footer>
+        </section>
+      </div>
+    </div>
+
+    <div id="createSettlementModal" data-modal class="fixed inset-0 z-[60] hidden overflow-hidden">
+      <div data-modal-overlay="createSettlementModal" class="absolute inset-0 bg-black/75 backdrop-blur-sm"></div>
+      <div class="relative flex h-full min-h-0 items-center justify-center overflow-y-auto p-3 sm:p-5">
+        <section class="my-auto w-full max-w-xl rounded-2xl border border-white/10 bg-gray-900 shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="createSettlementTitle">
+          <header class="flex items-center justify-between border-b border-gray-800 px-5 py-4 sm:px-6">
+            <h2 id="createSettlementTitle" class="text-xl font-semibold">Confirm New Settlement</h2>
+            <button type="button" data-close-modal="createSettlementModal" class="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-800 text-gray-400 hover:text-white" aria-label="Close confirmation">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </header>
+          <div id="createSettlementContent" class="space-y-5 p-5 sm:p-6"></div>
+          <footer class="flex flex-col-reverse gap-2 border-t border-gray-800 px-5 py-4 sm:flex-row sm:justify-end sm:px-6">
+            <button type="button" data-close-modal="createSettlementModal" class="rounded-lg bg-gray-800 px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Back</button>
+            <button type="button" id="confirmCreateSettlement" class="rounded-lg bg-violet-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-violet-500">
+              Create Pending Settlement
+            </button>
+          </footer>
+        </section>
+      </div>
+    </div>
+
+    <div id="settlementDetailsModal" data-modal class="fixed inset-0 z-50 hidden overflow-hidden">
+      <div data-modal-overlay="settlementDetailsModal" class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+      <div class="relative flex h-full min-h-0 items-center justify-center overflow-hidden p-3 sm:p-5">
+        <section class="flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-gray-900 shadow-2xl" style="max-height: 94vh" role="dialog" aria-modal="true" aria-labelledby="settlementDetailsTitle">
+          <header class="flex shrink-0 items-center justify-between border-b border-gray-800 px-5 py-4 sm:px-6">
+            <div class="min-w-0">
+              <h2 id="settlementDetailsTitle" class="break-all text-xl font-semibold">Settlement Details</h2>
+              <p id="settlementDetailsStatus" class="mt-2"></p>
+            </div>
+            <button type="button" data-close-modal="settlementDetailsModal" class="ml-4 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-800 text-gray-400 hover:text-white" aria-label="Close settlement details">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </header>
+          <div id="settlementDetailsContent" class="min-h-0 flex-1 overflow-y-auto p-5 sm:p-6">
+            <p class="py-12 text-center text-gray-400">Loading settlement details...</p>
+          </div>
+          <footer id="settlementDetailsActions" class="flex shrink-0 flex-wrap justify-end gap-2 border-t border-gray-800 px-5 py-4 sm:px-6"></footer>
+        </section>
+      </div>
+    </div>
+
+    <div id="settlementStatusModal" data-modal class="fixed inset-0 z-[70] hidden overflow-hidden">
+      <div data-modal-overlay="settlementStatusModal" class="absolute inset-0 bg-black/75 backdrop-blur-sm"></div>
+      <div class="relative flex h-full min-h-0 items-center justify-center overflow-y-auto p-3 sm:p-5">
+        <section class="my-auto w-full max-w-lg rounded-2xl border border-white/10 bg-gray-900 shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="settlementStatusTitle">
+          <header class="flex items-center justify-between border-b border-gray-800 px-5 py-4 sm:px-6">
+            <h2 id="settlementStatusTitle" class="text-xl font-semibold">Update Settlement</h2>
+            <button type="button" data-close-modal="settlementStatusModal" class="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-800 text-gray-400 hover:text-white" aria-label="Close status update">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </header>
+          <form id="settlementStatusForm" class="space-y-5 p-5 sm:p-6">
+            <p id="settlementStatusPrompt" class="text-sm text-gray-300"></p>
+            <label id="paymentReferenceField" class="hidden text-sm text-gray-400">
+              External bank transaction reference
+              <input id="paymentReferenceInput" type="text" maxlength="100" autocomplete="off" class="mt-2 w-full rounded-lg border border-gray-800 bg-gray-950 px-3 py-3 text-white placeholder-gray-500 focus:border-gray-600 focus:outline-none" />
+              <span class="mt-1 block text-xs text-gray-500">Enter the reference from the bank transfer completed outside ServiceHub.</span>
+            </label>
+            <label id="failureReasonField" class="hidden text-sm text-gray-400">
+              Failure reason
+              <textarea id="failureReasonInput" rows="4" maxlength="1000" class="mt-2 w-full resize-y rounded-lg border border-gray-800 bg-gray-950 px-3 py-3 text-white placeholder-gray-500 focus:border-gray-600 focus:outline-none"></textarea>
+              <span class="mt-1 block text-xs text-gray-500">Required, up to 1000 characters.</span>
+            </label>
+            <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <button type="button" data-close-modal="settlementStatusModal" class="rounded-lg bg-gray-800 px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Cancel</button>
+              <button id="submitSettlementStatus" type="submit" class="rounded-lg bg-violet-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-violet-500">Confirm Update</button>
+            </div>
+          </form>
+        </section>
+      </div>
+    </div>
+
+    <div id="settlementReversalModal" data-modal class="fixed inset-0 z-[70] hidden overflow-hidden">
+      <div data-modal-overlay="settlementReversalModal" class="absolute inset-0 bg-black/75 backdrop-blur-sm"></div>
+      <div class="relative flex h-full min-h-0 items-center justify-center overflow-y-auto p-3 sm:p-5">
+        <section class="my-auto w-full max-w-xl rounded-2xl border border-white/10 bg-gray-900 shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="settlementReversalTitle">
+          <header class="flex items-center justify-between border-b border-gray-800 px-5 py-4 sm:px-6">
+            <h2 id="settlementReversalTitle" class="text-xl font-semibold">Record Verified Bank Reversal</h2>
+            <button type="button" data-close-modal="settlementReversalModal" class="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-800 text-gray-400 hover:text-white" aria-label="Close reversal form">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </header>
+          <form id="settlementReversalForm" class="space-y-5 p-5 sm:p-6">
+            <div class="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-100">
+              <p class="font-medium">Use only after verifying the reversal with external bank records.</p>
+              <p class="mt-1">This adds an audit record and makes only this settlement's payment items eligible again. It does not change or delete the original SETTLED record, and it does not create a replacement settlement.</p>
+            </div>
+            <label class="block text-sm text-gray-400">
+              Bank reversal reference
+              <input id="bankReversalReferenceInput" type="text" maxlength="100" required autocomplete="off" class="mt-2 w-full rounded-lg border border-gray-800 bg-gray-950 px-3 py-3 text-white placeholder-gray-500 focus:border-gray-600 focus:outline-none" />
+            </label>
+            <label class="block text-sm text-gray-400">
+              Reversal reason
+              <textarea id="reversalReasonInput" rows="3" maxlength="1000" required class="mt-2 w-full resize-y rounded-lg border border-gray-800 bg-gray-950 px-3 py-3 text-white placeholder-gray-500 focus:border-gray-600 focus:outline-none"></textarea>
+            </label>
+            <label class="flex items-start gap-3 rounded-lg border border-gray-800 bg-gray-950/60 p-4 text-sm text-gray-300">
+              <input id="reversalVerifiedCheckbox" type="checkbox" required class="mt-0.5 h-4 w-4 rounded border-gray-700 bg-gray-950 text-violet-500 focus:ring-violet-500" />
+              <span>I verified external bank records and confirm this original transfer was reversed or unsuccessful.</span>
+            </label>
+            <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <button type="button" data-close-modal="settlementReversalModal" class="rounded-lg bg-gray-800 px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Cancel</button>
+              <button id="submitSettlementReversal" type="submit" class="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-500">Record Verified Reversal</button>
+            </div>
+          </form>
+        </section>
+      </div>
+    </div>
+
+    <script src="Components/AdminLayout.js"></script>
+    <script src="WorkerSettlementManagement.js"></script>
+  </body>
+</html>

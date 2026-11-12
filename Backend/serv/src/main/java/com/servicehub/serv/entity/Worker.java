@@ -5,6 +5,7 @@ import com.servicehub.serv.enums.VerificationStatus;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -36,6 +37,15 @@ public class Worker {
     @Enumerated(EnumType.STRING)
     @Column(name = "availability_status", nullable = false)
     private AvailabilityStatus availabilityStatus = AvailabilityStatus.UNAVAILABLE;
+
+    @Column(name = "current_latitude", precision = 10, scale = 7)
+    private BigDecimal currentLatitude;
+
+    @Column(name = "current_longitude", precision = 10, scale = 7)
+    private BigDecimal currentLongitude;
+
+    @Column(name = "location_last_updated_at")
+    private LocalDateTime locationLastUpdatedAt;
 
     @Column(nullable = false, precision = 2, scale = 1)
     private BigDecimal rating = BigDecimal.valueOf(5.0);
@@ -108,6 +118,36 @@ public class Worker {
 
     public void setAvailabilityStatus(AvailabilityStatus availabilityStatus) {
         this.availabilityStatus = availabilityStatus;
+    }
+
+    public BigDecimal getCurrentLatitude() {
+        return currentLatitude;
+    }
+
+    public void setCurrentLatitude(BigDecimal currentLatitude) {
+        this.currentLatitude = currentLatitude;
+    }
+
+    public BigDecimal getCurrentLongitude() {
+        return currentLongitude;
+    }
+
+    public void setCurrentLongitude(BigDecimal currentLongitude) {
+        this.currentLongitude = currentLongitude;
+    }
+
+    public LocalDateTime getLocationLastUpdatedAt() {
+        return locationLastUpdatedAt;
+    }
+
+    public void setLocationLastUpdatedAt(LocalDateTime locationLastUpdatedAt) {
+        this.locationLastUpdatedAt = locationLastUpdatedAt;
+    }
+
+    public void markAvailableAfterBooking() {
+        if (availabilityStatus == AvailabilityStatus.BUSY) {
+            availabilityStatus = AvailabilityStatus.AVAILABLE;
+        }
     }
 
     public BigDecimal getRating() {

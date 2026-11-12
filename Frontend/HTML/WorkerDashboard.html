@@ -113,6 +113,29 @@
               Loading...
             </span>
           </div>
+
+          <div class="mt-5 flex flex-wrap items-center gap-3">
+            <button
+              id="availabilityToggleButton"
+              type="button"
+              disabled
+              class="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2 text-sm font-medium transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <i class="fa-solid fa-spinner fa-spin"></i>
+              <span id="availabilityToggleLabel">Loading...</span>
+            </button>
+
+            <p
+              id="availabilityFeedback"
+              class="text-sm text-gray-400"
+              role="status"
+              aria-live="polite"
+            ></p>
+          </div>
+          <p class="mt-3 text-xs text-gray-500">
+            Location updates run while this dashboard is active. Browser or
+            device restrictions may pause tracking in the background.
+          </p>
         </div>
       </section>
 

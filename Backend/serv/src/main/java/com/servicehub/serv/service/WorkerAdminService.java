@@ -48,7 +48,7 @@ public class WorkerAdminService {
                 VerificationStatus.VERIFIED);
 
         worker.setAvailabilityStatus(
-                AvailabilityStatus.AVAILABLE);
+                AvailabilityStatus.UNAVAILABLE);
 
         workerRepository.save(worker);
 

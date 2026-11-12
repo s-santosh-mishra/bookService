@@ -1,6 +1,5 @@
 package com.servicehub.serv.service;
 
-import com.servicehub.serv.entity.Booking;
 import com.servicehub.serv.enums.BookingStatus;
 import com.servicehub.serv.repository.BookingRepository;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -8,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 public class BookingTimeoutService {
@@ -21,23 +19,14 @@ public class BookingTimeoutService {
         this.bookingRepository = bookingRepository;
     }
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedDelay = 10_000)
     @Transactional
     public void expirePendingBookings() {
-
-        LocalDateTime timeoutTime = LocalDateTime.now().minusMinutes(30);
-
-        List<Booking> expiredBookings = bookingRepository.findByStatusAndCreatedAtBefore(
+        LocalDateTime now = LocalDateTime.now();
+        bookingRepository.expireUnassignedPendingBookings(
                 BookingStatus.PENDING,
-                timeoutTime);
-
-        for (Booking booking : expiredBookings) {
-
-            booking.setStatus(BookingStatus.NO_WORKER);
-        }
-
-        if (!expiredBookings.isEmpty()) {
-            bookingRepository.saveAll(expiredBookings);
-        }
+                BookingStatus.NO_WORKER,
+                now.minusMinutes(30),
+                now);
     }
 }

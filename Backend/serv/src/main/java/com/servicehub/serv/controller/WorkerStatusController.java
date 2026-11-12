@@ -1,7 +1,9 @@
 package com.servicehub.serv.controller;
 
 import com.servicehub.serv.dto.WorkerStatusDto;
+import com.servicehub.serv.dto.WorkerLocationUpdateDto;
 import com.servicehub.serv.service.WorkerStatusService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -27,5 +29,34 @@ public class WorkerStatusController {
         WorkerStatusDto status = workerStatusService.getWorkerStatus(workerId);
 
         return ResponseEntity.ok(status);
+    }
+
+    @PostMapping("/online")
+    public ResponseEntity<WorkerStatusDto> goOnline(
+            Authentication authentication) {
+
+        UUID workerId = UUID.fromString(authentication.getName());
+
+        return ResponseEntity.ok(workerStatusService.goOnline(workerId));
+    }
+
+    @PostMapping("/offline")
+    public ResponseEntity<WorkerStatusDto> goOffline(
+            Authentication authentication) {
+
+        UUID workerId = UUID.fromString(authentication.getName());
+
+        return ResponseEntity.ok(workerStatusService.goOffline(workerId));
+    }
+
+    @PostMapping("/location")
+    public ResponseEntity<WorkerStatusDto> updateLocation(
+            Authentication authentication,
+            @Valid @RequestBody WorkerLocationUpdateDto request) {
+
+        UUID workerId = UUID.fromString(authentication.getName());
+
+        return ResponseEntity.ok(
+                workerStatusService.updateLocation(workerId, request));
     }
 }

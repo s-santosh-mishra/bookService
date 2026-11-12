@@ -5,6 +5,18 @@ const USER_NAME_KEY = "servicehub_user_name";
 const API_BASE_URL = "http://localhost:8080/api/worker";
 let workerBookingRefreshTimer = null;
 let lastWorkerBookingsSnapshot = null;
+let currentWorkerStatus = null;
+let isAvailabilityUpdating = false;
+let workerLocationWatchId = null;
+let workerLocationUpdateTimer = null;
+let workerLocationStartAttempted = false;
+let workerLocationUpdateInProgress = false;
+let workerLocationAcquisitionInProgress = false;
+let lastWorkerLocation = null;
+let lastWorkerLocationUpdateAt = 0;
+const WORKER_LOCATION_UPDATE_INTERVAL_MS = 90_000;
+const WORKER_LOCATION_MOVEMENT_THRESHOLD_METERS = 50;
+const WORKER_LOCATION_MIN_UPDATE_INTERVAL_MS = 15_000;
 const razorpayConfirmationCountdowns = new Map();
 const dismissedRazorpayBookingIds = new Set();
 
@@ -58,8 +70,18 @@ async function loadWorkerStatus() {
     const status = await workerApiRequest(`${API_BASE_URL}/status`);
 
     renderWorkerStatus(status);
+    if (status?.availabilityStatus === "AVAILABLE") {
+      if (!isAvailabilityUpdating) {
+        ensureWorkerLocationTracking();
+      }
+    } else {
+      stopWorkerLocationTracking();
+    }
   } catch (error) {
     console.error("Failed to load worker status:", error);
+    currentWorkerStatus = null;
+    stopWorkerLocationTracking();
+    updateAvailabilityToggle();
 
     const statusElement = document.getElementById("availabilityStatus");
 
@@ -83,6 +105,9 @@ async function loadWorkerStatus() {
 }
 
 function renderWorkerStatus(status) {
+  currentWorkerStatus = status;
+  updateAvailabilityToggle();
+
   const verificationStatusElement =
     document.getElementById("verificationStatus");
 
@@ -235,6 +260,362 @@ function renderWorkerStatus(status) {
   statusElement.textContent = availability || "Unknown";
 
   badge.textContent = "Unknown";
+}
+
+function updateAvailabilityToggle() {
+  const button = document.getElementById("availabilityToggleButton");
+  const label = document.getElementById("availabilityToggleLabel");
+
+  if (!button || !label) {
+    return;
+  }
+
+  const availability = currentWorkerStatus?.availabilityStatus;
+  const isVerified = currentWorkerStatus?.verificationStatus === "VERIFIED";
+  const isBusy = availability === "BUSY";
+  const canChange = isVerified && ["AVAILABLE", "UNAVAILABLE"].includes(availability);
+
+  button.disabled = isAvailabilityUpdating || !canChange;
+  label.textContent = isAvailabilityUpdating
+    ? "Updating..."
+    : isBusy
+      ? "Busy"
+      : !currentWorkerStatus
+        ? "Status unavailable"
+        : !isVerified
+          ? "Verification required"
+          : availability === "AVAILABLE"
+            ? "Go offline"
+            : "Go online";
+
+  const icon = button.querySelector("i");
+  if (icon) {
+    icon.className = isAvailabilityUpdating
+      ? "fa-solid fa-spinner fa-spin"
+      : availability === "AVAILABLE"
+        ? "fa-solid fa-toggle-on"
+        : "fa-solid fa-toggle-off";
+  }
+}
+
+function showAvailabilityFeedback(message, isError = false) {
+  const feedback = document.getElementById("availabilityFeedback");
+
+  if (!feedback) {
+    return;
+  }
+
+  feedback.textContent = message;
+  feedback.classList.toggle("text-red-400", isError);
+  feedback.classList.toggle("text-green-400", !isError && Boolean(message));
+  feedback.classList.toggle("text-gray-400", !message);
+}
+
+async function toggleWorkerAvailability() {
+  if (isAvailabilityUpdating || !currentWorkerStatus) {
+    return;
+  }
+
+  const isOnline = currentWorkerStatus.availabilityStatus === "AVAILABLE";
+  const endpoint = isOnline ? "offline" : "online";
+  isAvailabilityUpdating = true;
+  updateAvailabilityToggle();
+
+  try {
+    if (isOnline) {
+      showAvailabilityFeedback("Going offline...");
+      const updatedStatus = await workerApiRequest(
+        `${API_BASE_URL}/status/${endpoint}`,
+        { method: "POST" },
+      );
+      renderWorkerStatus(updatedStatus);
+      stopWorkerLocationTracking();
+      showAvailabilityFeedback("You are now offline.");
+    } else {
+      showAvailabilityFeedback("Getting your current location...");
+      const position = await getCurrentBrowserPosition();
+
+      showAvailabilityFeedback("Going online and verifying your location...");
+      const updatedStatus = await workerApiRequest(
+        `${API_BASE_URL}/status/${endpoint}`,
+        { method: "POST" },
+      );
+
+      if (!updatedStatus || updatedStatus.availabilityStatus !== "AVAILABLE") {
+        throw new Error("Unable to change availability to online.");
+      }
+
+      renderWorkerStatus(updatedStatus);
+      try {
+        await updateWorkerLocation(position.coords);
+      } catch (locationError) {
+        try {
+          const offlineStatus = await workerApiRequest(
+            `${API_BASE_URL}/status/offline`,
+            { method: "POST" },
+          );
+          renderWorkerStatus(offlineStatus);
+          throw locationError;
+        } catch (rollbackError) {
+          if (rollbackError === locationError) {
+            throw rollbackError;
+          }
+
+          console.error("Failed to roll back worker availability:", rollbackError);
+          await loadWorkerStatus();
+          throw new Error(
+            `${locationError.message} Your online status could not be rolled back; check your availability and location before continuing.`,
+          );
+        }
+      }
+
+      workerLocationStartAttempted = false;
+      startWorkerLocationTracking(position.coords);
+      showAvailabilityFeedback(
+        "You are online and your location was updated.",
+      );
+    }
+
+    await loadBookingRequests();
+  } catch (error) {
+    console.error("Failed to update worker availability:", error);
+    showAvailabilityFeedback(
+      error.message || "Unable to update availability.",
+      true,
+    );
+  } finally {
+    isAvailabilityUpdating = false;
+    updateAvailabilityToggle();
+    if (currentWorkerStatus?.availabilityStatus === "AVAILABLE"
+        && workerLocationWatchId === null
+        && workerLocationUpdateTimer === null) {
+      ensureWorkerLocationTracking();
+    }
+  }
+}
+
+function getCurrentBrowserPosition() {
+  if (!navigator.geolocation) {
+    return Promise.reject(
+      new Error("This browser does not support location access."),
+    );
+  }
+
+  return new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(
+      resolve,
+      (error) => {
+        if (error.code === error.PERMISSION_DENIED) {
+          reject(
+            new Error("Location permission was denied. Allow location access to go online."),
+          );
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          reject(new Error("Your current location is unavailable."));
+        } else {
+          reject(new Error("Location request timed out. Please try again."));
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 15_000,
+      },
+    );
+  });
+}
+
+async function updateWorkerLocation(coords) {
+  const updatedStatus = await workerApiRequest(
+    `${API_BASE_URL}/status/location`,
+    {
+      method: "POST",
+      body: JSON.stringify({
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+      }),
+    },
+  );
+
+  if (!updatedStatus || updatedStatus.availabilityStatus !== "AVAILABLE") {
+    throw new Error("The server did not confirm the location update.");
+  }
+
+  lastWorkerLocation = {
+    latitude: coords.latitude,
+    longitude: coords.longitude,
+  };
+  lastWorkerLocationUpdateAt = Date.now();
+}
+
+function ensureWorkerLocationTracking() {
+  if (workerLocationStartAttempted
+      || workerLocationWatchId !== null
+      || workerLocationUpdateTimer !== null
+      || currentWorkerStatus?.availabilityStatus !== "AVAILABLE") {
+    return;
+  }
+
+  workerLocationStartAttempted = true;
+  workerLocationAcquisitionInProgress = true;
+  getCurrentBrowserPosition()
+    .then(async (position) => {
+      await updateWorkerLocation(position.coords);
+      startWorkerLocationTracking(position.coords);
+      showAvailabilityFeedback("Location tracking is active.");
+    })
+    .catch((error) => {
+      console.error("Unable to start worker location tracking:", error);
+      showAvailabilityFeedback(
+        `Location tracking is not active: ${error.message}`,
+        true,
+      );
+    })
+    .finally(() => {
+      workerLocationAcquisitionInProgress = false;
+    });
+}
+
+function startWorkerLocationTracking(initialCoords) {
+  if (currentWorkerStatus?.availabilityStatus !== "AVAILABLE"
+      || workerLocationWatchId !== null
+      || workerLocationUpdateTimer !== null) {
+    return;
+  }
+
+  workerLocationStartAttempted = true;
+  lastWorkerLocation = {
+    latitude: initialCoords.latitude,
+    longitude: initialCoords.longitude,
+  };
+  if (!lastWorkerLocationUpdateAt) {
+    lastWorkerLocationUpdateAt = Date.now();
+  }
+
+  if (navigator.geolocation?.watchPosition) {
+    workerLocationWatchId = navigator.geolocation.watchPosition(
+      (position) => updateWorkerLocationOnMovement(position.coords),
+      (error) => {
+        if (error.code === error.PERMISSION_DENIED) {
+          stopWorkerLocationTracking(false);
+          showAvailabilityFeedback(
+            "Location permission was revoked. Location tracking has stopped.",
+            true,
+          );
+        } else {
+          showAvailabilityFeedback(
+            "Unable to read your location. Tracking will retry.",
+            true,
+          );
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 60_000,
+        timeout: 20_000,
+      },
+    );
+  }
+
+  workerLocationUpdateTimer = setInterval(
+    refreshWorkerLocation,
+    WORKER_LOCATION_UPDATE_INTERVAL_MS,
+  );
+}
+
+async function updateWorkerLocationOnMovement(coords) {
+  if (!lastWorkerLocation
+      || workerLocationUpdateInProgress
+      || currentWorkerStatus?.availabilityStatus !== "AVAILABLE"
+      || Date.now() - lastWorkerLocationUpdateAt
+        < WORKER_LOCATION_MIN_UPDATE_INTERVAL_MS
+      || distanceBetweenCoordinates(
+        lastWorkerLocation.latitude,
+        lastWorkerLocation.longitude,
+        coords.latitude,
+        coords.longitude,
+      ) < WORKER_LOCATION_MOVEMENT_THRESHOLD_METERS) {
+    return;
+  }
+
+  await sendWorkerLocation(coords);
+}
+
+async function refreshWorkerLocation() {
+  if (document.visibilityState !== "visible"
+      || workerLocationAcquisitionInProgress
+      || workerLocationUpdateInProgress
+      || currentWorkerStatus?.availabilityStatus !== "AVAILABLE") {
+    return;
+  }
+
+  workerLocationAcquisitionInProgress = true;
+  try {
+    const position = await getCurrentBrowserPosition();
+    await sendWorkerLocation(position.coords);
+  } catch (error) {
+    console.error("Worker location refresh failed:", error);
+    showAvailabilityFeedback(
+      `Location update failed; your location may become stale. ${error.message}`,
+      true,
+    );
+  } finally {
+    workerLocationAcquisitionInProgress = false;
+  }
+}
+
+async function sendWorkerLocation(coords) {
+  if (workerLocationUpdateInProgress
+      || currentWorkerStatus?.availabilityStatus !== "AVAILABLE") {
+    return;
+  }
+
+  workerLocationUpdateInProgress = true;
+  try {
+    await updateWorkerLocation(coords);
+    showAvailabilityFeedback("Location updated.");
+  } catch (error) {
+    console.error("Worker location update failed:", error);
+    showAvailabilityFeedback(
+      `Location update failed; your location may become stale. ${error.message}`,
+      true,
+    );
+  } finally {
+    workerLocationUpdateInProgress = false;
+  }
+}
+
+function stopWorkerLocationTracking(resetStartAttempt = true) {
+  if (workerLocationWatchId !== null && navigator.geolocation?.clearWatch) {
+    navigator.geolocation.clearWatch(workerLocationWatchId);
+    workerLocationWatchId = null;
+  }
+
+  if (workerLocationUpdateTimer !== null) {
+    clearInterval(workerLocationUpdateTimer);
+    workerLocationUpdateTimer = null;
+  }
+
+  workerLocationAcquisitionInProgress = false;
+  lastWorkerLocation = null;
+  lastWorkerLocationUpdateAt = 0;
+  if (resetStartAttempt) {
+    workerLocationStartAttempted = false;
+  }
+}
+
+function distanceBetweenCoordinates(latitude1, longitude1, latitude2, longitude2) {
+  const radians = (degrees) => (degrees * Math.PI) / 180;
+  const latitudeDelta = radians(latitude2 - latitude1);
+  const longitudeDelta = radians(longitude2 - longitude1);
+  const haversine = Math.sin(latitudeDelta / 2) ** 2
+    + Math.cos(radians(latitude1))
+      * Math.cos(radians(latitude2))
+      * Math.sin(longitudeDelta / 2) ** 2;
+
+  return 6_371_000 * 2 * Math.atan2(
+    Math.sqrt(haversine),
+    Math.sqrt(1 - haversine),
+  );
 }
 
 let bookingRequestRefreshTimer = null;
@@ -3315,6 +3696,7 @@ window.addEventListener("beforeunload", () => {
   stopBookingRequestPolling();
   stopWorkerPartsPolling();
   stopWorkerBookingPolling();
+  stopWorkerLocationTracking();
   for (const countdown of razorpayConfirmationCountdowns.values()) {
     if (countdown.timerId !== null) {
       clearInterval(countdown.timerId);
@@ -3324,6 +3706,17 @@ window.addEventListener("beforeunload", () => {
 });
 
 // Dashboard Initialisation
+
+const availabilityToggleButton = document.getElementById(
+  "availabilityToggleButton",
+);
+
+if (availabilityToggleButton) {
+  availabilityToggleButton.addEventListener(
+    "click",
+    toggleWorkerAvailability,
+  );
+}
 
 if (checkWorkerLogin()) {
   loadWorkerInformation();

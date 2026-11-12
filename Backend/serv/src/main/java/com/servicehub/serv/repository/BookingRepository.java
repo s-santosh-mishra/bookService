@@ -5,8 +5,10 @@ import com.servicehub.serv.enums.BookingStatus;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -78,6 +80,36 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
         List<Booking> findByStatusAndCreatedAtBefore(
                         BookingStatus status,
                         LocalDateTime createdAt);
+
+        @Query("""
+                        SELECT booking.bookingId
+                        FROM Booking booking
+                        WHERE booking.status = :status
+                          AND booking.worker IS NULL
+                          AND booking.createdAt >= :createdAfter
+                          AND booking.createdAt < :createdBefore
+                        ORDER BY booking.createdAt
+                        """)
+        List<UUID> findPendingBookingIdsForDiscovery(
+                        @Param("status") BookingStatus status,
+                        @Param("createdAfter") LocalDateTime createdAfter,
+                        @Param("createdBefore") LocalDateTime createdBefore,
+                        Pageable pageable);
+
+        @Modifying(clearAutomatically = true, flushAutomatically = true)
+        @Query("""
+                        UPDATE Booking booking
+                        SET booking.status = :expiredStatus,
+                            booking.updatedAt = :updatedAt
+                        WHERE booking.status = :pendingStatus
+                          AND booking.worker IS NULL
+                          AND booking.createdAt <= :deadline
+                        """)
+        int expireUnassignedPendingBookings(
+                        @Param("pendingStatus") BookingStatus pendingStatus,
+                        @Param("expiredStatus") BookingStatus expiredStatus,
+                        @Param("deadline") LocalDateTime deadline,
+                        @Param("updatedAt") LocalDateTime updatedAt);
 
         @Lock(LockModeType.PESSIMISTIC_WRITE)
         @Query("SELECT b FROM Booking b WHERE b.bookingId = :bookingId")

@@ -1,21 +1,4 @@
-// Get Logged-in Admin Email
 const API_BASE_URL = "http://localhost:8080/api";
-function loadAdminEmail() {
-
-    const email = sessionStorage.getItem("servicehub_user_email");
-
-    const adminEmailElement =
-        document.getElementById("adminEmail");
-
-    if (adminEmailElement) {
-
-        adminEmailElement.textContent =
-            email || "Admin account";
-
-    }
-}
-
-
 // Update Status Display
 
 function updateStatus(elementId, dotId, status, successStatus) {
@@ -219,6 +202,4 @@ async function loadDashboardData() {
 
 
 // Initialize Dashboard
-
-loadAdminEmail();
 loadDashboardData();

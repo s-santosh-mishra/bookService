@@ -7,13 +7,14 @@ import com.servicehub.serv.entity.Billing;
 import com.servicehub.serv.entity.Booking;
 import com.servicehub.serv.entity.Payment;
 import com.servicehub.serv.entity.Users;
-import com.servicehub.serv.enums.AvailabilityStatus;
+import com.servicehub.serv.entity.Worker;
 import com.servicehub.serv.enums.BookingStatus;
 import com.servicehub.serv.exception.BookingConflictException;
 import com.servicehub.serv.exception.ResourceNotFoundException;
 import com.servicehub.serv.repository.BillingRepository;
 import com.servicehub.serv.repository.BookingRepository;
 import com.servicehub.serv.repository.PaymentRepository;
+import com.servicehub.serv.repository.WorkerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,14 +32,17 @@ public class AdminBookingService {
     private final BookingRepository bookingRepository;
     private final BillingRepository billingRepository;
     private final PaymentRepository paymentRepository;
+    private final WorkerRepository workerRepository;
 
     public AdminBookingService(
             BookingRepository bookingRepository,
             BillingRepository billingRepository,
-            PaymentRepository paymentRepository) {
+            PaymentRepository paymentRepository,
+            WorkerRepository workerRepository) {
         this.bookingRepository = bookingRepository;
         this.billingRepository = billingRepository;
         this.paymentRepository = paymentRepository;
+        this.workerRepository = workerRepository;
     }
 
     @Transactional(readOnly = true)
@@ -116,8 +120,11 @@ public class AdminBookingService {
         booking.setAdminCancellationReason(reason);
 
         if (booking.getWorker() != null) {
-            booking.getWorker().setAvailabilityStatus(
-                    AvailabilityStatus.AVAILABLE);
+            Worker worker = workerRepository.findByUserIdForUpdate(
+                            booking.getWorker().getUserId())
+                    .orElseThrow(() -> new IllegalStateException(
+                            "Assigned worker not found."));
+            worker.markAvailableAfterBooking();
         }
 
         Booking savedBooking = bookingRepository.save(booking);

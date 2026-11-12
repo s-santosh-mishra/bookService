@@ -11,6 +11,7 @@ import com.servicehub.serv.repository.*;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.util.concurrent.ThreadLocalRandom;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,6 +26,10 @@ public class BookingService {
     private final WorkerRepository workerRepository;
     private final WorkerServiceRepository workerServiceRepository;
     private final WorkerBookingRejectionRepository workerBookingRejectionRepository;
+    private final BookingOfferRepository bookingOfferRepository;
+    private final BookingDiscoveryService bookingDiscoveryService;
+    private final Clock locationClock;
+    private final OdishaServiceArea odishaServiceArea;
     private final BillingService billingService;
     private final BillingRepository billingRepository;
     private final PaymentRepository paymentRepository;
@@ -37,6 +42,10 @@ public class BookingService {
             WorkerRepository workerRepository,
             WorkerServiceRepository workerServiceRepository,
             WorkerBookingRejectionRepository workerBookingRejectionRepository,
+            BookingOfferRepository bookingOfferRepository,
+            BookingDiscoveryService bookingDiscoveryService,
+            Clock locationClock,
+            OdishaServiceArea odishaServiceArea,
             BillingService billingService,
             BillingRepository billingRepository,
             PaymentRepository paymentRepository) {
@@ -48,6 +57,10 @@ public class BookingService {
         this.workerRepository = workerRepository;
         this.workerServiceRepository = workerServiceRepository;
         this.workerBookingRejectionRepository = workerBookingRejectionRepository;
+        this.bookingOfferRepository = bookingOfferRepository;
+        this.bookingDiscoveryService = bookingDiscoveryService;
+        this.locationClock = locationClock;
+        this.odishaServiceArea = odishaServiceArea;
         this.billingService = billingService;
         this.billingRepository = billingRepository;
         this.paymentRepository = paymentRepository;
@@ -59,6 +72,16 @@ public class BookingService {
 
     @Transactional
     public BookingDto createBooking(UUID customerId, CreateBookingDto request) {
+        if (request == null
+                || request.getLatitude() == null
+                || request.getLongitude() == null
+                || !odishaServiceArea.contains(
+                        request.getLatitude().doubleValue(),
+                        request.getLongitude().doubleValue())) {
+            throw new IllegalArgumentException(
+                    "Booking location must be within the Odisha service area.");
+        }
+
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new IllegalArgumentException("Customer not found."));
         Service service = serviceRepository.findById(request.getServiceId())
@@ -80,7 +103,9 @@ public class BookingService {
         booking.setServiceLatitude(request.getLatitude());
         booking.setServiceLongitude(request.getLongitude());
 
-        return toDto(bookingRepository.save(booking));
+        Booking savedBooking = bookingRepository.save(booking);
+        bookingDiscoveryService.discoverBooking(savedBooking.getBookingId());
+        return toDto(savedBooking);
     }
 
     @Transactional
@@ -90,7 +115,7 @@ public class BookingService {
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Customer not found."));
 
-        Booking booking = bookingRepository.findById(bookingId)
+        Booking booking = bookingRepository.findByBookingIdForUpdate(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Booking not found."));
 
@@ -132,6 +157,8 @@ public class BookingService {
         booking.setStatus(BookingStatus.CANCELLED);
         booking.setCancelledAt(cancellationTime);
 
+        markWorkerAvailableAfterBooking(booking);
+
         /*
          * Create the cancellation billing snapshot
          * before returning the booking.
@@ -139,16 +166,6 @@ public class BookingService {
         billingService.createCustomerCancellationBilling(
                 booking,
                 cancellationTime);
-
-        /*
-         * Once the customer cancels an accepted or
-         * in-progress booking, the worker becomes available.
-         */
-        if (booking.getWorker() != null) {
-            booking.getWorker()
-                    .setAvailabilityStatus(
-                            AvailabilityStatus.AVAILABLE);
-        }
 
         return toDto(
                 bookingRepository.save(booking));
@@ -159,7 +176,7 @@ public class BookingService {
         Worker worker = workerRepository.findById(workerId)
                 .orElseThrow(() -> new IllegalArgumentException("Worker not found."));
 
-        Booking booking = bookingRepository.findById(bookingId)
+        Booking booking = bookingRepository.findByBookingIdForUpdate(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found."));
 
         if (booking.getWorker() == null
@@ -194,16 +211,7 @@ public class BookingService {
             UUID bookingId,
             WorkerBookingLocationDto request) {
 
-        Worker worker = workerRepository.findById(workerId)
-                .orElseThrow(() -> new IllegalArgumentException("Worker not found."));
-
-        if (worker.getVerificationStatus() != VerificationStatus.VERIFIED)
-            throw new IllegalStateException("Only verified workers can accept bookings.");
-
-        if (worker.getAvailabilityStatus() != AvailabilityStatus.AVAILABLE)
-            throw new IllegalStateException("Worker is not available.");
-
-        Booking booking = bookingRepository.findById(bookingId)
+        Booking booking = bookingRepository.findByBookingIdForUpdate(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found."));
 
         if (booking.getStatus() != BookingStatus.PENDING)
@@ -211,6 +219,36 @@ public class BookingService {
 
         if (booking.getWorker() != null)
             throw new IllegalStateException("Booking has already been assigned.");
+
+        if (booking.getCreatedAt() == null
+                || !LocalDateTime.now().isBefore(booking.getCreatedAt().plusMinutes(30))) {
+            throw new IllegalStateException("This booking offer has expired.");
+        }
+
+        if (!bookingOfferRepository.existsByBooking_BookingIdAndWorker_UserId(
+                bookingId, workerId)) {
+            throw new IllegalStateException("This booking has not been offered to you.");
+        }
+
+        if (workerBookingRejectionRepository.existsByWorker_UserIdAndBooking_BookingId(
+                workerId, bookingId)) {
+            throw new IllegalStateException("You have already rejected this booking.");
+        }
+
+        Worker worker = workerRepository.findByUserIdForUpdate(workerId)
+                .orElseThrow(() -> new IllegalArgumentException("Worker not found."));
+
+        if (!worker.getUser().isActive())
+            throw new IllegalStateException("Worker account is inactive.");
+
+        if (worker.getVerificationStatus() != VerificationStatus.VERIFIED)
+            throw new IllegalStateException("Only verified workers can accept bookings.");
+
+        if (worker.getAvailabilityStatus() != AvailabilityStatus.AVAILABLE)
+            throw new IllegalStateException("Worker is not available.");
+
+        if (!WorkerLocationFreshness.isFresh(worker, LocalDateTime.now(locationClock)))
+            throw new IllegalStateException("Share a fresh location before accepting a booking.");
 
         boolean provides = workerServiceRepository.findByWorker_UserId(workerId).stream()
                 .anyMatch(ws -> ws.getService().getServiceId().equals(booking.getService().getServiceId()));
@@ -225,6 +263,10 @@ public class BookingService {
                         BookingStatus.WAITING_FOR_PAYMENT)))
             throw new IllegalStateException(
                     "You can't accept another booking until you finish your current booking.");
+
+        if (!LocalDateTime.now().isBefore(booking.getCreatedAt().plusMinutes(30))) {
+            throw new IllegalStateException("This booking offer has expired.");
+        }
 
         booking.setWorker(worker);
         booking.setStatus(BookingStatus.ACCEPTED);
@@ -241,31 +283,31 @@ public class BookingService {
         return toDto(bookingRepository.save(booking));
     }
 
+    @Transactional(readOnly = true)
     public List<WorkerBookingRequestDto> getWorkerBookingRequests(UUID workerId) {
+        Worker worker = workerRepository.findById(workerId)
+                .orElseThrow(() -> new IllegalArgumentException("Worker not found."));
 
-        List<UUID> serviceIds = workerServiceRepository
-                .findByWorker_UserId(workerId)
-                .stream()
-                .map(ws -> ws.getService().getServiceId())
-                .toList();
-
-        if (serviceIds.isEmpty()) {
+        if (!worker.getUser().isActive()
+                || worker.getVerificationStatus() != VerificationStatus.VERIFIED
+                || worker.getAvailabilityStatus() != AvailabilityStatus.AVAILABLE
+                || !WorkerLocationFreshness.isFresh(worker, LocalDateTime.now(locationClock))
+                || bookingRepository.existsByWorkerUserIdAndStatusIn(
+                        workerId,
+                        List.of(
+                                BookingStatus.ACCEPTED,
+                                BookingStatus.IN_PROGRESS,
+                                BookingStatus.WAITING_FOR_PAYMENT))) {
             return List.of();
         }
 
-        List<UUID> rejectedBookingIds = workerBookingRejectionRepository
-                .findByWorker_UserId(workerId)
+        LocalDateTime requestNow = LocalDateTime.now();
+        return bookingOfferRepository
+                .findPendingOffersForWorker(workerId, BookingStatus.PENDING)
                 .stream()
-                .map(rejection -> rejection.getBooking().getBookingId())
-                .toList();
-
-        return bookingRepository
-                .findByServiceServiceIdInAndStatus(
-                        serviceIds,
-                        BookingStatus.PENDING)
-                .stream()
-                .filter(booking -> !rejectedBookingIds.contains(
-                        booking.getBookingId()))
+                .map(offer -> offer.getBooking())
+                .filter(booking -> booking.getCreatedAt() != null
+                        && requestNow.isBefore(booking.getCreatedAt().plusMinutes(30)))
                 .map(b -> new WorkerBookingRequestDto(
                         b.getBookingId(),
                         b.getCustomer().getUserId(),
@@ -291,12 +333,22 @@ public class BookingService {
                     "Only verified workers can reject bookings.");
         }
 
-        Booking booking = bookingRepository.findById(bookingId)
+        Booking booking = bookingRepository.findByBookingIdForUpdate(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found."));
 
         if (booking.getStatus() != BookingStatus.PENDING) {
             throw new IllegalStateException(
                     "Booking is no longer available.");
+        }
+
+        if (booking.getCreatedAt() == null
+                || !LocalDateTime.now().isBefore(booking.getCreatedAt().plusMinutes(30))) {
+            throw new IllegalStateException("This booking offer has expired.");
+        }
+
+        if (!bookingOfferRepository.existsByBooking_BookingIdAndWorker_UserId(
+                bookingId, workerId)) {
+            throw new IllegalStateException("This booking has not been offered to you.");
         }
 
         boolean provides = workerServiceRepository
@@ -336,7 +388,7 @@ public class BookingService {
         Worker worker = workerRepository.findById(workerId)
                 .orElseThrow(() -> new IllegalArgumentException("Worker not found."));
 
-        Booking booking = bookingRepository.findById(bookingId)
+        Booking booking = bookingRepository.findByBookingIdForUpdate(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found."));
 
         if (booking.getWorker() == null
@@ -381,10 +433,7 @@ public class BookingService {
             UUID bookingId,
             WorkerCancellationRequestDto request) {
 
-        Worker worker = workerRepository.findById(workerId)
-                .orElseThrow(() -> new IllegalArgumentException("Worker not found."));
-
-        Booking booking = bookingRepository.findById(bookingId)
+        Booking booking = bookingRepository.findByBookingIdForUpdate(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found."));
 
         // Make sure this booking belongs to the logged-in worker
@@ -394,6 +443,9 @@ public class BookingService {
             throw new IllegalStateException(
                     "Booking is not assigned to this worker.");
         }
+
+        Worker worker = workerRepository.findByUserIdForUpdate(workerId)
+                .orElseThrow(() -> new IllegalArgumentException("Worker not found."));
 
         if (worker.getVerificationStatus() != VerificationStatus.VERIFIED) {
             throw new IllegalStateException(
@@ -456,7 +508,7 @@ public class BookingService {
          * so make the worker available again.
          */
 
-        worker.setAvailabilityStatus(AvailabilityStatus.AVAILABLE);
+        worker.markAvailableAfterBooking();
 
         return toDto(bookingRepository.save(booking));
     }
@@ -470,7 +522,7 @@ public class BookingService {
         Worker worker = workerRepository.findById(workerId)
                 .orElseThrow(() -> new IllegalArgumentException("Worker not found."));
 
-        Booking booking = bookingRepository.findById(bookingId)
+        Booking booking = bookingRepository.findByBookingIdForUpdate(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found."));
 
         if (booking.getWorker() == null
@@ -528,7 +580,7 @@ public class BookingService {
         Worker worker = workerRepository.findById(workerId)
                 .orElseThrow(() -> new IllegalArgumentException("Worker not found."));
 
-        Booking booking = bookingRepository.findById(bookingId)
+        Booking booking = bookingRepository.findByBookingIdForUpdate(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found."));
 
         if (booking.getWorker() == null
@@ -582,6 +634,17 @@ public class BookingService {
 
     public List<BookingDto> getWorkerBookings(UUID workerId) {
         return bookingRepository.findByWorkerUserId(workerId).stream().map(this::toDto).toList();
+    }
+
+    private void markWorkerAvailableAfterBooking(Booking booking) {
+        if (booking.getWorker() == null) {
+            return;
+        }
+
+        UUID workerId = booking.getWorker().getUserId();
+        Worker worker = workerRepository.findByUserIdForUpdate(workerId)
+                .orElseThrow(() -> new IllegalStateException("Assigned worker not found."));
+        worker.markAvailableAfterBooking();
     }
 
     private BookingDto toDto(Booking b) {

@@ -34,6 +34,7 @@ public class RegisterReqDto {
     private String city;
 
     @NotBlank(message = "State is required")
+    @Pattern(regexp = "^Odisha$", message = "State must be Odisha")
     private String state;
 
     @NotBlank(message = "PIN code is required")

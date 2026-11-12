@@ -224,8 +224,8 @@ function validateForm() {
 
   // State
 
-  if (!state.value) {
-    showError(state, "stateError", "Please select your state.");
+  if (state.value !== "Odisha") {
+    showError(state, "stateError", "Only Odisha is currently supported.");
 
     valid = false;
   }

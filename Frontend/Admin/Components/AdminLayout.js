@@ -43,6 +43,39 @@ const adminSidebarHTML = `
 
         </a>
 
+        <a href="BookingManagement.html"
+           data-page="BookingManagement.html"
+           class="admin-nav-link flex items-center gap-3 px-4 py-3
+                  text-gray-400 hover:text-white hover:bg-gray-800
+                  rounded-lg transition-colors">
+
+            <i class="fa-solid fa-calendar-check w-5"></i>
+            <span>Booking Management</span>
+
+        </a>
+
+        <a href="PaymentManagement.html"
+           data-page="PaymentManagement.html"
+           class="admin-nav-link flex items-center gap-3 px-4 py-3
+                  text-gray-400 hover:text-white hover:bg-gray-800
+                  rounded-lg transition-colors">
+
+            <i class="fa-solid fa-credit-card w-5"></i>
+            <span>Payment Management</span>
+
+        </a>
+
+        <a href="WorkerSettlementManagement.html"
+           data-page="WorkerSettlementManagement.html"
+           class="admin-nav-link flex items-center gap-3 px-4 py-3
+                  text-gray-400 hover:text-white hover:bg-gray-800
+                  rounded-lg transition-colors">
+
+            <i class="fa-solid fa-money-bill-transfer w-5"></i>
+            <span>Settlement Management</span>
+
+        </a>
+
         <a href="CustomerManagement.html"
            data-page="CustomerManagement.html"
            class="admin-nav-link flex items-center gap-3 px-4 py-3
@@ -145,7 +178,7 @@ const adminHeaderHTML = `
                     </p>
 
                     <p id="adminEmail" class="text-xs text-gray-500">
-                        Loading...
+                        Admin account
                     </p>
 
                 </div>
@@ -194,6 +227,13 @@ function loadAdminComponents() {
 
     if (headerContainer) {
         headerContainer.innerHTML = adminHeaderHTML;
+
+        const adminEmail = headerContainer.querySelector("#adminEmail");
+
+        if (adminEmail) {
+            adminEmail.textContent =
+                sessionStorage.getItem("servicehub_user_email") || "Admin account";
+        }
     }
 
     initializeAdminLayout();

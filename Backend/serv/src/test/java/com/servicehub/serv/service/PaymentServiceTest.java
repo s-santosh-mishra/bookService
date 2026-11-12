@@ -5,6 +5,7 @@ import com.servicehub.serv.entity.Booking;
 import com.servicehub.serv.entity.Payment;
 import com.servicehub.serv.entity.Users;
 import com.servicehub.serv.entity.Worker;
+import com.servicehub.serv.enums.AvailabilityStatus;
 import com.servicehub.serv.enums.BookingStatus;
 import com.servicehub.serv.enums.PaymentMethod;
 import com.servicehub.serv.enums.PaymentStatus;
@@ -37,6 +38,7 @@ class PaymentServiceTest {
         Worker worker = new Worker();
         worker.setUserId(workerId);
         worker.setUser(workerUser);
+        worker.setAvailabilityStatus(AvailabilityStatus.UNAVAILABLE);
 
         Booking booking = new Booking();
         booking.setBookingId(bookingId);
@@ -67,7 +69,7 @@ class PaymentServiceTest {
                 bookingId,
                 PaymentStatus.PENDING))
                 .thenReturn(List.of(pendingRazorpayPayment));
-        when(workerRepository.findById(workerId))
+        when(workerRepository.findByUserIdForUpdate(workerId))
                 .thenReturn(Optional.of(worker));
 
         PaymentService paymentService = new PaymentService(
@@ -83,6 +85,7 @@ class PaymentServiceTest {
         assertEquals(PaymentStatus.SUCCESS, cashPayment.getStatus());
         assertEquals(PaymentStatus.CANCELLED, pendingRazorpayPayment.getStatus());
         assertEquals(BookingStatus.COMPLETED, booking.getStatus());
+        assertEquals(AvailabilityStatus.UNAVAILABLE, worker.getAvailabilityStatus());
         verify(paymentRepository).saveAll(List.of(pendingRazorpayPayment));
     }
 

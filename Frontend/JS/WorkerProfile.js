@@ -263,6 +263,11 @@ function populateProfile(profile) {
   setValue("qualification", profile.qualification);
   setValue("bio", profile.bio);
 
+  setValue("bankAccountHolderName", profile.bankAccountHolderName);
+  setValue("maskedBankAccountNumber", profile.maskedBankAccountNumber);
+  setValue("bankIfscCode", profile.bankIfscCode);
+  setValue("bankName", profile.bankName);
+
   // Statuses
   renderWorkerStatus(profile.verificationStatus, profile.availabilityStatus);
 

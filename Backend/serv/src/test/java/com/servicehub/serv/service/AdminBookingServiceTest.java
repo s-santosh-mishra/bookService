@@ -13,6 +13,7 @@ import com.servicehub.serv.exception.BookingConflictException;
 import com.servicehub.serv.repository.BillingRepository;
 import com.servicehub.serv.repository.BookingRepository;
 import com.servicehub.serv.repository.PaymentRepository;
+import com.servicehub.serv.repository.WorkerRepository;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -58,9 +59,12 @@ class AdminBookingServiceTest {
         BookingRepository bookingRepository = mock(BookingRepository.class);
         BillingRepository billingRepository = mock(BillingRepository.class);
         PaymentRepository paymentRepository = mock(PaymentRepository.class);
+        WorkerRepository workerRepository = mock(WorkerRepository.class);
 
         when(bookingRepository.findByBookingIdForUpdate(booking.getBookingId()))
                 .thenReturn(Optional.of(booking));
+        when(workerRepository.findByUserIdForUpdate(worker.getUserId()))
+                .thenReturn(Optional.of(worker));
         when(bookingRepository.save(booking)).thenReturn(booking);
         when(billingRepository.findByBookingBookingId(booking.getBookingId()))
                 .thenReturn(Optional.empty());
@@ -71,7 +75,8 @@ class AdminBookingServiceTest {
         AdminBookingService service = new AdminBookingService(
                 bookingRepository,
                 billingRepository,
-                paymentRepository);
+                paymentRepository,
+                workerRepository);
 
         service.cancelBooking(booking.getBookingId(), "  Admin cancellation  ");
 
@@ -85,12 +90,47 @@ class AdminBookingServiceTest {
     }
 
     @Test
+    void adminCancellationPreservesOfflineWorkerAvailability() {
+        Booking booking = createBooking(BookingStatus.ACCEPTED);
+        Worker worker = createWorker();
+        worker.setAvailabilityStatus(AvailabilityStatus.UNAVAILABLE);
+        booking.setWorker(worker);
+
+        BookingRepository bookingRepository = mock(BookingRepository.class);
+        BillingRepository billingRepository = mock(BillingRepository.class);
+        PaymentRepository paymentRepository = mock(PaymentRepository.class);
+        WorkerRepository workerRepository = mock(WorkerRepository.class);
+
+        when(bookingRepository.findByBookingIdForUpdate(booking.getBookingId()))
+                .thenReturn(Optional.of(booking));
+        when(workerRepository.findByUserIdForUpdate(worker.getUserId()))
+                .thenReturn(Optional.of(worker));
+        when(bookingRepository.save(booking)).thenReturn(booking);
+        when(billingRepository.findByBookingBookingId(booking.getBookingId()))
+                .thenReturn(Optional.empty());
+        when(paymentRepository.findByBookingBookingIdInOrderByCreatedAtDesc(
+                anyCollection()))
+                .thenReturn(List.of());
+
+        AdminBookingService service = new AdminBookingService(
+                bookingRepository,
+                billingRepository,
+                paymentRepository,
+                workerRepository);
+
+        service.cancelBooking(booking.getBookingId(), "Reason");
+
+        assertEquals(AvailabilityStatus.UNAVAILABLE, worker.getAvailabilityStatus());
+    }
+
+    @Test
     void rejectsBlankCancellationReason() {
         BookingRepository bookingRepository = mock(BookingRepository.class);
         AdminBookingService service = new AdminBookingService(
                 bookingRepository,
                 mock(BillingRepository.class),
-                mock(PaymentRepository.class));
+                mock(PaymentRepository.class),
+                mock(WorkerRepository.class));
 
         assertThrows(
                 IllegalArgumentException.class,
@@ -104,6 +144,7 @@ class AdminBookingServiceTest {
         BookingRepository bookingRepository = mock(BookingRepository.class);
         BillingRepository billingRepository = mock(BillingRepository.class);
         PaymentRepository paymentRepository = mock(PaymentRepository.class);
+        WorkerRepository workerRepository = mock(WorkerRepository.class);
 
         when(bookingRepository.findByBookingIdForUpdate(booking.getBookingId()))
                 .thenReturn(Optional.of(booking));
@@ -117,7 +158,8 @@ class AdminBookingServiceTest {
         AdminBookingService service = new AdminBookingService(
                 bookingRepository,
                 billingRepository,
-                paymentRepository);
+                paymentRepository,
+                workerRepository);
 
         service.cancelBooking(booking.getBookingId(), "Reason");
 
@@ -133,7 +175,8 @@ class AdminBookingServiceTest {
         AdminBookingService service = new AdminBookingService(
                 bookingRepository,
                 mock(BillingRepository.class),
-                mock(PaymentRepository.class));
+                mock(PaymentRepository.class),
+                mock(WorkerRepository.class));
 
         when(bookingRepository.findByBookingIdForUpdate(booking.getBookingId()))
                 .thenReturn(Optional.of(booking));
@@ -187,6 +230,7 @@ class AdminBookingServiceTest {
         workerUser.setPhone("5550200");
 
         Worker worker = new Worker();
+        worker.setUserId(workerUser.getUserId());
         worker.setUser(workerUser);
         worker.setAvailabilityStatus(AvailabilityStatus.BUSY);
         return worker;

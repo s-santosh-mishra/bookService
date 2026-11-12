@@ -39,7 +39,7 @@ public class BookingPartService {
                         UUID bookingId,
                         AddBookingPartDto request) {
 
-                Booking booking = bookingRepository.findById(bookingId)
+                Booking booking = bookingRepository.findByBookingIdForUpdate(bookingId)
                                 .orElseThrow(() -> new IllegalArgumentException("Booking not found."));
 
                 if (booking.getWorker() == null
@@ -100,7 +100,9 @@ public class BookingPartService {
                                 .orElseThrow(() -> new IllegalArgumentException(
                                                 "Part request not found."));
 
-                Booking booking = part.getBooking();
+                Booking booking = bookingRepository.findByBookingIdForUpdate(
+                                part.getBooking().getBookingId())
+                                .orElseThrow(() -> new IllegalArgumentException("Booking not found."));
 
                 if (booking.getCustomer() == null
                                 || !booking.getCustomer()
@@ -109,6 +111,11 @@ public class BookingPartService {
 
                         throw new IllegalStateException(
                                         "You are not the customer for this booking.");
+                }
+
+                if (booking.getStatus() != BookingStatus.IN_PROGRESS) {
+                        throw new IllegalStateException(
+                                        "Parts can only be approved while the service is in progress.");
                 }
 
                 if (part.getStatus() != PartApprovalStatus.PENDING) {

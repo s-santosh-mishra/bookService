@@ -32,6 +32,16 @@ const qualification = document.getElementById("qualification");
 
 const bio = document.getElementById("bio");
 
+const bankAccountHolderName = document.getElementById(
+  "bankAccountHolderName",
+);
+
+const bankAccountNumber = document.getElementById("bankAccountNumber");
+
+const bankIfscCode = document.getElementById("bankIfscCode");
+
+const bankName = document.getElementById("bankName");
+
 const password = document.getElementById("password");
 
 const confirmPassword = document.getElementById("confirmPassword");
@@ -304,6 +314,10 @@ experienceYears.addEventListener("input", () => {
   experienceYears.value = experienceYears.value.replace(/\D/g, "").slice(0, 2);
 });
 
+bankIfscCode.addEventListener("input", () => {
+  bankIfscCode.value = bankIfscCode.value.toUpperCase();
+});
+
 // Form Submission
 
 registerForm.addEventListener("submit", async (event) => {
@@ -373,6 +387,14 @@ registerForm.addEventListener("submit", async (event) => {
     serviceIds: selectedServiceIds,
 
     termsAccepted: terms.checked,
+
+    bankAccountHolderName: bankAccountHolderName.value.trim(),
+
+    bankAccountNumber: bankAccountNumber.value.trim(),
+
+    bankIfscCode: bankIfscCode.value.trim().toUpperCase(),
+
+    bankName: bankName.value.trim(),
   };
 
   // Loading
@@ -508,8 +530,8 @@ function validateForm() {
 
   // State
 
-  if (!state.value) {
-    showError(state, "stateError", "Please select your state.");
+  if (state.value !== "Odisha") {
+    showError(state, "stateError", "Only Odisha is currently supported.");
 
     valid = false;
   }
@@ -549,6 +571,74 @@ function validateForm() {
       qualification,
       "qualificationError",
       "Please enter your qualification.",
+    );
+
+    valid = false;
+  }
+
+  // Bank Details
+
+  if (!bankAccountHolderName.value.trim()) {
+    showError(
+      bankAccountHolderName,
+      "bankAccountHolderNameError",
+      "Please enter the account holder name.",
+    );
+
+    valid = false;
+  } else if (bankAccountHolderName.value.trim().length > 150) {
+    showError(
+      bankAccountHolderName,
+      "bankAccountHolderNameError",
+      "Account holder name must be 150 characters or fewer.",
+    );
+
+    valid = false;
+  }
+
+  if (!bankAccountNumber.value.trim()) {
+    showError(
+      bankAccountNumber,
+      "bankAccountNumberError",
+      "Please enter the bank account number.",
+    );
+
+    valid = false;
+  } else if (bankAccountNumber.value.trim().length > 30) {
+    showError(
+      bankAccountNumber,
+      "bankAccountNumberError",
+      "Bank account number must be 30 characters or fewer.",
+    );
+
+    valid = false;
+  }
+
+  const normalizedIfscCode = bankIfscCode.value.trim().toUpperCase();
+
+  if (!normalizedIfscCode) {
+    showError(bankIfscCode, "bankIfscCodeError", "Please enter the IFSC code.");
+
+    valid = false;
+  } else if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(normalizedIfscCode)) {
+    showError(
+      bankIfscCode,
+      "bankIfscCodeError",
+      "Enter a valid 11-character IFSC code.",
+    );
+
+    valid = false;
+  }
+
+  if (!bankName.value.trim()) {
+    showError(bankName, "bankNameError", "Please enter the bank name.");
+
+    valid = false;
+  } else if (bankName.value.trim().length > 150) {
+    showError(
+      bankName,
+      "bankNameError",
+      "Bank name must be 150 characters or fewer.",
     );
 
     valid = false;
