@@ -156,6 +156,8 @@ function filterCustomers(status) {
     updateFilterButtons();
 
     applyFilters();
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 

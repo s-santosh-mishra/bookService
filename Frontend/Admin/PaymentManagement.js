@@ -95,10 +95,6 @@ async function loadPayments() {
     payments = dashboard.payments;
     renderSummary(dashboard.summary);
     applyFilters();
-    document.getElementById("adminPageTitle").textContent =
-      "Payment Management";
-    document.getElementById("adminPageSubtitle").textContent =
-      "Payment monitoring and transaction history";
   } catch (error) {
     paymentTableBody.innerHTML = `
       <tr>

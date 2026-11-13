@@ -304,6 +304,8 @@ tabs.forEach(tab => {
 
         loadWorkers(status);
 
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
     });
 
 });

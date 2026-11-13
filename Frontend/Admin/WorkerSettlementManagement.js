@@ -105,10 +105,6 @@ loadPage();
 async function loadPage() {
   try {
     await Promise.all([loadSummary(), loadBatches(), loadHistory()]);
-    document.getElementById("adminPageTitle").textContent =
-      "Worker Settlement Management";
-    document.getElementById("adminPageSubtitle").textContent =
-      "IST business-date batches and manual worker transfers";
   } catch (error) {
     showMessage(error.message || "Unable to load settlement management.", "error");
   }

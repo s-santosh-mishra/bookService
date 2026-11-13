@@ -33,12 +33,12 @@
     <div id="adminSidebar"></div>
 
     <!-- Main Content -->
-    <main class="min-h-screen lg:ml-64">
+    <main class="min-h-screen min-w-0 flex-1 lg:ml-64">
       <!-- Admin Header -->
       <div id="adminHeader"></div>
 
       <!-- Page Content -->
-      <section class="px-6 py-8">
+      <section class="px-4 py-8 sm:px-6 lg:px-8">
         <div class="max-w-7xl mx-auto">
           <!-- Page Heading -->
           <div class="mb-8">
@@ -64,10 +64,10 @@
 
           <!-- Search + Filters -->
           <div
-            class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8"
+            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8"
           >
             <!-- Search -->
-            <div class="relative w-full lg:w-1/2">
+            <div class="relative w-full sm:w-80 lg:w-96">
               <i
                 class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-gray-500"
               ></i>
@@ -340,7 +340,7 @@
     <script src="../JS/config.js"></script>
 
     <!-- Shared Admin Layout -->
-    <script src="components/AdminLayout.js"></script>
+    <script src="Components/AdminLayout.js"></script>
 
     <!-- Customer Management Logic -->
     <script src="CustomerManagement.js"></script>
