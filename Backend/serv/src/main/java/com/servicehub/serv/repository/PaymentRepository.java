@@ -167,6 +167,25 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
     List<Payment> findEligiblePaymentsForWorker(
             @Param("workerId") UUID workerId);
 
+    @EntityGraph(attributePaths = {
+            "booking",
+            "booking.worker"
+    })
+    @Query("""
+            SELECT payment
+            FROM Payment payment
+            WHERE payment.booking.worker.userId = :workerId
+              AND payment.status = com.servicehub.serv.enums.PaymentStatus.SUCCESS
+              AND payment.paidAt IS NOT NULL
+              AND payment.booking.status IN (
+                  com.servicehub.serv.enums.BookingStatus.COMPLETED,
+                  com.servicehub.serv.enums.BookingStatus.REVIEWED
+              )
+            ORDER BY payment.paidAt DESC, payment.paymentId DESC
+            """)
+    List<Payment> findSuccessfulPaymentsForWorker(
+            @Param("workerId") UUID workerId);
+
     @Query("""
             SELECT new com.servicehub.serv.dto.WorkerSettlementSummaryDto(
                 worker.userId,

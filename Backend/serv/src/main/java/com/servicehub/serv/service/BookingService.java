@@ -685,13 +685,27 @@ public class BookingService {
                 .ifPresent(billing ->
                         d.setFinalBilledPrice(billing.getFinalBilledPrice()));
 
-        // Include the latest payment details, if a payment exists.
-        paymentRepository.findFirstByBookingBookingIdOrderByCreatedAtDesc(
-                b.getBookingId()
-        ).ifPresent(payment -> {
-            d.setPaymentStatus(payment.getStatus());
-            d.setPaymentMethod(payment.getPaymentMethod());
-        });
+        // Include the actual payment details, if a payment exists.
+        List<Payment> payments = paymentRepository
+                .findByBookingBookingIdOrderByCreatedAtDesc(b.getBookingId());
+
+        Payment primaryPayment = payments.stream()
+                .filter(payment -> payment.getStatus() == PaymentStatus.SUCCESS)
+                .findFirst()
+                .orElseGet(() -> payments.stream()
+                        .filter(payment -> payment.getStatus() == PaymentStatus.REFUNDED)
+                        .findFirst()
+                        .orElse(payments.isEmpty() ? null : payments.get(0)));
+
+        if (primaryPayment != null) {
+            d.setPaymentStatus(primaryPayment.getStatus());
+            d.setPaymentMethod(primaryPayment.getPaymentMethod());
+            d.setPaymentAmount(primaryPayment.getAmount());
+            if (primaryPayment.getStatus() == PaymentStatus.SUCCESS) {
+                d.setPaidAmount(primaryPayment.getAmount());
+                d.setPaidAt(primaryPayment.getPaidAt());
+            }
+        }
 
         return d;
     }

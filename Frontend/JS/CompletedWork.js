@@ -75,6 +75,212 @@ async function workerApiRequest(url, options = {}) {
   return response.json();
 }
 
+// Daily Settlement Summary
+
+function formatCurrency(val) {
+  const num = Number(val || 0);
+  return `₹${num.toLocaleString("en-IN", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
+async function loadDailySettlementSummary() {
+  try {
+    const summary = await workerApiRequest(
+      `${API_BASE_URL}/settlements/today-summary`,
+    );
+    renderDailySettlementSummary(summary);
+  } catch (error) {
+    console.error("Failed to load daily settlement summary:", error);
+    renderDailySettlementSummaryError(error);
+  }
+}
+
+function renderDailySettlementSummary(summary) {
+  if (!summary) return;
+
+  const dateEl = document.getElementById("summaryBusinessDateText");
+  const totalEarningsEl = document.getElementById("summaryTotalEarnings");
+  const jobCountEl = document.getElementById("summaryJobCount");
+  const cashEarningsEl = document.getElementById("summaryCashEarnings");
+  const statusBadgeEl = document.getElementById("summaryStatusBadge");
+  const statusMessageEl = document.getElementById("summaryStatusMessage");
+  const statusIconContainer = document.getElementById(
+    "summaryStatusIconContainer",
+  );
+  const statusIcon = document.getElementById("summaryStatusIcon");
+  const settledAmountEl = document.getElementById("summarySettledAmount");
+  const pendingAmountEl = document.getElementById("summaryPendingAmount");
+  const unsettledBreakdownEl = document.getElementById(
+    "summaryUnsettledBreakdown",
+  );
+
+  if (dateEl) {
+    let formattedDate = summary.businessDate || "Today";
+    if (window.SERVICEHUB_DATE && window.SERVICEHUB_DATE.formatDateOnly) {
+      formattedDate = window.SERVICEHUB_DATE.formatDateOnly(
+        summary.businessDate,
+        { fallback: summary.businessDate },
+      );
+    } else if (summary.businessDate) {
+      try {
+        const [year, month, day] = summary.businessDate
+          .split("-")
+          .map(Number);
+        const d = new Date(year, month - 1, day);
+        formattedDate = d.toLocaleDateString("en-IN", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
+      } catch (e) {
+        // preserve original string
+      }
+    }
+    const batchTag = summary.batchClosed ? "Batch Closed" : "Active Batch";
+    dateEl.textContent = `Business Date: ${formattedDate} (${batchTag})`;
+  }
+
+  if (totalEarningsEl) {
+    totalEarningsEl.textContent = formatCurrency(summary.totalEarnings);
+  }
+
+  if (jobCountEl) {
+    const count = summary.completedJobsCount || 0;
+    jobCountEl.textContent = `${count} ${count === 1 ? "job" : "jobs"}`;
+  }
+
+  if (cashEarningsEl) {
+    cashEarningsEl.textContent = `Cash: ${formatCurrency(summary.cashEarnings)}`;
+  }
+
+  if (settledAmountEl) {
+    settledAmountEl.textContent = formatCurrency(summary.settledAmount);
+  }
+
+  if (pendingAmountEl) {
+    pendingAmountEl.textContent = formatCurrency(
+      summary.pendingSettlementAmount,
+    );
+  }
+
+  if (unsettledBreakdownEl) {
+    const unsettled = Number(summary.unsettledAmount || 0);
+    const online = Number(summary.onlineEarnings || 0);
+    if (unsettled > 0 && !summary.batchClosed) {
+      unsettledBreakdownEl.textContent = `Online: ${formatCurrency(online)} (accumulating)`;
+    } else if (unsettled > 0) {
+      unsettledBreakdownEl.textContent = `Online: ${formatCurrency(online)} (ready)`;
+    } else {
+      unsettledBreakdownEl.textContent = `Online: ${formatCurrency(online)}`;
+    }
+  }
+
+  // Status Badge and Message
+  if (statusBadgeEl && statusMessageEl) {
+    statusMessageEl.textContent = summary.settlementStatusMessage || "";
+
+    const statusConfig = {
+      NO_JOBS: {
+        text: "No Jobs Yet",
+        badgeClass: "bg-gray-800 text-gray-400 border-gray-700",
+        iconClass: "fa-solid fa-moon text-gray-400 text-sm",
+        iconBoxClass: "bg-gray-800/60 border-gray-700",
+      },
+      CASH_COLLECTED: {
+        text: "Direct Cash",
+        badgeClass: "bg-teal-900/30 text-teal-400 border-teal-700/40",
+        iconClass: "fa-solid fa-money-bill-wave text-teal-400 text-sm",
+        iconBoxClass: "bg-teal-900/30 border-teal-700/40",
+      },
+      SETTLED: {
+        text: "Settled",
+        badgeClass:
+          "bg-emerald-900/30 text-emerald-400 border-emerald-700/40",
+        iconClass: "fa-solid fa-circle-check text-emerald-400 text-sm",
+        iconBoxClass: "bg-emerald-900/30 border-emerald-700/40",
+      },
+      PARTIALLY_SETTLED: {
+        text: "Partially Settled",
+        badgeClass: "bg-amber-900/30 text-amber-400 border-amber-700/40",
+        iconClass: "fa-solid fa-hourglass-half text-amber-400 text-sm",
+        iconBoxClass: "bg-amber-900/30 border-amber-700/40",
+      },
+      PROCESSING: {
+        text: "Processing",
+        badgeClass: "bg-amber-900/30 text-amber-400 border-amber-700/40",
+        iconClass: "fa-solid fa-spinner fa-spin text-amber-400 text-sm",
+        iconBoxClass: "bg-amber-900/30 border-amber-700/40",
+      },
+      OPEN_ACCUMULATING: {
+        text: "Batch Open",
+        badgeClass: "bg-blue-900/30 text-blue-400 border-blue-700/40",
+        iconClass: "fa-solid fa-clock-rotate-left text-blue-400 text-sm",
+        iconBoxClass: "bg-blue-900/30 border-blue-700/40",
+      },
+      READY_FOR_SETTLEMENT: {
+        text: "Batch Closed",
+        badgeClass:
+          "bg-violet-900/30 text-violet-400 border-violet-700/40",
+        iconClass: "fa-solid fa-check-double text-violet-400 text-sm",
+        iconBoxClass: "bg-violet-900/30 border-violet-700/40",
+      },
+      REVERSED_RETRY_AVAILABLE: {
+        text: "Reversed — Retrying",
+        badgeClass: "bg-rose-900/30 text-rose-400 border-rose-700/40",
+        iconClass: "fa-solid fa-rotate-left text-rose-400 text-sm",
+        iconBoxClass: "bg-rose-900/30 border-rose-700/40",
+      },
+      FAILED_RETRY_AVAILABLE: {
+        text: "Transfer Failed",
+        badgeClass: "bg-rose-900/30 text-rose-400 border-rose-700/40",
+        iconClass:
+          "fa-solid fa-triangle-exclamation text-rose-400 text-sm",
+        iconBoxClass: "bg-rose-900/30 border-rose-700/40",
+      },
+    };
+
+    const cfg = statusConfig[summary.settlementStatus] || {
+      text: summary.settlementStatus || "Pending",
+      badgeClass: "bg-gray-800 text-gray-300 border-gray-700",
+      iconClass: "fa-solid fa-hourglass-half text-gray-400 text-sm",
+      iconBoxClass: "bg-gray-800/60 border-gray-700",
+    };
+
+    statusBadgeEl.className = `px-2.5 py-0.5 rounded-full text-xs font-medium border ${cfg.badgeClass}`;
+    statusBadgeEl.textContent = cfg.text;
+
+    if (statusIcon) {
+      statusIcon.className = cfg.iconClass;
+    }
+    if (statusIconContainer) {
+      statusIconContainer.className = `w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 ${cfg.iconBoxClass}`;
+    }
+  }
+}
+
+function renderDailySettlementSummaryError(error) {
+  const dateEl = document.getElementById("summaryBusinessDateText");
+  const statusBadgeEl = document.getElementById("summaryStatusBadge");
+  const statusMessageEl = document.getElementById("summaryStatusMessage");
+
+  if (dateEl) {
+    dateEl.textContent = "Unable to load business date";
+  }
+  if (statusBadgeEl) {
+    statusBadgeEl.className =
+      "px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-900/30 text-red-400 border border-red-700/40";
+    statusBadgeEl.textContent = "Summary Unavailable";
+  }
+  if (statusMessageEl) {
+    statusMessageEl.textContent =
+      error && error.message
+        ? error.message
+        : "Unable to retrieve today's settlement summary.";
+  }
+}
+
 // Load Completed Work
 
 async function loadCompletedWork() {
@@ -83,6 +289,9 @@ async function loadCompletedWork() {
   if (!container) {
     return;
   }
+
+  // Load daily settlement summary in parallel
+  loadDailySettlementSummary();
 
   try {
     const bookings = await workerApiRequest(`${API_BASE_URL}/bookings`);

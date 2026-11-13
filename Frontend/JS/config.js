@@ -218,18 +218,44 @@
       }
       .servicehub-spinner {
         animation: servicehub-spin 0.75s linear infinite !important;
-        display: inline-block;
-        vertical-align: middle;
+        display: inline-block !important;
+        vertical-align: middle !important;
+        width: 1.125rem !important;
+        height: 1.125rem !important;
+      }
+      .servicehub-spinner-track {
+        stroke: rgba(255, 255, 255, 0.25) !important;
+        opacity: 0.28 !important;
+        stroke-opacity: 0.28 !important;
+      }
+      .servicehub-spinner-head {
+        fill: #ffffff !important;
+        opacity: 1 !important;
+        fill-opacity: 1 !important;
+      }
+      button.bg-white .servicehub-spinner-track,
+      button.text-gray-900 .servicehub-spinner-track,
+      button.text-black .servicehub-spinner-track {
+        stroke: rgba(0, 0, 0, 0.2) !important;
+        opacity: 0.25 !important;
+      }
+      button.bg-white .servicehub-spinner-head,
+      button.text-gray-900 .servicehub-spinner-head,
+      button.text-black .servicehub-spinner-head {
+        fill: #111827 !important;
+        opacity: 1 !important;
       }
     `;
     document.head.appendChild(style);
   }
 
-  function createSpinnerSvg() {
+  function createSpinnerSvg(isDarkText = false) {
+    const trackColor = isDarkText ? "rgba(0, 0, 0, 0.2)" : "rgba(255, 255, 255, 0.25)";
+    const headColor = isDarkText ? "#111827" : "#ffffff";
     return `
-      <svg class="servicehub-spinner h-4 w-4 shrink-0 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      <svg class="servicehub-spinner shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true" style="display:inline-block; vertical-align:middle; width:1.125rem; height:1.125rem;">
+        <circle class="servicehub-spinner-track" cx="12" cy="12" r="10" stroke="${trackColor}" stroke-width="3.5" style="stroke:${trackColor}; opacity:0.28; stroke-opacity:0.28; fill:none;"></circle>
+        <path class="servicehub-spinner-head" fill="${headColor}" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" style="fill:${headColor}; opacity:1; fill-opacity:1;"></path>
       </svg>
     `.trim();
   }
@@ -260,7 +286,11 @@
     button.setAttribute("aria-busy", "true");
 
     const text = loadingText || "Processing...";
-    const spinner = createSpinnerSvg();
+    const isDarkText =
+      button.classList.contains("bg-white") ||
+      button.classList.contains("text-gray-900") ||
+      button.classList.contains("text-black");
+    const spinner = createSpinnerSvg(isDarkText);
 
     button.innerHTML = `
       <span class="inline-flex items-center justify-center gap-2 pointer-events-none w-full">

@@ -41,6 +41,12 @@ public class BookingDto {
 
     private PaymentMethod paymentMethod;
 
+    private BigDecimal paidAmount;
+
+    private BigDecimal paymentAmount;
+
+    private LocalDateTime paidAt;
+
     public UUID getBookingId() {
         return bookingId;
     }
@@ -303,5 +309,29 @@ public class BookingDto {
 
     public void setPaymentMethod(PaymentMethod paymentMethod) {
         this.paymentMethod = paymentMethod;
+    }
+
+    public BigDecimal getPaidAmount() {
+        return paidAmount;
+    }
+
+    public void setPaidAmount(BigDecimal paidAmount) {
+        this.paidAmount = paidAmount;
+    }
+
+    public BigDecimal getPaymentAmount() {
+        return paymentAmount;
+    }
+
+    public void setPaymentAmount(BigDecimal paymentAmount) {
+        this.paymentAmount = paymentAmount;
+    }
+
+    public LocalDateTime getPaidAt() {
+        return paidAt;
+    }
+
+    public void setPaidAt(LocalDateTime paidAt) {
+        this.paidAt = paidAt;
     }
 }

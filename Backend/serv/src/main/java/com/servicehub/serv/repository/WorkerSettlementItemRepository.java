@@ -44,4 +44,11 @@ public interface WorkerSettlementItemRepository extends JpaRepository<WorkerSett
                      item.settlement.settlementId
             """)
     List<WorkerSettlementItem> findAllForBatchHistory();
+
+    @EntityGraph(attributePaths = {
+            "payment",
+            "settlement",
+            "settlement.reversal"
+    })
+    List<WorkerSettlementItem> findByPayment_PaymentIdIn(Collection<UUID> paymentIds);
 }

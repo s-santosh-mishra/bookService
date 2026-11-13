@@ -1,6 +1,9 @@
-
 {
   "rewrites": [
+    {
+      "source": "/Admin/components/:path*",
+      "destination": "/Admin/Components/:path*"
+    },
     {
       "source": "/",
       "destination": "/HTML/index.html"

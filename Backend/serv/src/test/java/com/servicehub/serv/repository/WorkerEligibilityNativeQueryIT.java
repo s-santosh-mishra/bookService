@@ -220,7 +220,7 @@ class WorkerEligibilityNativeQueryIT {
         assertEquals(eligibleWorker.getUserId(), result.get(0).getUserId(),
                 "The returned worker must be the genuinely eligible worker");
 
-        Set<UUID> returnedIds = result.stream().map(Worker::getUserId).collect(Collectors.toSet());
+        Set<UUID> returnedIds = result.stream().map(worker -> worker.getUserId()).collect(Collectors.toSet());
         assertTrue(returnedIds.contains(eligibleWorker.getUserId()));
         assertFalse(returnedIds.contains(outsideBoxWorker.getUserId()), "Outside box worker must be excluded");
         assertFalse(returnedIds.contains(staleGpsWorker.getUserId()), "Stale GPS worker must be excluded");
@@ -265,7 +265,7 @@ class WorkerEligibilityNativeQueryIT {
                 19.9, 20.1, 84.9, 85.1
         );
 
-        Set<UUID> resultIds = result.stream().map(Worker::getUserId).collect(Collectors.toSet());
+        Set<UUID> resultIds = result.stream().map(worker -> worker.getUserId()).collect(Collectors.toSet());
         assertEquals(2, result.size());
         assertTrue(resultIds.contains(workerWithCompletedBooking.getUserId()));
         assertTrue(resultIds.contains(workerWithCancelledBooking.getUserId()));
@@ -302,7 +302,7 @@ class WorkerEligibilityNativeQueryIT {
                 19.9, 20.1, 84.9, 85.1
         );
 
-        Set<UUID> resultIds = result.stream().map(Worker::getUserId).collect(Collectors.toSet());
+        Set<UUID> resultIds = result.stream().map(worker -> worker.getUserId()).collect(Collectors.toSet());
         assertEquals(2, result.size());
         assertTrue(resultIds.contains(workerOfferedOther.getUserId()));
         assertTrue(resultIds.contains(workerRejectedOther.getUserId()));
@@ -338,7 +338,7 @@ class WorkerEligibilityNativeQueryIT {
                 19.9, 20.1, 84.9, 85.1
         );
 
-        Set<UUID> resultIds = result.stream().map(Worker::getUserId).collect(Collectors.toSet());
+        Set<UUID> resultIds = result.stream().map(worker -> worker.getUserId()).collect(Collectors.toSet());
         assertEquals(2, result.size());
         assertTrue(resultIds.contains(atFreshAfter.getUserId()));
         assertTrue(resultIds.contains(atLocationNow.getUserId()));

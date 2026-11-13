@@ -119,6 +119,194 @@ function getStatusDescription(status) {
   return descriptions[status] || "Booking status information is unavailable.";
 }
 
+/* PAYMENT HELPERS */
+
+function formatCurrency(val) {
+  const num = Number(val || 0);
+  return `₹${num.toLocaleString("en-IN", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
+function getPaymentDisplayDetails(booking) {
+  // 1. Confirmed successful payment
+  if (booking.paymentStatus === "SUCCESS") {
+    const isCash = booking.paymentMethod === "CASH";
+    const amountStr =
+      booking.paidAmount != null ? formatCurrency(booking.paidAmount) : "Paid";
+    const paidAtParts = booking.paidAt ? formatDateTime(booking.paidAt) : null;
+    const paidAtText =
+      paidAtParts && paidAtParts.date !== "Not available"
+        ? `on ${paidAtParts.date} · ${paidAtParts.time}`
+        : "";
+
+    if (isCash) {
+      return {
+        badgeText: "Paid in Cash",
+        badgeClasses: "bg-teal-900/30 text-teal-400 border-teal-700/40",
+        icon: "fa-solid fa-money-bill-wave text-teal-400 text-sm",
+        methodTitle: "Cash Payment",
+        amountText: amountStr,
+        amountSubtext: "Paid to worker",
+        subtext: `Cash receipt confirmed by service professional ${paidAtText}`.trim(),
+        isPaid: true,
+      };
+    } else {
+      return {
+        badgeText: "Paid Online",
+        badgeClasses: "bg-emerald-900/30 text-emerald-400 border-emerald-700/40",
+        icon: "fa-solid fa-credit-card text-emerald-400 text-sm",
+        methodTitle: "Online Payment (Razorpay)",
+        amountText: amountStr,
+        amountSubtext: "Paid online",
+        subtext: `Online payment verified successfully ${paidAtText}`.trim(),
+        isPaid: true,
+      };
+    }
+  }
+
+  // 2. Pending payment attempt
+  if (
+    booking.paymentStatus === "PENDING" ||
+    booking.paymentStatus === "CREATED"
+  ) {
+    const isCash = booking.paymentMethod === "CASH";
+    const dueAmount =
+      booking.paymentAmount != null
+        ? formatCurrency(booking.paymentAmount)
+        : booking.finalBilledPrice != null
+          ? formatCurrency(booking.finalBilledPrice)
+          : "Pending";
+
+    if (isCash) {
+      return {
+        badgeText: "Cash Due on Completion",
+        badgeClasses: "bg-amber-900/30 text-amber-400 border-amber-700/40",
+        icon: "fa-solid fa-hand-holding-dollar text-amber-400 text-sm",
+        methodTitle: "Cash on Delivery",
+        amountText: dueAmount,
+        amountSubtext: "Cash amount due",
+        subtext:
+          "Pay in cash directly to your service professional upon completion.",
+        isPaid: false,
+      };
+    } else {
+      return {
+        badgeText: "Payment Pending",
+        badgeClasses: "bg-amber-900/30 text-amber-400 border-amber-700/40",
+        icon: "fa-solid fa-clock-rotate-left text-amber-400 text-sm",
+        methodTitle: "Online Payment",
+        amountText: dueAmount,
+        amountSubtext: "Awaiting confirmation",
+        subtext: "Online payment attempt is processing or pending verification.",
+        isPaid: false,
+      };
+    }
+  }
+
+  // 3. Failed payment attempt
+  if (booking.paymentStatus === "FAILED") {
+    return {
+      badgeText: "Payment Failed",
+      badgeClasses: "bg-rose-900/30 text-rose-400 border-rose-700/40",
+      icon: "fa-solid fa-triangle-exclamation text-rose-400 text-sm",
+      methodTitle:
+        booking.paymentMethod === "CASH" ? "Cash Payment" : "Online Payment",
+      amountText:
+        booking.paymentAmount != null
+          ? formatCurrency(booking.paymentAmount)
+          : "Failed",
+      amountSubtext: "Attempt failed",
+      subtext: "Payment was unsuccessful. Please retry payment or contact support.",
+      isPaid: false,
+    };
+  }
+
+  // 4. Refunded payment
+  if (booking.paymentStatus === "REFUNDED") {
+    return {
+      badgeText: "Refunded",
+      badgeClasses: "bg-purple-900/30 text-purple-400 border-purple-700/40",
+      icon: "fa-solid fa-rotate-left text-purple-400 text-sm",
+      methodTitle:
+        booking.paymentMethod === "CASH" ? "Cash Refund" : "Online Refund",
+      amountText:
+        booking.paymentAmount != null
+          ? formatCurrency(booking.paymentAmount)
+          : booking.paidAmount != null
+            ? formatCurrency(booking.paidAmount)
+            : "Refunded",
+      amountSubtext: "Refund processed",
+      subtext: "Payment has been refunded to your original payment source.",
+      isPaid: false,
+    };
+  }
+
+  // 5. Cancelled payment attempt
+  if (booking.paymentStatus === "CANCELLED") {
+    return {
+      badgeText: "Payment Cancelled",
+      badgeClasses: "bg-gray-800 text-gray-400 border-gray-700",
+      icon: "fa-solid fa-ban text-gray-400 text-sm",
+      methodTitle: "Cancelled",
+      amountText:
+        booking.paymentAmount != null
+          ? formatCurrency(booking.paymentAmount)
+          : "—",
+      amountSubtext: "Cancelled attempt",
+      subtext: "This payment attempt was cancelled.",
+      isPaid: false,
+    };
+  }
+
+  // 6. No payment attempt recorded yet
+  if (booking.status === "WAITING_FOR_PAYMENT") {
+    const billedAmount =
+      booking.finalBilledPrice != null
+        ? formatCurrency(booking.finalBilledPrice)
+        : "Pending bill";
+    return {
+      badgeText: "Awaiting Payment",
+      badgeClasses: "bg-orange-900/30 text-orange-400 border-orange-700/40",
+      icon: "fa-solid fa-receipt text-orange-400 text-sm",
+      methodTitle: "Payment Required",
+      amountText: billedAmount,
+      amountSubtext: "Billed price",
+      subtext: "Service is complete. Please pay the billed amount on your dashboard.",
+      isPaid: false,
+    };
+  }
+
+  if (booking.status === "COMPLETED" || booking.status === "REVIEWED") {
+    return {
+      badgeText: "Payment Recorded",
+      badgeClasses: "bg-gray-800 text-gray-400 border-gray-700",
+      icon: "fa-solid fa-circle-check text-gray-400 text-sm",
+      methodTitle: "Completed Booking",
+      amountText:
+        booking.finalBilledPrice != null
+          ? formatCurrency(booking.finalBilledPrice)
+          : "—",
+      amountSubtext: "Final price",
+      subtext: "Service completed.",
+      isPaid: false,
+    };
+  }
+
+  // Ongoing / Pending / Cancelled before billing
+  return {
+    badgeText: "Not Due Yet",
+    badgeClasses: "bg-gray-800/60 text-gray-400 border-gray-700/60",
+    icon: "fa-solid fa-clock text-gray-500 text-sm",
+    methodTitle: "Payment",
+    amountText: "—",
+    amountSubtext: "Upon completion",
+    subtext: "Final billing is calculated after the service is completed.",
+    isPaid: false,
+  };
+}
+
 
 /* DATE /  TIME*/
 
@@ -252,6 +440,8 @@ function createBookingCard(booking) {
   const serviceName = booking.serviceName || "Service request";
 
   const workerText = booking.workerName || "Worker not assigned";
+
+  const paymentInfo = getPaymentDisplayDetails(booking);
 
   card.innerHTML = `
 
@@ -442,6 +632,60 @@ function createBookingCard(booking) {
                     : ""
                 }
 
+
+            </div>
+
+
+            <!-- Payment Information -->
+
+            <div class="pt-4 border-t border-gray-800">
+
+                <div class="bg-gray-950/70 border border-gray-800/80 rounded-xl p-4">
+
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+
+                        <div class="flex items-center gap-3">
+
+                            <div class="w-10 h-10 rounded-lg bg-gray-900 border border-gray-800 flex items-center justify-center shrink-0">
+                                <i class="${paymentInfo.icon}"></i>
+                            </div>
+
+                            <div>
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <p class="text-xs text-gray-400 uppercase tracking-wider font-medium">Payment Information</p>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${paymentInfo.badgeClasses}">
+                                        ${paymentInfo.badgeText}
+                                    </span>
+                                </div>
+
+                                <p class="text-sm font-medium text-gray-200 mt-0.5">
+                                    ${paymentInfo.methodTitle}
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <div class="sm:text-right pl-13 sm:pl-0">
+                            <p class="text-xs text-gray-500 mb-0.5">${paymentInfo.amountSubtext}</p>
+                            <p class="text-base font-bold ${paymentInfo.isPaid ? "text-emerald-400" : "text-white"}">
+                                ${paymentInfo.amountText}
+                            </p>
+                        </div>
+
+                    </div>
+
+                    ${
+                      paymentInfo.subtext
+                        ? `
+                        <p class="text-xs text-gray-400 mt-2.5 pt-2.5 border-t border-gray-900 flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-info text-gray-500 text-[10px]"></i>
+                            <span>${paymentInfo.subtext}</span>
+                        </p>
+                    `
+                        : ""
+                    }
+
+                </div>
 
             </div>
 

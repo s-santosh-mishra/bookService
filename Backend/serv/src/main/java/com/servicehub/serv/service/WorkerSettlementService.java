@@ -18,6 +18,8 @@ import com.servicehub.serv.dto.WorkerSettlementItemDto;
 import com.servicehub.serv.dto.WorkerSettlementResponseDto;
 import com.servicehub.serv.dto.WorkerSettlementReversalDto;
 import com.servicehub.serv.dto.WorkerSettlementSummaryDto;
+import com.servicehub.serv.dto.WorkerDailySettlementSummaryDto;
+import com.servicehub.serv.enums.PaymentMethod;
 import com.servicehub.serv.enums.SettlementStatus;
 import com.servicehub.serv.enums.SettlementBatchStatus;
 import com.servicehub.serv.enums.UserRole;
@@ -833,6 +835,140 @@ public class WorkerSettlementService {
                     eligiblePaymentCount,
                     eligibleAmount);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public WorkerDailySettlementSummaryDto getWorkerDailySummary(UUID workerId) {
+        Worker worker = workerRepository.findById(workerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Worker not found."));
+
+        ZonedDateTime now = businessDateCalculator.now();
+        LocalDate targetBusinessDate = businessDateCalculator.businessDate(now.toLocalDateTime());
+        boolean batchClosed = businessDateCalculator.isClosed(targetBusinessDate, now);
+
+        List<Payment> allSuccessfulPayments =
+                paymentRepository.findSuccessfulPaymentsForWorker(workerId);
+
+        List<Payment> todayPayments = allSuccessfulPayments.stream()
+                .filter(payment -> targetBusinessDate.equals(
+                        businessDateCalculator.businessDate(payment.getPaidAt())))
+                .toList();
+
+        int completedJobsCount = (int) todayPayments.stream()
+                .map(p -> p.getBooking().getBookingId())
+                .distinct()
+                .count();
+
+        BigDecimal cashEarnings = BigDecimal.ZERO;
+        BigDecimal onlineEarnings = BigDecimal.ZERO;
+        List<Payment> onlinePayments = new ArrayList<>();
+
+        for (Payment payment : todayPayments) {
+            if (payment.getPaymentMethod() == PaymentMethod.CASH) {
+                cashEarnings = cashEarnings.add(payment.getAmount());
+            } else if (payment.getPaymentMethod() == PaymentMethod.RAZORPAY) {
+                onlineEarnings = onlineEarnings.add(payment.getAmount());
+                onlinePayments.add(payment);
+            }
+        }
+        BigDecimal totalEarnings = cashEarnings.add(onlineEarnings);
+
+        BigDecimal settledAmount = BigDecimal.ZERO;
+        BigDecimal pendingSettlementAmount = BigDecimal.ZERO;
+        BigDecimal unsettledAmount = BigDecimal.ZERO;
+        boolean hasReversal = false;
+        boolean hasFailure = false;
+
+        if (!onlinePayments.isEmpty()) {
+            List<UUID> onlinePaymentIds = onlinePayments.stream()
+                    .map(payment -> payment.getPaymentId())
+                    .toList();
+            List<WorkerSettlementItem> items =
+                    workerSettlementItemRepository.findByPayment_PaymentIdIn(onlinePaymentIds);
+            Map<UUID, List<WorkerSettlementItem>> itemsByPayment =
+                    groupItemsByPayment(items);
+
+            for (Payment payment : onlinePayments) {
+                List<WorkerSettlementItem> paymentItems =
+                        itemsByPayment.getOrDefault(payment.getPaymentId(), List.of());
+
+                boolean isSettled = false;
+                boolean isPendingOrProcessing = false;
+
+                for (WorkerSettlementItem item : paymentItems) {
+                    WorkerSettlement settlement = item.getSettlement();
+                    if (settlement.getStatus() == SettlementStatus.SETTLED) {
+                        if (settlement.getReversal() != null) {
+                            hasReversal = true;
+                        } else {
+                            isSettled = true;
+                        }
+                    } else if (settlement.getStatus() == SettlementStatus.PENDING
+                            || settlement.getStatus() == SettlementStatus.PROCESSING) {
+                        isPendingOrProcessing = true;
+                    } else if (settlement.getStatus() == SettlementStatus.FAILED) {
+                        hasFailure = true;
+                    }
+                }
+
+                if (isSettled) {
+                    settledAmount = settledAmount.add(payment.getAmount());
+                } else if (isPendingOrProcessing) {
+                    pendingSettlementAmount = pendingSettlementAmount.add(payment.getAmount());
+                } else {
+                    unsettledAmount = unsettledAmount.add(payment.getAmount());
+                }
+            }
+        }
+
+        String settlementStatus;
+        String settlementStatusMessage;
+
+        if (completedJobsCount == 0) {
+            settlementStatus = "NO_JOBS";
+            settlementStatusMessage = "No completed jobs in the current business date batch.";
+        } else if (onlineEarnings.compareTo(BigDecimal.ZERO) == 0) {
+            settlementStatus = "CASH_COLLECTED";
+            settlementStatusMessage = "Earnings collected directly in cash. No bank transfer required.";
+        } else if (settledAmount.compareTo(onlineEarnings) == 0) {
+            settlementStatus = "SETTLED";
+            settlementStatusMessage = "Bank transfer completed successfully.";
+        } else if (pendingSettlementAmount.compareTo(BigDecimal.ZERO) > 0) {
+            if (settledAmount.compareTo(BigDecimal.ZERO) > 0) {
+                settlementStatus = "PARTIALLY_SETTLED";
+                settlementStatusMessage = "Partially settled. Remaining amount is currently processing.";
+            } else {
+                settlementStatus = "PROCESSING";
+                settlementStatusMessage = "Settlement is currently being processed by administration.";
+            }
+        } else {
+            if (hasReversal) {
+                settlementStatus = "REVERSED_RETRY_AVAILABLE";
+                settlementStatusMessage = "Previous bank transfer was reversed. Funds are available for re-settlement.";
+            } else if (hasFailure) {
+                settlementStatus = "FAILED_RETRY_AVAILABLE";
+                settlementStatusMessage = "Previous settlement attempt failed. Funds are awaiting retry.";
+            } else if (!batchClosed) {
+                settlementStatus = "OPEN_ACCUMULATING";
+                settlementStatusMessage = "Current batch is open and accumulating. Batch closes at 8:00 PM IST.";
+            } else {
+                settlementStatus = "READY_FOR_SETTLEMENT";
+                settlementStatusMessage = "Batch closed at 8:00 PM IST. Awaiting administrator transfer.";
+            }
+        }
+
+        return new WorkerDailySettlementSummaryDto(
+                targetBusinessDate,
+                completedJobsCount,
+                totalEarnings,
+                cashEarnings,
+                onlineEarnings,
+                settledAmount,
+                pendingSettlementAmount,
+                unsettledAmount,
+                batchClosed,
+                settlementStatus,
+                settlementStatusMessage);
     }
 
     private WorkerSettlement getSettlementForUpdate(UUID settlementId) {

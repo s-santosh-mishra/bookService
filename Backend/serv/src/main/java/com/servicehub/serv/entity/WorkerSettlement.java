@@ -197,4 +197,8 @@ public class WorkerSettlement {
     public WorkerSettlementReversal getReversal() {
         return reversal;
     }
+
+    public void setReversal(WorkerSettlementReversal reversal) {
+        this.reversal = reversal;
+    }
 }
