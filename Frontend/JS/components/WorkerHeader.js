@@ -168,7 +168,7 @@ document
   .forEach((link) => {
     const linkPage = link.getAttribute("href");
 
-    if (linkPage === currentWorkerPage || linkPage.endsWith("/" + currentWorkerPage)) {
+    if (linkPage && (linkPage === currentWorkerPage || linkPage.endsWith("/" + currentWorkerPage))) {
       link.classList.add("active");
     }
   });

@@ -126,7 +126,7 @@ const currentPage = window.location.pathname.split("/").pop();
 document.querySelectorAll(".nav-btn, .mobile-nav-btn").forEach((link) => {
   const linkPage = link.getAttribute("href");
 
-  if (linkPage === currentPage || linkPage.endsWith("/" + currentPage)) {
+  if (linkPage && (linkPage === currentPage || linkPage.endsWith("/" + currentPage))) {
     link.classList.add("active");
   }
 });
