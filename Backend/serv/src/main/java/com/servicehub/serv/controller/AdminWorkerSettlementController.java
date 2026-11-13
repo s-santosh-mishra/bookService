@@ -16,6 +16,8 @@ import com.servicehub.serv.dto.RecordSettlementReversalRequestDto;
 import com.servicehub.serv.enums.SettlementStatus;
 import com.servicehub.serv.service.WorkerSettlementService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +37,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/admin/settlements")
 public class AdminWorkerSettlementController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AdminWorkerSettlementController.class);
 
     private final WorkerSettlementService workerSettlementService;
 
@@ -65,12 +69,16 @@ public class AdminWorkerSettlementController {
     public ResponseEntity<WorkerSettlementResponseDto> createSettlement(
             @Valid @RequestBody CreateSettlementRequestDto request,
             Authentication authentication) {
+        UUID adminId = authenticatedAdminId(authentication);
+        logger.info("AdminWorkerSettlementController: createSettlement requested by adminId={} for workerId={} date={} paymentsCount={}",
+                adminId, request.getWorkerId(), request.getBusinessDate(),
+                request.getPaymentIds() != null ? request.getPaymentIds().size() : 0);
         WorkerSettlementResponseDto response =
                 workerSettlementService.createSettlementResponse(
                         request.getWorkerId(),
                         request.getPaymentIds(),
                         request.getBusinessDate(),
-                        authenticatedAdminId(authentication));
+                        adminId);
         return ResponseEntity
                 .created(URI.create("/api/admin/settlements/" + response.getSettlementId()))
                 .body(response);

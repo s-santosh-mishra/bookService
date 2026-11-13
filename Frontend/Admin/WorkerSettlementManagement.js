@@ -555,7 +555,21 @@ async function createSettlement() {
       }),
     });
   } catch (error) {
-    showMessage(error.message || "Unable to create the settlement.", "error");
+    const errorMsg = error.message || "Unable to create the settlement.";
+    const existingAlert = document.getElementById("createSettlementError");
+    if (existingAlert) {
+      existingAlert.innerHTML = `<p class="font-medium text-red-200">Settlement creation failed</p><p class="mt-1">${escapeHtml(errorMsg)}</p>`;
+    } else {
+      const content = document.getElementById("createSettlementContent");
+      if (content) {
+        const alertDiv = document.createElement("div");
+        alertDiv.id = "createSettlementError";
+        alertDiv.className = "rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300";
+        alertDiv.innerHTML = `<p class="font-medium text-red-200">Settlement creation failed</p><p class="mt-1">${escapeHtml(errorMsg)}</p>`;
+        content.prepend(alertDiv);
+      }
+    }
+    showMessage(errorMsg, "error");
     return;
   } finally {
     if (restore) {
@@ -1118,15 +1132,7 @@ async function settlementRequest(path, options = {}) {
     headers,
   });
 
-  if (response.status === 401 || response.status === 403) {
-    sessionStorage.removeItem("servicehub_access_token");
-    sessionStorage.removeItem("servicehub_user_id");
-    sessionStorage.removeItem("servicehub_user_email");
-    sessionStorage.removeItem("servicehub_user_role");
-    window.location.href = "/Admin/adminLogin.html";
-    throw new Error("Your administrator session has expired.");
-  }
-
+  // Parse response body before deciding how to handle the status
   const responseText = await response.text();
   let data = null;
   if (responseText) {
@@ -1136,13 +1142,26 @@ async function settlementRequest(path, options = {}) {
       data = responseText;
     }
   }
+
+  if (response.status === 401) {
+    // Genuine authentication failure — JWT expired or invalid
+    sessionStorage.removeItem("servicehub_access_token");
+    sessionStorage.removeItem("servicehub_user_id");
+    sessionStorage.removeItem("servicehub_user_email");
+    sessionStorage.removeItem("servicehub_user_role");
+    window.location.href = "/Admin/adminLogin.html";
+    throw new Error("Your administrator session has expired.");
+  }
+
   if (!response.ok) {
     const message =
       (data &&
         typeof data === "object" &&
         (data.message || data.error || data.detail)) ||
       (typeof data === "string" && data) ||
-      `Request failed with status ${response.status}.`;
+      (response.status === 403
+        ? "Access forbidden. Your account does not have permission to perform this settlement action."
+        : `Request failed with status ${response.status}.`);
     throw new Error(message);
   }
   return data;

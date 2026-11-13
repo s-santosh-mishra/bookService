@@ -4,10 +4,15 @@ import com.servicehub.serv.security.JwtAuthenticationFilter;
 
 import java.util.List;
 
+import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -19,6 +24,8 @@ import org.springframework.http.HttpMethod;
 
 @Configuration
 public class SecurityConfig {
+
+        private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
         private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
@@ -118,6 +125,28 @@ public class SecurityConfig {
                                                 // Everything else requires authentication
                                                 .anyRequest()
                                                 .authenticated())
+
+                                // Exception handling for unauthenticated requests (401) and access denied (403)
+                                .exceptionHandling(exceptions -> exceptions
+                                                .authenticationEntryPoint((request, response, authException) -> {
+                                                        logger.warn("Unauthenticated request: method={} path={} reason={}",
+                                                                        request.getMethod(), request.getRequestURI(), authException.getMessage());
+                                                        response.setContentType("application/json");
+                                                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                                        response.getWriter().write("{\"error\":\"Authentication required.\"}");
+                                                })
+                                                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                                                        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                                                        String principal = (auth != null) ? auth.getName() : "anonymous";
+                                                        String authorities = (auth != null && auth.getAuthorities() != null)
+                                                                        ? auth.getAuthorities().toString() : "none";
+                                                        logger.warn("Access denied: method={} path={} principal={} authorities={} reason={}",
+                                                                        request.getMethod(), request.getRequestURI(), principal, authorities,
+                                                                        accessDeniedException.getMessage());
+                                                        response.setContentType("application/json");
+                                                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                                                        response.getWriter().write("{\"error\":\"Access denied.\"}");
+                                                }))
 
                                 // JWT filter
                                 .addFilterBefore(
