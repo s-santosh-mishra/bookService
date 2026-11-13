@@ -2592,16 +2592,26 @@ function formatDateTime(dateString) {
     return "—";
   }
 
-  const date = new Date(dateString);
+  if (window.SERVICEHUB_DATE) {
+    return window.SERVICEHUB_DATE.formatDateTime(dateString, { fallback: "—" });
+  }
+
+  let str = String(dateString).trim();
+  const hasOffset = /(?:Z|[+-]\d{2}(?::?\d{2})?)$/i.test(str);
+  if (!hasOffset && /^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}/.test(str)) {
+    str = str.replace(" ", "T") + "Z";
+  }
+  const date = new Date(str);
 
   if (Number.isNaN(date.getTime())) {
     return "—";
   }
 
-  return date.toLocaleString(undefined, {
+  return new Intl.DateTimeFormat("en-IN", {
+    timeZone: "Asia/Kolkata",
     dateStyle: "medium",
     timeStyle: "short",
-  });
+  }).format(date);
 }
 
 function escapeHtml(value) {

@@ -113,6 +113,10 @@ function getStatusDescription(status) {
 /* DATE /  TIME*/
 
 function formatDateTime(value) {
+  if (window.SERVICEHUB_DATE) {
+    return window.SERVICEHUB_DATE.formatDateTimeParts(value);
+  }
+
   if (!value) {
     return {
       date: "Not available",
@@ -120,7 +124,12 @@ function formatDateTime(value) {
     };
   }
 
-  const date = new Date(value);
+  let str = String(value).trim();
+  const hasOffset = /(?:Z|[+-]\d{2}(?::?\d{2})?)$/i.test(str);
+  if (!hasOffset && /^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}/.test(str)) {
+    str = str.replace(" ", "T") + "Z";
+  }
+  const date = new Date(str);
 
   if (Number.isNaN(date.getTime())) {
     return {
@@ -130,16 +139,19 @@ function formatDateTime(value) {
   }
 
   return {
-    date: date.toLocaleDateString([], {
+    date: new Intl.DateTimeFormat("en-IN", {
+      timeZone: "Asia/Kolkata",
       day: "2-digit",
       month: "short",
       year: "numeric",
-    }),
+    }).format(date),
 
-    time: date.toLocaleTimeString([], {
+    time: new Intl.DateTimeFormat("en-IN", {
+      timeZone: "Asia/Kolkata",
       hour: "2-digit",
       minute: "2-digit",
-    }),
+      hour12: true,
+    }).format(date),
   };
 }
 
@@ -179,7 +191,12 @@ async function loadBookings() {
             Newest bookings first.
         */
 
-    bookings.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    bookings.sort((a, b) =>
+      window.SERVICEHUB_DATE
+        ? window.SERVICEHUB_DATE.getTimestamp(b.createdAt) -
+          window.SERVICEHUB_DATE.getTimestamp(a.createdAt)
+        : new Date(b.createdAt) - new Date(a.createdAt),
+    );
 
     renderBookings(bookings);
   } catch (error) {

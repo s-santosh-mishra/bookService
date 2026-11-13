@@ -8,9 +8,210 @@
     ? "http://localhost:8080"
     : "https://bookservice-z2kr.onrender.com";
 
+  function isDateOnly(str) {
+    return /^\d{4}-\d{2}-\d{2}$/.test(str);
+  }
+
+  function parseUtcToDate(value) {
+    if (value === null || value === undefined || value === "") return null;
+    if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+    if (typeof value === "number") {
+      const d = new Date(value);
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+    let str = String(value).trim();
+    if (!str) return null;
+    if (isDateOnly(str)) return null;
+
+    const hasOffset = /(?:Z|[+-]\d{2}(?::?\d{2})?)$/i.test(str);
+    if (!hasOffset && /^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}/.test(str)) {
+      str = str.replace(" ", "T") + "Z";
+    }
+    const date = new Date(str);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  function parseIstToDate(value) {
+    if (value === null || value === undefined || value === "") return null;
+    if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+    if (typeof value === "number") {
+      const d = new Date(value);
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+    let str = String(value).trim();
+    if (!str) return null;
+    if (isDateOnly(str)) return null;
+
+    const hasOffset = /(?:Z|[+-]\d{2}(?::?\d{2})?)$/i.test(str);
+    if (!hasOffset && /^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}/.test(str)) {
+      str = str.replace(" ", "T") + "+05:30";
+    }
+    const date = new Date(str);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  function formatCalendarDate(value, options) {
+    const fallback = options && options.fallback !== undefined ? options.fallback : "—";
+    if (value === null || value === undefined || value === "") return fallback;
+    const str = String(value).trim();
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(str);
+    if (!match) return fallback;
+    const year = Number(match[1]);
+    const month = Number(match[2]) - 1;
+    const day = Number(match[3]);
+    const date = new Date(Date.UTC(year, month, day));
+    const opts = Object.assign(
+      {
+        timeZone: "UTC",
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+      },
+      options
+    );
+    delete opts.fallback;
+    return new Intl.DateTimeFormat("en-IN", opts).format(date);
+  }
+
+  function formatDateTime(value, options) {
+    const date = parseUtcToDate(value);
+    const fallback = options && options.fallback !== undefined ? options.fallback : "—";
+    if (!date) return fallback;
+    const opts = Object.assign(
+      {
+        timeZone: "Asia/Kolkata",
+        dateStyle: "medium",
+        timeStyle: "short"
+      },
+      options
+    );
+    delete opts.fallback;
+    return new Intl.DateTimeFormat("en-IN", opts).format(date);
+  }
+
+  function formatIstDateTime(value, options) {
+    const date = parseIstToDate(value);
+    const fallback = options && options.fallback !== undefined ? options.fallback : "—";
+    if (!date) return fallback;
+    const opts = Object.assign(
+      {
+        timeZone: "Asia/Kolkata",
+        dateStyle: "medium",
+        timeStyle: "short"
+      },
+      options
+    );
+    delete opts.fallback;
+    return new Intl.DateTimeFormat("en-IN", opts).format(date);
+  }
+
+  function formatDate(value, options) {
+    if (typeof value === "string" && isDateOnly(value.trim())) {
+      return formatCalendarDate(value, options);
+    }
+    const date = parseUtcToDate(value);
+    const fallback = options && options.fallback !== undefined ? options.fallback : "—";
+    if (!date) return fallback;
+    const opts = Object.assign(
+      {
+        timeZone: "Asia/Kolkata",
+        dateStyle: "medium"
+      },
+      options
+    );
+    delete opts.fallback;
+    return new Intl.DateTimeFormat("en-IN", opts).format(date);
+  }
+
+  function formatTime(value, options) {
+    const date = parseUtcToDate(value);
+    const fallback = options && options.fallback !== undefined ? options.fallback : "—";
+    if (!date) return fallback;
+    const opts = Object.assign(
+      {
+        timeZone: "Asia/Kolkata",
+        timeStyle: "short"
+      },
+      options
+    );
+    delete opts.fallback;
+    return new Intl.DateTimeFormat("en-IN", opts).format(date);
+  }
+
+  function formatDateTimeParts(value) {
+    const date = parseUtcToDate(value);
+    if (!date) {
+      return {
+        date: "Not available",
+        time: "Not available"
+      };
+    }
+    const dateStr = new Intl.DateTimeFormat("en-IN", {
+      timeZone: "Asia/Kolkata",
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    }).format(date);
+    const timeStr = new Intl.DateTimeFormat("en-IN", {
+      timeZone: "Asia/Kolkata",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true
+    }).format(date);
+    return {
+      date: dateStr,
+      time: timeStr
+    };
+  }
+
+  function getLocalDateValue(value) {
+    if (typeof value === "string" && isDateOnly(value.trim())) {
+      return value.trim();
+    }
+    const date = parseUtcToDate(value);
+    if (!date) return "";
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: "Asia/Kolkata",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).formatToParts(date);
+    const y = parts.find((p) => p.type === "year")?.value;
+    const m = parts.find((p) => p.type === "month")?.value;
+    const d = parts.find((p) => p.type === "day")?.value;
+    return `${y}-${m}-${d}`;
+  }
+
+  function getTimestamp(value) {
+    const date = parseUtcToDate(value);
+    return date ? date.getTime() : 0;
+  }
+
+  function getIstTimestamp(value) {
+    const date = parseIstToDate(value);
+    return date ? date.getTime() : 0;
+  }
+
+  const SERVICEHUB_DATE = {
+    isDateOnly: isDateOnly,
+    parseUtcToDate: parseUtcToDate,
+    parseIstToDate: parseIstToDate,
+    formatDateTime: formatDateTime,
+    formatIstDateTime: formatIstDateTime,
+    formatCalendarDate: formatCalendarDate,
+    formatDate: formatDate,
+    formatTime: formatTime,
+    formatDateTimeParts: formatDateTimeParts,
+    getLocalDateValue: getLocalDateValue,
+    getTimestamp: getTimestamp,
+    getIstTimestamp: getIstTimestamp
+  };
+
+  window.SERVICEHUB_DATE = SERVICEHUB_DATE;
+
   window.SERVICEHUB_CONFIG = {
     API_BASE_URL: API_BASE_URL,
-    isLocal: isLocal
+    isLocal: isLocal,
+    dateUtils: SERVICEHUB_DATE
   };
 })();
-

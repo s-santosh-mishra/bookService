@@ -465,7 +465,7 @@ function renderEligiblePaymentRow(payment) {
         <p class="mt-1 break-all text-xs text-gray-500">Booking ${escapeHtml(payment.bookingId || "—")}</p>
       </td>
       <td class="px-4 py-3 text-sm text-gray-300">${escapeHtml(formatStatus(payment.bookingStatus))}</td>
-      <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-400">${escapeHtml(formatDateTimeIst(payment.paymentCreatedAt))}</td>
+      <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-400">${escapeHtml(formatDateTime(payment.paymentCreatedAt))}</td>
       <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-400">${escapeHtml(formatDateTimeIst(payment.paymentDate))}</td>
       <td class="whitespace-nowrap px-4 py-3 font-medium text-gray-200">${escapeHtml(formatMoney(payment.paymentAmount))}</td>
     </tr>
@@ -1243,16 +1243,37 @@ function formatDateTime(value) {
   if (!value) {
     return "—";
   }
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? "—" : date.toLocaleString("en-IN");
+  if (window.SERVICEHUB_DATE) {
+    return window.SERVICEHUB_DATE.formatDateTime(value, { fallback: "—" });
+  }
+  let str = String(value).trim();
+  const hasOffset = /(?:Z|[+-]\d{2}(?::?\d{2})?)$/i.test(str);
+  if (!hasOffset && /^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}/.test(str)) {
+    str = str.replace(" ", "T") + "Z";
+  }
+  const date = new Date(str);
+  return Number.isNaN(date.getTime())
+    ? "—"
+    : new Intl.DateTimeFormat("en-IN", {
+        timeZone: "Asia/Kolkata",
+        dateStyle: "medium",
+        timeStyle: "short",
+      }).format(date);
 }
 
 function formatDateTimeIst(value) {
   if (!value) {
     return "—";
   }
-  const text = String(value);
-  const hasOffset = /(?:Z|[+-]\d{2}:\d{2})$/i.test(text);
+  if (window.SERVICEHUB_DATE) {
+    return window.SERVICEHUB_DATE.formatIstDateTime(value, {
+      fallback: "—",
+      dateStyle: "medium",
+      timeStyle: "medium",
+    });
+  }
+  const text = String(value).trim();
+  const hasOffset = /(?:Z|[+-]\d{2}(?::?\d{2})?)$/i.test(text);
   const date = new Date(hasOffset ? text : `${text}+05:30`);
   return Number.isNaN(date.getTime())
     ? "—"
@@ -1264,6 +1285,9 @@ function formatDateTimeIst(value) {
 }
 
 function formatBusinessDate(value) {
+  if (window.SERVICEHUB_DATE) {
+    return window.SERVICEHUB_DATE.formatCalendarDate(value, { fallback: "Unclassified" });
+  }
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value || ""));
   if (!match) {
     return "Unclassified";

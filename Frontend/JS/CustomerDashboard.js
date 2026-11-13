@@ -714,7 +714,12 @@ async function loadActiveBooking() {
           "COMPLETED",
         ].includes(booking.status),
       )
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      .sort((a, b) =>
+        window.SERVICEHUB_DATE
+          ? window.SERVICEHUB_DATE.getTimestamp(b.createdAt) -
+            window.SERVICEHUB_DATE.getTimestamp(a.createdAt)
+          : new Date(b.createdAt) - new Date(a.createdAt),
+      );
 
     if (active.length > 0) {
       startActiveBookingPolling();
@@ -791,18 +796,13 @@ function renderActiveBookings(bookings) {
           ? "bg-green-900/30 text-green-400 border border-green-700/30"
           : "bg-yellow-900/30 text-yellow-400 border border-yellow-700/30";
 
-    const createdAt = new Date(booking.createdAt);
+    const formattedDate = window.SERVICEHUB_DATE
+      ? window.SERVICEHUB_DATE.formatDate(booking.createdAt, { fallback: "-" })
+      : "-";
 
-    const formattedDate = Number.isNaN(createdAt.getTime())
-      ? "-"
-      : createdAt.toLocaleDateString();
-
-    const formattedTime = Number.isNaN(createdAt.getTime())
-      ? "-"
-      : createdAt.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
+    const formattedTime = window.SERVICEHUB_DATE
+      ? window.SERVICEHUB_DATE.formatTime(booking.createdAt, { fallback: "-" })
+      : "-";
 
     const otpSection =
       booking.status === "ACCEPTED" && booking.startOtp
@@ -1247,16 +1247,26 @@ function formatBookingDateTime(value) {
     return null;
   }
 
-  const date = new Date(value);
+  if (window.SERVICEHUB_DATE) {
+    return window.SERVICEHUB_DATE.formatDateTime(value, { fallback: null });
+  }
+
+  let str = String(value).trim();
+  const hasOffset = /(?:Z|[+-]\d{2}(?::?\d{2})?)$/i.test(str);
+  if (!hasOffset && /^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}/.test(str)) {
+    str = str.replace(" ", "T") + "Z";
+  }
+  const date = new Date(str);
 
   if (Number.isNaN(date.getTime())) {
     return null;
   }
 
-  return date.toLocaleString([], {
+  return new Intl.DateTimeFormat("en-IN", {
+    timeZone: "Asia/Kolkata",
     dateStyle: "medium",
     timeStyle: "short",
-  });
+  }).format(date);
 }
 
 /* Booking Timeline */

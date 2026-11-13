@@ -712,7 +712,7 @@ function renderPayment(payment) {
       ${createDetailItem("Razorpay Order ID", payment.razorpayOrderId)}
       ${createDetailItem("Razorpay Payment ID", payment.razorpayPaymentId)}
       ${createDetailItem("Created", formatDateTime(payment.createdAt))}
-      ${createDetailItem("Completed", formatDateTime(payment.paidAt))}
+      ${createDetailItem("Completed", formatIstDateTime(payment.paidAt))}
     </div>
   `;
 }
@@ -927,21 +927,46 @@ function getStatusLabel(status) {
 }
 
 function getLocalDateValue(dateValue) {
-  const date = new Date(dateValue);
+  if (window.SERVICEHUB_DATE) {
+    return window.SERVICEHUB_DATE.getLocalDateValue(dateValue);
+  }
+
+  let str = String(dateValue || "").trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+    return str;
+  }
+  const hasOffset = /(?:Z|[+-]\d{2}(?::?\d{2})?)$/i.test(str);
+  if (!hasOffset && /^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}/.test(str)) {
+    str = str.replace(" ", "T") + "Z";
+  }
+  const date = new Date(str);
 
   if (Number.isNaN(date.getTime())) {
     return "";
   }
 
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const y = parts.find((p) => p.type === "year")?.value;
+  const m = parts.find((p) => p.type === "month")?.value;
+  const d = parts.find((p) => p.type === "day")?.value;
+  return `${y}-${m}-${d}`;
 }
 
 function getTimestamp(dateValue) {
-  const timestamp = new Date(dateValue).getTime();
+  if (window.SERVICEHUB_DATE) {
+    return window.SERVICEHUB_DATE.getTimestamp(dateValue);
+  }
+  let str = String(dateValue || "").trim();
+  const hasOffset = /(?:Z|[+-]\d{2}(?::?\d{2})?)$/i.test(str);
+  if (!hasOffset && /^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}/.test(str)) {
+    str = str.replace(" ", "T") + "Z";
+  }
+  const timestamp = new Date(str).getTime();
   return Number.isNaN(timestamp) ? 0 : timestamp;
 }
 
@@ -950,13 +975,53 @@ function formatDateTime(dateValue) {
     return "N/A";
   }
 
-  const date = new Date(dateValue);
+  if (window.SERVICEHUB_DATE) {
+    return window.SERVICEHUB_DATE.formatDateTime(dateValue, { fallback: "N/A" });
+  }
+
+  let str = String(dateValue).trim();
+  const hasOffset = /(?:Z|[+-]\d{2}(?::?\d{2})?)$/i.test(str);
+  if (!hasOffset && /^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}/.test(str)) {
+    str = str.replace(" ", "T") + "Z";
+  }
+  const date = new Date(str);
 
   if (Number.isNaN(date.getTime())) {
     return "N/A";
   }
 
-  return date.toLocaleString();
+  return new Intl.DateTimeFormat("en-IN", {
+    timeZone: "Asia/Kolkata",
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
+}
+
+function formatIstDateTime(dateValue) {
+  if (!dateValue) {
+    return "N/A";
+  }
+
+  if (window.SERVICEHUB_DATE) {
+    return window.SERVICEHUB_DATE.formatIstDateTime(dateValue, { fallback: "N/A" });
+  }
+
+  let str = String(dateValue).trim();
+  const hasOffset = /(?:Z|[+-]\d{2}(?::?\d{2})?)$/i.test(str);
+  if (!hasOffset && /^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}/.test(str)) {
+    str = str.replace(" ", "T") + "+05:30";
+  }
+  const date = new Date(str);
+
+  if (Number.isNaN(date.getTime())) {
+    return "N/A";
+  }
+
+  return new Intl.DateTimeFormat("en-IN", {
+    timeZone: "Asia/Kolkata",
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
 }
 
 function formatMoney(amount) {
