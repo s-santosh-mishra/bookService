@@ -761,9 +761,22 @@ async function updateWorkerStatus(action) {
         restore: restoreWorkerButton
     };
 
-    const button = buttonMap[action];
+    const loadingLabels = {
+        approve: "Approving...",
+        reject: "Rejecting...",
+        suspend: "Suspending...",
+        restore: "Restoring..."
+    };
 
-    button.disabled = true;
+    const button = buttonMap[action];
+    const restore = button && window.SERVICEHUB_BUTTON
+        ? window.SERVICEHUB_BUTTON.setLoading(button, loadingLabels[action] || "Updating...")
+        : null;
+    if (button && window.SERVICEHUB_BUTTON && !restore) return;
+
+    if (!restore && button) {
+        button.disabled = true;
+    }
 
     try {
 
@@ -800,9 +813,11 @@ async function updateWorkerStatus(action) {
         alert("Failed to update worker status.");
 
     } finally {
-
-        button.disabled = false;
-
+        if (restore) {
+            restore();
+        } else if (button) {
+            button.disabled = false;
+        }
     }
 }
 

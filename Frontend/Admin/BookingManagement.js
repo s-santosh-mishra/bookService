@@ -823,8 +823,14 @@ async function submitCancellation(event) {
   }
 
   const submitButton = document.getElementById("confirmCancelBooking");
-  submitButton.disabled = true;
-  submitButton.textContent = "Cancelling...";
+  const restore = submitButton && window.SERVICEHUB_BUTTON
+    ? window.SERVICEHUB_BUTTON.setLoading(submitButton, "Cancelling...")
+    : null;
+  if (submitButton && window.SERVICEHUB_BUTTON && !restore) return;
+  if (submitButton && !restore) {
+    submitButton.disabled = true;
+    submitButton.textContent = "Cancelling...";
+  }
   errorElement.classList.add("hidden");
 
   const token = sessionStorage.getItem(BOOKING_ACCESS_TOKEN_KEY);
@@ -868,8 +874,12 @@ async function submitCancellation(event) {
     console.error("Error cancelling booking:", error);
     showCancellationError(error.message || "Unable to cancel the booking.");
   } finally {
-    submitButton.disabled = false;
-    submitButton.innerHTML = "Confirm Cancellation";
+    if (restore) {
+      restore();
+    } else if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.innerHTML = "Confirm Cancellation";
+    }
   }
 }
 

@@ -225,11 +225,11 @@ categoryTableBody.addEventListener("click", event => {
     const action =
         button.dataset.action;
 
-    updateCategoryStatus(categoryId, action);
+    updateCategoryStatus(categoryId, action, button);
 });
 
 
-async function updateCategoryStatus(categoryId, action) {
+async function updateCategoryStatus(categoryId, action, button) {
 
     const actionText =
         action === "activate"
@@ -243,6 +243,12 @@ async function updateCategoryStatus(categoryId, action) {
     if (!confirmed) {
         return;
     }
+
+    const loadingLabel = action === "activate" ? "Activating..." : "Deactivating...";
+    const restore = button && window.SERVICEHUB_BUTTON
+        ? window.SERVICEHUB_BUTTON.setLoading(button, loadingLabel)
+        : null;
+    if (button && window.SERVICEHUB_BUTTON && !restore) return;
 
     const token =
         sessionStorage.getItem(CATEGORY_ACCESS_TOKEN_KEY);
@@ -286,6 +292,10 @@ async function updateCategoryStatus(categoryId, action) {
         alert(
             `Failed to ${actionText} category.`
         );
+    } finally {
+        if (restore) {
+            restore();
+        }
     }
 }
 
@@ -318,7 +328,14 @@ addCategoryForm.addEventListener("submit", async event => {
             'button[type="submit"]'
         );
 
-    submitButton.disabled = true;
+    const restore = submitButton && window.SERVICEHUB_BUTTON
+        ? window.SERVICEHUB_BUTTON.setLoading(submitButton, "Adding...")
+        : null;
+    if (submitButton && window.SERVICEHUB_BUTTON && !restore) return;
+
+    if (!restore && submitButton) {
+        submitButton.disabled = true;
+    }
 
     try {
 
@@ -365,9 +382,11 @@ addCategoryForm.addEventListener("submit", async event => {
         alert(error.message);
 
     } finally {
-
-        submitButton.disabled = false;
-
+        if (restore) {
+            restore();
+        } else if (submitButton) {
+            submitButton.disabled = false;
+        }
     }
 });
 

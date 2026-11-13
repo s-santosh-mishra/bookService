@@ -98,14 +98,19 @@ adminLoginForm.addEventListener(
 
 
         // Loading State
-
-        adminLoginButton.disabled = true;
-
-        adminLoginButton.innerHTML = `
-            <i class="fa-solid fa-spinner fa-spin"></i>
-            <span>Signing in...</span>
-        `;
-
+        const restoreButton = window.SERVICEHUB_BUTTON
+            ? window.SERVICEHUB_BUTTON.setLoading(adminLoginButton, "Signing in...")
+            : null;
+        if (window.SERVICEHUB_BUTTON && !restoreButton) {
+            return;
+        }
+        if (!restoreButton) {
+            adminLoginButton.disabled = true;
+            adminLoginButton.innerHTML = `
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <span>Signing in...</span>
+            `;
+        }
 
         try {
 
@@ -232,14 +237,15 @@ adminLoginForm.addEventListener(
             );
 
         } finally {
-
-            adminLoginButton.disabled = false;
-
-            adminLoginButton.innerHTML = `
-                <i class="fa-solid fa-right-to-bracket"></i>
-                <span>Admin Login</span>
-            `;
-
+            if (restoreButton) {
+                restoreButton();
+            } else {
+                adminLoginButton.disabled = false;
+                adminLoginButton.innerHTML = `
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span>Admin Login</span>
+                `;
+            }
         }
 
     }

@@ -32,6 +32,7 @@ let originalProfile = null;
 const profileForm = document.getElementById("profileForm");
 const editProfileBtn = document.getElementById("editProfileBtn");
 const cancelBtn = document.getElementById("cancelBtn");
+const saveBtn = document.getElementById("saveBtn");
 const formActions = document.getElementById("formActions");
 const profileMessage = document.getElementById("profileMessage");
 
@@ -535,6 +536,12 @@ async function saveProfile(event) {
     return;
   }
 
+  const submitButton = saveBtn || profileForm.querySelector("button[type='submit']");
+  const restore = submitButton && window.SERVICEHUB_BUTTON
+    ? window.SERVICEHUB_BUTTON.setLoading(submitButton, "Saving...")
+    : null;
+  if (submitButton && window.SERVICEHUB_BUTTON && !restore) return;
+
   const data = getFormData();
 
   try {
@@ -561,6 +568,10 @@ async function saveProfile(event) {
 
     if (error.message !== "Unauthorized") {
       showMessage(error.message || "Failed to update profile.", "error");
+    }
+  } finally {
+    if (restore) {
+      restore();
     }
   }
 }

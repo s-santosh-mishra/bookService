@@ -299,20 +299,30 @@ function validateForm() {
 }
 
 // Loading
+let registerButtonRestore = null;
 
 function setLoading(loading) {
-  registerButton.disabled = loading;
-
   if (loading) {
-    registerButton.innerHTML = `
+    if (window.SERVICEHUB_BUTTON) {
+      registerButtonRestore = window.SERVICEHUB_BUTTON.setLoading(registerButton, "Creating account...");
+    } else {
+      registerButton.disabled = true;
+      registerButton.innerHTML = `
             <i class="fa-solid fa-spinner fa-spin"></i>
             <span>Creating account...</span>
         `;
+    }
   } else {
-    registerButton.innerHTML = `
+    if (registerButtonRestore) {
+      registerButtonRestore();
+      registerButtonRestore = null;
+    } else {
+      registerButton.disabled = false;
+      registerButton.innerHTML = `
             <i class="fa-solid fa-user-plus"></i>
             <span>Create Account</span>
         `;
+    }
   }
 }
 

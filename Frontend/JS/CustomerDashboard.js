@@ -118,19 +118,56 @@ let bookingRefreshTimer = null;
 
 /* Category Icons */
 
-const categoryIconMap = {
-  plumbing: "fa-faucet-drip",
-
-  electrical: "fa-bolt",
-
-  cleaning: "fa-broom",
-
-  repair: "fa-screwdriver-wrench",
-
-  "ac service": "fa-snowflake",
-
-  "home services": "fa-house",
-};
+const categoryIconRules = [
+  {
+    keywords: ["carpentry", "carpenter", "woodworking", "woodwork"],
+    icon: "fa-hammer",
+  },
+  { keywords: ["motorcycle", "motorbike"], icon: "fa-motorcycle" },
+  {
+    keywords: ["vehicle", "automotive", "car repair", "auto repair", "mechanic"],
+    icon: "fa-car-side",
+  },
+  { keywords: ["painting", "painter", "paint"], icon: "fa-paint-roller" },
+  {
+    keywords: [
+      "appliance",
+      "refrigerator",
+      "fridge",
+      "washing machine",
+      "washer",
+      "dishwasher",
+      "microwave",
+      "oven",
+    ],
+    icon: "fa-blender",
+  },
+  {
+    keywords: ["plumbing", "plumber", "pipe", "faucet", "drainage"],
+    icon: "fa-faucet-drip",
+  },
+  { keywords: ["electrical", "electrician", "wiring"], icon: "fa-bolt" },
+  {
+    keywords: ["cleaning", "cleaner", "housekeeping", "maid"],
+    icon: "fa-broom",
+  },
+  {
+    keywords: ["air conditioning", "ac service", "ac repair", "ac", "hvac", "cooling"],
+    icon: "fa-snowflake",
+  },
+  { keywords: ["garden", "gardening", "landscaping", "lawn"], icon: "fa-leaf" },
+  { keywords: ["pest", "insect", "exterminator"], icon: "fa-bug" },
+  { keywords: ["beauty", "salon", "hair"], icon: "fa-scissors" },
+  { keywords: ["moving", "delivery"], icon: "fa-truck" },
+  { keywords: ["pet", "animal", "dog"], icon: "fa-paw" },
+  { keywords: ["cooking", "catering", "kitchen"], icon: "fa-utensils" },
+  { keywords: ["locksmith", "lock", "security"], icon: "fa-lock" },
+  {
+    keywords: ["repair", "maintenance", "handyman"],
+    icon: "fa-screwdriver-wrench",
+  },
+  { keywords: ["home", "house"], icon: "fa-house" },
+];
 
 /* Service Icons */
 
@@ -153,7 +190,13 @@ const serviceIconMap = {
 /* Get Category Icon */
 
 function getCategoryIcon(name) {
-  return categoryIconMap[(name || "").toLowerCase().trim()] || "fa-house";
+  const normalizedName = ` ${(name || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim()} `;
+
+  const matchingRule = categoryIconRules.find(({ keywords }) =>
+    keywords.some((keyword) => normalizedName.includes(` ${keyword} `)),
+  );
+
+  return matchingRule?.icon || "fa-screwdriver-wrench";
 }
 
 /* Get Service Icon */
@@ -244,9 +287,16 @@ async function startRazorpayPayment(bookingId, button) {
     return;
   }
 
+  const restore = window.SERVICEHUB_BUTTON
+    ? window.SERVICEHUB_BUTTON.setLoading(button, "Preparing payment...")
+    : null;
+  if (window.SERVICEHUB_BUTTON && !restore) return;
+
   try {
-    button.disabled = true;
-    button.textContent = "Preparing payment...";
+    if (!restore) {
+      button.disabled = true;
+      button.textContent = "Preparing payment...";
+    }
 
     const profile = await apiRequest(`${API_BASE_URL}/profile`);
     const email = profile?.email?.trim();
@@ -329,8 +379,12 @@ async function startRazorpayPayment(bookingId, button) {
   } catch (error) {
     alert(error.message || "Unable to start online payment.");
   } finally {
-    button.disabled = false;
-    button.textContent = "Pay Online";
+    if (restore) {
+      restore();
+    } else {
+      button.disabled = false;
+      button.textContent = "Pay Online";
+    }
   }
 }
 
@@ -1039,7 +1093,7 @@ function renderActiveBookings(bookings) {
 
         </div>
 
-        <div class="text-center lg:text-right shrink-0">
+        <div class="booking-action-buttons shrink-0">
 
           ${
             booking.status === "COMPLETED"
@@ -1134,8 +1188,13 @@ function renderActiveBookings(bookings) {
           return;
         }
 
+        const restore = window.SERVICEHUB_BUTTON
+          ? window.SERVICEHUB_BUTTON.setLoading(button, "Processing...")
+          : null;
+        if (window.SERVICEHUB_BUTTON && !restore) return;
+
         try {
-          button.disabled = true;
+          if (!restore) button.disabled = true;
 
           await apiRequest(
             `${API_BASE_URL}/payments/cash/${encodeURIComponent(bookingId)}`,
@@ -1152,7 +1211,11 @@ function renderActiveBookings(bookings) {
         } catch (error) {
           alert(error.message || "Unable to select cash payment.");
         } finally {
-          button.disabled = false;
+          if (restore) {
+            restore();
+          } else {
+            button.disabled = false;
+          }
         }
       });
     });
@@ -1168,8 +1231,13 @@ function renderActiveBookings(bookings) {
           return;
         }
 
+        const restore = window.SERVICEHUB_BUTTON
+          ? window.SERVICEHUB_BUTTON.setLoading(button, "Cancelling...")
+          : null;
+        if (window.SERVICEHUB_BUTTON && !restore) return;
+
         try {
-          button.disabled = true;
+          if (!restore) button.disabled = true;
 
           await apiRequest(
             `${API_BASE_URL}/payments/cancel/${encodeURIComponent(bookingId)}`,
@@ -1186,7 +1254,11 @@ function renderActiveBookings(bookings) {
         } catch (error) {
           alert(error.message || "Unable to change payment method.");
         } finally {
-          button.disabled = false;
+          if (restore) {
+            restore();
+          } else {
+            button.disabled = false;
+          }
         }
       });
     });
@@ -1869,6 +1941,9 @@ function renderCustomerReviewForm(booking) {
     ).map((input) => input.value);
 
     setButtonsDisabled(true);
+    const restoreSubmit = window.SERVICEHUB_BUTTON
+      ? window.SERVICEHUB_BUTTON.setLoading(submitButton, "Submitting...")
+      : null;
 
     try {
       await apiRequest(
@@ -1894,6 +1969,10 @@ function renderCustomerReviewForm(booking) {
         error.message || "Unable to submit your review. Please try again.";
 
       errorElement.classList.remove("hidden");
+    } finally {
+      if (restoreSubmit) {
+        restoreSubmit();
+      }
       setButtonsDisabled(false);
     }
   });
@@ -1903,6 +1982,9 @@ function renderCustomerReviewForm(booking) {
   skipButton.addEventListener("click", async () => {
     errorElement.classList.add("hidden");
     setButtonsDisabled(true);
+    const restoreSkip = window.SERVICEHUB_BUTTON
+      ? window.SERVICEHUB_BUTTON.setLoading(skipButton, "Skipping...")
+      : null;
 
     try {
       await apiRequest(
@@ -1921,6 +2003,10 @@ function renderCustomerReviewForm(booking) {
         error.message || "Unable to skip this review right now.";
 
       errorElement.classList.remove("hidden");
+    } finally {
+      if (restoreSkip) {
+        restoreSkip();
+      }
       setButtonsDisabled(false);
     }
   });
@@ -2020,13 +2106,18 @@ async function submitBooking() {
     return;
   }
 
-  confirmCreateBookingButton.disabled = true;
-  confirmCreateBookingButton.textContent = "Getting location...";
+  const restore = window.SERVICEHUB_BUTTON
+    ? window.SERVICEHUB_BUTTON.setLoading(confirmCreateBookingButton, "Requesting...")
+    : null;
+  if (window.SERVICEHUB_BUTTON && !restore) return;
 
   try {
-    const location = await getCurrentLocation();
+    if (!restore) {
+      confirmCreateBookingButton.disabled = true;
+      confirmCreateBookingButton.textContent = "Requesting...";
+    }
 
-    confirmCreateBookingButton.textContent = "Requesting...";
+    const location = await getCurrentLocation();
 
     await apiRequest(`${API_BASE_URL}/bookings`, {
       method: "POST",
@@ -2049,8 +2140,12 @@ async function submitBooking() {
     console.error("Booking creation error:", error);
     alert(error.message);
   } finally {
-    confirmCreateBookingButton.disabled = false;
-    confirmCreateBookingButton.textContent = "Request Service";
+    if (restore) {
+      restore();
+    } else {
+      confirmCreateBookingButton.disabled = false;
+      confirmCreateBookingButton.textContent = "Request Service";
+    }
   }
 }
 
@@ -2081,9 +2176,13 @@ async function cancelCustomerBooking() {
 
   const button = document.getElementById("cancelCustomerBookingButton");
 
-  if (button) {
-    button.disabled = true;
+  const restore = button && window.SERVICEHUB_BUTTON
+    ? window.SERVICEHUB_BUTTON.setLoading(button, "Cancelling...")
+    : null;
+  if (button && window.SERVICEHUB_BUTTON && !restore) return;
 
+  if (button && !restore) {
+    button.disabled = true;
     button.textContent = "Cancelling...";
   }
 
@@ -2106,10 +2205,11 @@ async function cancelCustomerBooking() {
     console.error("Booking cancellation error:", error);
 
     alert(error.message);
-
-    if (button) {
+  } finally {
+    if (restore) {
+      restore();
+    } else if (button) {
       button.disabled = false;
-
       button.innerHTML = `
                 <i class="fa-solid fa-xmark"></i>
                 Cancel Booking

@@ -115,6 +115,28 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
+.booking-action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.booking-action-buttons > button {
+    width: 100%;
+}
+
+@media (min-width: 641px) {
+    .booking-action-buttons {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .booking-action-buttons > button {
+        width: auto;
+    }
+}
+
 
 /*   Category Cards*/
 

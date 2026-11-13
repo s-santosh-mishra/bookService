@@ -207,11 +207,117 @@
     getIstTimestamp: getIstTimestamp
   };
 
+  // Inject CSS for consistent, dependency-free spinner animation
+  if (typeof document !== "undefined" && !document.getElementById("servicehub-spinner-style")) {
+    const style = document.createElement("style");
+    style.id = "servicehub-spinner-style";
+    style.textContent = `
+      @keyframes servicehub-spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      .servicehub-spinner {
+        animation: servicehub-spin 0.75s linear infinite !important;
+        display: inline-block;
+        vertical-align: middle;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function createSpinnerSvg() {
+    return `
+      <svg class="servicehub-spinner h-4 w-4 shrink-0 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+    `.trim();
+  }
+
+  function setButtonLoading(button, loadingText, options = {}) {
+    if (!button || !(button instanceof Element)) return null;
+
+    // Prevent duplicate triggers if already loading
+    if (button.dataset.servicehubLoading === "true") {
+      return null;
+    }
+
+    const originalHtml = button.innerHTML;
+    const originalDisabled = button.disabled;
+    const originalAriaBusy = button.getAttribute("aria-busy");
+    const originalMinWidth = button.style.minWidth;
+
+    // Dimension stability: preserve current rendered width if not already fixed
+    if (options.lockWidth !== false) {
+      const rect = button.getBoundingClientRect();
+      if (rect.width > 0 && !button.style.minWidth) {
+        button.style.minWidth = `${Math.ceil(rect.width)}px`;
+      }
+    }
+
+    button.dataset.servicehubLoading = "true";
+    button.disabled = true;
+    button.setAttribute("aria-busy", "true");
+
+    const text = loadingText || "Processing...";
+    const spinner = createSpinnerSvg();
+
+    button.innerHTML = `
+      <span class="inline-flex items-center justify-center gap-2 pointer-events-none w-full">
+        ${spinner}
+        <span>${text}</span>
+      </span>
+    `.trim();
+
+    let restored = false;
+    const restore = function () {
+      if (restored) return;
+      restored = true;
+      button.innerHTML = originalHtml;
+      button.disabled = originalDisabled;
+      button.style.minWidth = originalMinWidth;
+      if (originalAriaBusy !== null) {
+        button.setAttribute("aria-busy", originalAriaBusy);
+      } else {
+        button.removeAttribute("aria-busy");
+      }
+      delete button.dataset.servicehubLoading;
+      delete button._servicehubRestore;
+    };
+
+    button._servicehubRestore = restore;
+    return restore;
+  }
+
+  function restoreButton(button) {
+    if (button && typeof button._servicehubRestore === "function") {
+      button._servicehubRestore();
+    }
+  }
+
+  async function withButtonLoading(button, loadingText, actionFn) {
+    const restore = setButtonLoading(button, loadingText);
+    if (!restore) return null;
+    try {
+      return await actionFn();
+    } finally {
+      restore();
+    }
+  }
+
+  const SERVICEHUB_BUTTON = {
+    setLoading: setButtonLoading,
+    restore: restoreButton,
+    withLoading: withButtonLoading
+  };
+
+  window.SERVICEHUB_BUTTON = SERVICEHUB_BUTTON;
   window.SERVICEHUB_DATE = SERVICEHUB_DATE;
 
   window.SERVICEHUB_CONFIG = {
     API_BASE_URL: API_BASE_URL,
     isLocal: isLocal,
-    dateUtils: SERVICEHUB_DATE
+    dateUtils: SERVICEHUB_DATE,
+    buttonUtils: SERVICEHUB_BUTTON
   };
 })();

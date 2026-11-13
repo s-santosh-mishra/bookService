@@ -1129,12 +1129,17 @@ function getCurrentLocation() {
 
 // Accept Booking
 
-async function acceptBooking(bookingId) {
+async function acceptBooking(bookingId, button) {
   const confirmed = confirm("Are you sure you want to accept this booking?");
 
   if (!confirmed) {
     return;
   }
+
+  const restore = button && window.SERVICEHUB_BUTTON
+    ? window.SERVICEHUB_BUTTON.setLoading(button, "Accepting...")
+    : null;
+  if (button && window.SERVICEHUB_BUTTON && !restore) return;
 
   try {
     const location = await getCurrentLocation();
@@ -1154,17 +1159,26 @@ async function acceptBooking(bookingId) {
     ]);
   } catch (error) {
     alert(error.message);
+  } finally {
+    if (restore) {
+      restore();
+    }
   }
 }
 
 // Reject Booking
 
-async function rejectBooking(bookingId) {
+async function rejectBooking(bookingId, button) {
   const confirmed = confirm("Are you sure you want to reject this booking?");
 
   if (!confirmed) {
     return;
   }
+
+  const restore = button && window.SERVICEHUB_BUTTON
+    ? window.SERVICEHUB_BUTTON.setLoading(button, "Rejecting...")
+    : null;
+  if (button && window.SERVICEHUB_BUTTON && !restore) return;
 
   try {
     await workerApiRequest(`${API_BASE_URL}/bookings/${bookingId}/reject`, {
@@ -1181,6 +1195,10 @@ async function rejectBooking(bookingId) {
     await loadBookingRequests();
   } catch (error) {
     alert(error.message);
+  } finally {
+    if (restore) {
+      restore();
+    }
   }
 }
 
@@ -2249,7 +2267,7 @@ function showWorkerCancellationDialog(bookingId, bookingStatus) {
   });
 }
 
-async function cancelWorkerBooking(bookingId, bookingStatus) {
+async function cancelWorkerBooking(bookingId, bookingStatus, triggerBtn) {
   const cancellation = await showWorkerCancellationDialog(
     bookingId,
     bookingStatus,
@@ -2263,6 +2281,11 @@ async function cancelWorkerBooking(bookingId, bookingStatus) {
     return;
   }
 
+  const restore = triggerBtn && window.SERVICEHUB_BUTTON
+    ? window.SERVICEHUB_BUTTON.setLoading(triggerBtn, "Cancelling...")
+    : null;
+  if (triggerBtn && window.SERVICEHUB_BUTTON && !restore) return;
+
   try {
     await workerApiRequest(`${API_BASE_URL}/bookings/${bookingId}/cancel`, {
       method: "POST",
@@ -2275,13 +2298,17 @@ async function cancelWorkerBooking(bookingId, bookingStatus) {
     await Promise.all([loadWorkerBookings(), loadWorkerStatus()]);
   } catch (error) {
     alert(error.message);
+  } finally {
+    if (restore) {
+      restore();
+    }
   }
 }
 
 // Start Service
 
-async function startService(bookingId) {
-  const startButton = document.querySelector(
+async function startService(bookingId, triggerBtn) {
+  const startButton = triggerBtn || document.querySelector(
     `.start-service-btn[data-booking-id="${bookingId}"]`,
   );
 
@@ -2318,6 +2345,11 @@ async function startService(bookingId) {
       return;
     }
 
+    const restore = window.SERVICEHUB_BUTTON
+      ? window.SERVICEHUB_BUTTON.setLoading(startButton, "Starting...")
+      : null;
+    if (window.SERVICEHUB_BUTTON && !restore) return;
+
     try {
       await workerApiRequest(`${API_BASE_URL}/bookings/${bookingId}/start`, {
         method: "POST",
@@ -2331,6 +2363,8 @@ async function startService(bookingId) {
       alert(error.message);
       existingOtpInput.focus();
       existingOtpInput.select();
+    } finally {
+      if (restore) restore();
     }
 
     return;
@@ -2339,6 +2373,11 @@ async function startService(bookingId) {
   // --------------------------------------------------
   // FIRST CLICK → REQUEST START OTP
   // --------------------------------------------------
+  const restoreFirst = window.SERVICEHUB_BUTTON
+    ? window.SERVICEHUB_BUTTON.setLoading(startButton, "Requesting OTP...")
+    : null;
+  if (window.SERVICEHUB_BUTTON && !restoreFirst) return;
+
   try {
     await workerApiRequest(
       `${API_BASE_URL}/bookings/${bookingId}/request-start`,
@@ -2389,12 +2428,14 @@ async function startService(bookingId) {
     document.getElementById("startServiceOtp")?.focus();
   } catch (error) {
     alert(error.message);
+  } finally {
+    if (restoreFirst) restoreFirst();
   }
 }
 
 //request for completion
 
-async function requestCompletion(bookingId) {
+async function requestCompletion(bookingId, button) {
   const confirmed = confirm(
     "Are you sure the service is fully completed and ready for customer verification?",
   );
@@ -2402,6 +2443,12 @@ async function requestCompletion(bookingId) {
   if (!confirmed) {
     return;
   }
+
+  const targetBtn = button || document.querySelector(`.request-completion-btn[data-booking-id="${bookingId}"]`);
+  const restore = targetBtn && window.SERVICEHUB_BUTTON
+    ? window.SERVICEHUB_BUTTON.setLoading(targetBtn, "Requesting...")
+    : null;
+  if (targetBtn && window.SERVICEHUB_BUTTON && !restore) return;
 
   try {
     await workerApiRequest(
@@ -2419,12 +2466,14 @@ async function requestCompletion(bookingId) {
     }
 
     alert(error.message);
+  } finally {
+    if (restore) restore();
   }
 }
 
 // Complete Service
 
-async function completeService(bookingId) {
+async function completeService(bookingId, button) {
   const otpInput = document.getElementById("completionServiceOtp");
 
   if (!otpInput) {
@@ -2440,6 +2489,12 @@ async function completeService(bookingId) {
     return;
   }
 
+  const targetBtn = button || document.querySelector(`.complete-service-btn[data-booking-id="${bookingId}"]`);
+  const restore = targetBtn && window.SERVICEHUB_BUTTON
+    ? window.SERVICEHUB_BUTTON.setLoading(targetBtn, "Completing...")
+    : null;
+  if (targetBtn && window.SERVICEHUB_BUTTON && !restore) return;
+
   try {
     await workerApiRequest(`${API_BASE_URL}/bookings/${bookingId}/complete`, {
       method: "POST",
@@ -2451,12 +2506,14 @@ async function completeService(bookingId) {
     await Promise.all([loadWorkerBookings(), loadWorkerStatus()]);
   } catch (error) {
     alert(error.message);
+  } finally {
+    if (restore) restore();
   }
 }
 
 // Confirm Cash Payment
 
-async function confirmWorkerPayment(bookingId, paymentMethod) {
+async function confirmWorkerPayment(bookingId, paymentMethod, button) {
   if (paymentMethod !== "CASH") {
     return;
   }
@@ -2466,6 +2523,12 @@ async function confirmWorkerPayment(bookingId, paymentMethod) {
   if (!confirm(message)) {
     return;
   }
+
+  const targetBtn = button || document.querySelector(`.confirm-payment-btn[data-booking-id="${bookingId}"]`);
+  const restore = targetBtn && window.SERVICEHUB_BUTTON
+    ? window.SERVICEHUB_BUTTON.setLoading(targetBtn, "Confirming...")
+    : null;
+  if (targetBtn && window.SERVICEHUB_BUTTON && !restore) return;
 
   try {
     await workerApiRequest(
@@ -2478,6 +2541,8 @@ async function confirmWorkerPayment(bookingId, paymentMethod) {
     await Promise.all([loadWorkerBookings(), loadWorkerStatus()]);
   } catch (error) {
     alert(error.message);
+  } finally {
+    if (restore) restore();
   }
 }
 
@@ -2492,6 +2557,7 @@ document.addEventListener("click", (event) => {
     confirmWorkerPayment(
       confirmPaymentButton.dataset.bookingId,
       confirmPaymentButton.dataset.paymentMethod,
+      confirmPaymentButton,
     );
 
     return;
@@ -2500,7 +2566,7 @@ document.addEventListener("click", (event) => {
   const acceptButton = event.target.closest(".accept-booking-btn");
 
   if (acceptButton) {
-    acceptBooking(acceptButton.dataset.bookingId);
+    acceptBooking(acceptButton.dataset.bookingId, acceptButton);
 
     return;
   }
@@ -2508,7 +2574,7 @@ document.addEventListener("click", (event) => {
   const rejectButton = event.target.closest(".reject-booking-btn");
 
   if (rejectButton) {
-    rejectBooking(rejectButton.dataset.bookingId);
+    rejectBooking(rejectButton.dataset.bookingId, rejectButton);
 
     return;
   }
@@ -2516,7 +2582,7 @@ document.addEventListener("click", (event) => {
   const startButton = event.target.closest(".start-service-btn");
 
   if (startButton) {
-    startService(startButton.dataset.bookingId);
+    startService(startButton.dataset.bookingId, startButton);
 
     return;
   }
@@ -2526,7 +2592,7 @@ document.addEventListener("click", (event) => {
   );
 
   if (requestCompletionButton) {
-    requestCompletion(requestCompletionButton.dataset.bookingId);
+    requestCompletion(requestCompletionButton.dataset.bookingId, requestCompletionButton);
 
     return;
   }
@@ -2534,7 +2600,7 @@ document.addEventListener("click", (event) => {
   const completeButton = event.target.closest(".complete-service-btn");
 
   if (completeButton) {
-    completeService(completeButton.dataset.bookingId);
+    completeService(completeButton.dataset.bookingId, completeButton);
 
     return;
   }
@@ -2553,6 +2619,7 @@ document.addEventListener("click", (event) => {
     cancelWorkerBooking(
       cancelButton.dataset.bookingId,
       cancelButton.dataset.bookingStatus,
+      cancelButton,
     );
   }
 });
@@ -3667,10 +3734,16 @@ async function submitAddPart(bookingId, modal) {
     return;
   }
 
-  try {
-    submitButton.disabled = true;
+  const restore = submitButton && window.SERVICEHUB_BUTTON
+    ? window.SERVICEHUB_BUTTON.setLoading(submitButton, "Adding...")
+    : null;
+  if (submitButton && window.SERVICEHUB_BUTTON && !restore) return;
 
-    submitButton.textContent = "Adding...";
+  try {
+    if (!restore && submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = "Adding...";
+    }
 
     const formData = new FormData();
 
@@ -3696,10 +3769,13 @@ async function submitAddPart(bookingId, modal) {
     errorElement.textContent = error.message || "Unable to add part.";
 
     errorElement.classList.remove("hidden");
-
-    submitButton.disabled = false;
-
-    submitButton.textContent = "Add Part";
+  } finally {
+    if (restore) {
+      restore();
+    } else if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.textContent = "Add Part";
+    }
   }
 }
 

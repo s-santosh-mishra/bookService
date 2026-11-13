@@ -98,12 +98,19 @@ loginForm.addEventListener("submit", async (event) => {
     return;
   }
 
-  loginButton.disabled = true;
-
-  loginButton.innerHTML = `
+  const restoreButton = window.SERVICEHUB_BUTTON
+    ? window.SERVICEHUB_BUTTON.setLoading(loginButton, "Signing in...")
+    : null;
+  if (window.SERVICEHUB_BUTTON && !restoreButton) {
+    return;
+  }
+  if (!restoreButton) {
+    loginButton.disabled = true;
+    loginButton.innerHTML = `
         <i class="fa-solid fa-spinner fa-spin"></i>
         <span>Signing in...</span>
     `;
+  }
 
   try {
     const apiBase = window.SERVICEHUB_CONFIG ? window.SERVICEHUB_CONFIG.API_BASE_URL : "http://localhost:8080";
@@ -184,11 +191,14 @@ loginForm.addEventListener("submit", async (event) => {
       "error",
     );
   } finally {
-    loginButton.disabled = false;
-
-    loginButton.innerHTML = `
-        <i class="fa-solid fa-right-to-bracket"></i>
-        <span>Login</span>`;
+    if (restoreButton) {
+      restoreButton();
+    } else {
+      loginButton.disabled = false;
+      loginButton.innerHTML = `
+          <i class="fa-solid fa-right-to-bracket"></i>
+          <span>Login</span>`;
+    }
   }
 });
 

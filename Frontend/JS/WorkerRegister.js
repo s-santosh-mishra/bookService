@@ -696,20 +696,30 @@ function validateForm() {
 }
 
 // Loading State
+let registerButtonRestore = null;
 
 function setLoading(loading) {
-  registerButton.disabled = loading;
-
   if (loading) {
-    registerButton.innerHTML = `
+    if (window.SERVICEHUB_BUTTON) {
+      registerButtonRestore = window.SERVICEHUB_BUTTON.setLoading(registerButton, "Submitting registration...");
+    } else {
+      registerButton.disabled = true;
+      registerButton.innerHTML = `
             <i class="fa-solid fa-spinner fa-spin"></i>
             <span>Submitting registration...</span>
         `;
+    }
   } else {
-    registerButton.innerHTML = `
+    if (registerButtonRestore) {
+      registerButtonRestore();
+      registerButtonRestore = null;
+    } else {
+      registerButton.disabled = false;
+      registerButton.innerHTML = `
             <i class="fa-solid fa-user-plus"></i>
             <span>Submit Registration</span>
         `;
+    }
   }
 }
 

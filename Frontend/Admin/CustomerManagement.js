@@ -82,7 +82,9 @@ async function viewCustomer(customerId) {
 
 // ==================== CUSTOMER STATUS ====================
 
-async function changeCustomerStatus(customerId, action) {
+async function changeCustomerStatus(customerId, action, triggerButton) {
+
+    const button = triggerButton || (typeof event !== "undefined" && event?.target?.closest("button")) || null;
 
     const actionText = action === "activate"
         ? "activate"
@@ -95,6 +97,12 @@ async function changeCustomerStatus(customerId, action) {
     if (!confirmed) {
         return;
     }
+
+    const loadingText = action === "activate" ? "Activating..." : "Deactivating...";
+    const restore = button && window.SERVICEHUB_BUTTON
+        ? window.SERVICEHUB_BUTTON.setLoading(button, loadingText)
+        : null;
+    if (button && window.SERVICEHUB_BUTTON && !restore) return;
 
     try {
         const token = sessionStorage.getItem(CUSTOMER_ACCESS_TOKEN_KEY);
@@ -143,6 +151,10 @@ async function changeCustomerStatus(customerId, action) {
         );
 
         showError(error.message);
+    } finally {
+        if (restore) {
+            restore();
+        }
     }
 }
 
@@ -375,7 +387,8 @@ function renderCustomers(customerList) {
                             <button
                                 onclick="changeCustomerStatus(
                                     '${customer.customerId}',
-                                    'deactivate'
+                                    'deactivate',
+                                    this
                                 )"
                                 class="px-3 py-2
                                        text-sm
@@ -394,7 +407,8 @@ function renderCustomers(customerList) {
                             <button
                                 onclick="changeCustomerStatus(
                                     '${customer.customerId}',
-                                    'activate'
+                                    'activate',
+                                    this
                                 )"
                                 class="px-3 py-2
                                        text-sm
@@ -563,7 +577,8 @@ function showCustomerModal(customer) {
                 <button
                     onclick="changeCustomerStatus(
                         '${customer.customerId}',
-                        'deactivate'
+                        'deactivate',
+                        this
                     )"
                     class="px-4 py-2
                            rounded-lg
@@ -585,7 +600,8 @@ function showCustomerModal(customer) {
                 <button
                     onclick="changeCustomerStatus(
                         '${customer.customerId}',
-                        'activate'
+                        'activate',
+                        this
                     )"
                     class="px-4 py-2
                            rounded-lg

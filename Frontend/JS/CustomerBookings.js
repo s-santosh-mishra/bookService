@@ -63,19 +63,29 @@ function getStatusClasses(status) {
 
     IN_PROGRESS: "bg-purple-500/10 text-purple-400 border-purple-500/30",
 
+    WAITING_FOR_PAYMENT:
+      "bg-orange-500/10 text-orange-400 border-orange-500/30",
+
     COMPLETED: "bg-green-500/10 text-green-400 border-green-500/30",
 
-    AUTO_COMPLETED: "bg-green-500/10 text-green-400 border-green-500/30",
+    REVIEWED: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
 
     CANCELLED: "bg-gray-500/10 text-gray-400 border-gray-500/30",
 
     NO_WORKER: "bg-orange-500/10 text-orange-400 border-orange-500/30",
 
     FAILED: "bg-red-500/10 text-red-400 border-red-500/30",
+
+    WORKER_CANCELLED:
+      "bg-gray-500/10 text-gray-400 border-gray-500/30",
+
+    WORKER_CANNOT_COMPLETE:
+      "bg-red-500/10 text-red-400 border-red-500/30"
   };
 
   return classes[status] || "bg-gray-500/10 text-gray-400 border-gray-500/30";
 }
+
 
 function getStatusDescription(status) {
   const descriptions = {
@@ -88,10 +98,9 @@ function getStatusDescription(status) {
     WAITING_FOR_PAYMENT:
       "Your service is complete. Please pay the final billed amount.",
 
-    AUTO_COMPLETED:
-      "The service was automatically completed because the 30-minute confirmation window expired.",
+    COMPLETED: "Your service has been successfully completed.",
 
-    COMPLETED: "This service has been completed.",
+    REVIEWED: "Your booking is complete. Thank you for sharing your feedback!",
 
     CANCELLED: "This booking was cancelled.",
 
@@ -104,11 +113,12 @@ function getStatusDescription(status) {
       "The worker cancelled the booking before starting the service. You can request this service again.",
 
     WORKER_CANNOT_COMPLETE:
-      "The worker could not complete the service after starting it. Please contact ServiceHub if you need further assistance.",
+      "The worker could not complete the service after starting it. Please contact ServiceHub if you need further assistance."
   };
 
   return descriptions[status] || "Booking status information is unavailable.";
 }
+
 
 /* DATE /  TIME*/
 

@@ -307,10 +307,10 @@ serviceTableBody.addEventListener("click", (event) => {
   const serviceId = button.dataset.serviceId;
   const action = button.dataset.action;
 
-  updateServiceStatus(serviceId, action);
+  updateServiceStatus(serviceId, action, button);
 });
 
-async function updateServiceStatus(serviceId, action) {
+async function updateServiceStatus(serviceId, action, button) {
   const actionText = action === "activate" ? "activate" : "deactivate";
 
   const confirmed = confirm(
@@ -320,6 +320,12 @@ async function updateServiceStatus(serviceId, action) {
   if (!confirmed) {
     return;
   }
+
+  const loadingText = action === "activate" ? "Activating..." : "Deactivating...";
+  const restore = button && window.SERVICEHUB_BUTTON
+    ? window.SERVICEHUB_BUTTON.setLoading(button, loadingText)
+    : null;
+  if (button && window.SERVICEHUB_BUTTON && !restore) return;
 
   const token = sessionStorage.getItem(SERVICE_ACCESS_TOKEN_KEY);
 
@@ -349,6 +355,10 @@ async function updateServiceStatus(serviceId, action) {
     console.error(error);
 
     alert(error.message);
+  } finally {
+    if (restore) {
+      restore();
+    }
   }
 }
 
@@ -445,7 +455,14 @@ addServiceForm.addEventListener("submit", async (event) => {
 
   const submitButton = addServiceForm.querySelector('button[type="submit"]');
 
-  submitButton.disabled = true;
+  const restore = submitButton && window.SERVICEHUB_BUTTON
+    ? window.SERVICEHUB_BUTTON.setLoading(submitButton, "Adding...")
+    : null;
+  if (submitButton && window.SERVICEHUB_BUTTON && !restore) return;
+
+  if (!restore && submitButton) {
+    submitButton.disabled = true;
+  }
 
   try {
     const response = await fetch(
@@ -482,7 +499,11 @@ addServiceForm.addEventListener("submit", async (event) => {
 
     alert(error.message);
   } finally {
-    submitButton.disabled = false;
+    if (restore) {
+      restore();
+    } else if (submitButton) {
+      submitButton.disabled = false;
+    }
   }
 });
 

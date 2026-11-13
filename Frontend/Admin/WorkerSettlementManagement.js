@@ -536,8 +536,15 @@ async function createSettlement() {
     return;
   }
   const button = document.getElementById("confirmCreateSettlement");
-  button.disabled = true;
-  button.textContent = "Creating...";
+  const restore = button && window.SERVICEHUB_BUTTON
+    ? window.SERVICEHUB_BUTTON.setLoading(button, "Creating...")
+    : null;
+  if (button && window.SERVICEHUB_BUTTON && !restore) return;
+  if (!restore && button) {
+    button.disabled = true;
+    button.textContent = "Creating...";
+  }
+
   try {
     await settlementRequest("", {
       method: "POST",
@@ -549,13 +556,15 @@ async function createSettlement() {
     });
   } catch (error) {
     showMessage(error.message || "Unable to create the settlement.", "error");
-    button.disabled = false;
-    button.textContent = "Create Pending Settlement";
     return;
+  } finally {
+    if (restore) {
+      restore();
+    } else if (button) {
+      button.disabled = false;
+      button.textContent = "Create Pending Settlement";
+    }
   }
-
-  button.disabled = false;
-  button.textContent = "Create Pending Settlement";
   closeModal("createSettlementModal");
   closeModal("paymentSelectionModal");
   selectedPaymentIds.clear();
@@ -957,8 +966,15 @@ async function submitStatusUpdate(event) {
   }
 
   const submitButton = document.getElementById("submitSettlementStatus");
-  submitButton.disabled = true;
-  submitButton.textContent = "Saving...";
+  const restore = submitButton && window.SERVICEHUB_BUTTON
+    ? window.SERVICEHUB_BUTTON.setLoading(submitButton, "Saving...")
+    : null;
+  if (submitButton && window.SERVICEHUB_BUTTON && !restore) return;
+  if (!restore && submitButton) {
+    submitButton.disabled = true;
+    submitButton.textContent = "Saving...";
+  }
+
   try {
     await settlementRequest(path, {
       method: "PATCH",
@@ -966,15 +982,18 @@ async function submitStatusUpdate(event) {
     });
   } catch (error) {
     showMessage(error.message || "Unable to update settlement status.", "error");
-    submitButton.disabled = false;
-    submitButton.textContent = statusSubmitLabel(action);
     return;
+  } finally {
+    if (restore) {
+      restore();
+    } else if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.textContent = statusSubmitLabel(action);
+    }
   }
 
   closeModal("settlementStatusModal");
   showMessage("Settlement status updated.", "success");
-  submitButton.disabled = false;
-  submitButton.textContent = statusSubmitLabel(action);
   try {
     await refreshDashboard();
   } catch (error) {
@@ -1027,8 +1046,15 @@ async function submitReversal(event) {
   }
 
   const submitButton = document.getElementById("submitSettlementReversal");
-  submitButton.disabled = true;
-  submitButton.textContent = "Recording...";
+  const restore = submitButton && window.SERVICEHUB_BUTTON
+    ? window.SERVICEHUB_BUTTON.setLoading(submitButton, "Recording...")
+    : null;
+  if (submitButton && window.SERVICEHUB_BUTTON && !restore) return;
+  if (!restore && submitButton) {
+    submitButton.disabled = true;
+    submitButton.textContent = "Recording...";
+  }
+
   try {
     await settlementRequest(
       `/${encodeURIComponent(activeSettlementId)}/reversal`,
@@ -1043,9 +1069,14 @@ async function submitReversal(event) {
     );
   } catch (error) {
     showMessage(error.message || "Unable to record the bank reversal.", "error");
-    submitButton.disabled = false;
-    submitButton.textContent = "Record Verified Reversal";
     return;
+  } finally {
+    if (restore) {
+      restore();
+    } else if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.textContent = "Record Verified Reversal";
+    }
   }
 
   closeModal("settlementReversalModal");
