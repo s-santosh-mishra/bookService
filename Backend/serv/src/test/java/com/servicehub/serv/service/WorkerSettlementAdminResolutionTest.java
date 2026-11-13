@@ -70,8 +70,11 @@ public class WorkerSettlementAdminResolutionTest {
             if ("findById".equals(method.getName())) {
                 return Optional.ofNullable(usersDb.get(args[0]));
             }
-            if ("save".equals(method.getName())) {
+            if ("save".equals(method.getName()) || "saveAndFlush".equals(method.getName())) {
                 Users u = (Users) args[0];
+                if (u.getUserId() == null && u.getCredentials() != null) {
+                    u.setUserId(u.getCredentials().getUserId());
+                }
                 usersDb.put(u.getUserId(), u);
                 return u;
             }
@@ -309,7 +312,7 @@ public class WorkerSettlementAdminResolutionTest {
             if ("findById".equals(method.getName())) {
                 return Optional.of(existingAdmin);
             }
-            if ("save".equals(method.getName())) {
+            if ("save".equals(method.getName()) || "saveAndFlush".equals(method.getName())) {
                 usersSaveCount.incrementAndGet();
                 return args[0];
             }
@@ -418,8 +421,11 @@ public class WorkerSettlementAdminResolutionTest {
             if ("findById".equals(method.getName())) {
                 return Optional.ofNullable(savedUserRef.get());
             }
-            if ("save".equals(method.getName())) {
+            if ("save".equals(method.getName()) || "saveAndFlush".equals(method.getName())) {
                 Users u = (Users) args[0];
+                if (u.getUserId() == null && u.getCredentials() != null) {
+                    u.setUserId(u.getCredentials().getUserId());
+                }
                 savedUserRef.set(u);
                 return u;
             }
@@ -570,9 +576,12 @@ public class WorkerSettlementAdminResolutionTest {
             if ("findById".equals(method.getName())) {
                 return Optional.ofNullable(usersDb.get(args[0]));
             }
-            if ("save".equals(method.getName())) {
+            if ("save".equals(method.getName()) || "saveAndFlush".equals(method.getName())) {
                 saveCallCount.incrementAndGet();
                 Users u = (Users) args[0];
+                if (u.getUserId() == null && u.getCredentials() != null) {
+                    u.setUserId(u.getCredentials().getUserId());
+                }
                 Users existing = usersDb.putIfAbsent(u.getUserId(), u);
                 if (existing != null) {
                     throw new org.springframework.dao.DataIntegrityViolationException(
@@ -700,7 +709,7 @@ public class WorkerSettlementAdminResolutionTest {
                 }
                 return Optional.empty();
             }
-            if ("save".equals(method.getName())) {
+            if ("save".equals(method.getName()) || "saveAndFlush".equals(method.getName())) {
                 throw new org.springframework.dao.DataIntegrityViolationException(
                         "duplicate key value violates unique constraint users_pkey");
             }
@@ -755,6 +764,122 @@ public class WorkerSettlementAdminResolutionTest {
         WorkerSettlement settlement = service.createSettlement(workerId, List.of(paymentId), businessDate, adminId);
         assertNotNull(settlement);
         assertSame(raceWinner, settlement.getSettledBy());
+    }
+
+    @Test
+    void adminEntityDoesNotSetUserIdBeforeSaveToAvoidHibernateAssertionFailure() {
+        UUID adminId = UUID.randomUUID();
+        UUID workerId = UUID.randomUUID();
+        UUID paymentId = UUID.randomUUID();
+        LocalDate businessDate = LocalDate.of(2026, 11, 13);
+
+        Credentials adminCredentials = new Credentials();
+        adminCredentials.setUserId(adminId);
+        adminCredentials.setEmail("admin@servicehub.com");
+        adminCredentials.setRole(UserRole.ADMIN);
+
+        java.util.concurrent.atomic.AtomicReference<UUID> preSaveUserIdRef = new java.util.concurrent.atomic.AtomicReference<>();
+        java.util.concurrent.atomic.AtomicReference<Credentials> preSaveCredentialsRef = new java.util.concurrent.atomic.AtomicReference<>();
+
+        Worker worker = new Worker();
+        worker.setUserId(workerId);
+        Users workerUser = new Users();
+        workerUser.setUserId(workerId);
+        worker.setUser(workerUser);
+        worker.setBankAccountHolderName("Test Worker");
+        worker.setBankAccountNumber("001234567890");
+        worker.setBankIfscCode("BKID0001234");
+        worker.setBankName("Bank of India");
+
+        Payment payment = new Payment();
+        payment.setPaymentId(paymentId);
+        payment.setAmount(new BigDecimal("1000.00"));
+        payment.setPaymentMethod(PaymentMethod.RAZORPAY);
+        payment.setStatus(PaymentStatus.SUCCESS);
+        payment.setPaidAt(LocalDateTime.of(2026, 11, 13, 15, 0));
+
+        WorkerRepository workerRepo = createProxy(WorkerRepository.class, (method, args) -> {
+            if ("findByUserIdForUpdate".equals(method.getName())) {
+                return Optional.of(worker);
+            }
+            return null;
+        });
+
+        UsersRepository usersRepo = createProxy(UsersRepository.class, (method, args) -> {
+            if ("findById".equals(method.getName())) {
+                return Optional.empty();
+            }
+            if ("save".equals(method.getName()) || "saveAndFlush".equals(method.getName())) {
+                Users u = (Users) args[0];
+                // Record the pre-save state of the entity to verify MapsId contract
+                preSaveUserIdRef.set(u.getUserId());
+                preSaveCredentialsRef.set(u.getCredentials());
+                return u;
+            }
+            return null;
+        });
+
+        CredentialsRepository credentialsRepo = createProxy(CredentialsRepository.class, (method, args) -> {
+            if ("findById".equals(method.getName()) || "findByUserIdForUpdate".equals(method.getName())) {
+                return Optional.of(adminCredentials);
+            }
+            return null;
+        });
+
+        PaymentRepository paymentRepo = createProxy(PaymentRepository.class, (method, args) -> {
+            if ("findEligiblePaymentsForWorkerSettlementForUpdate".equals(method.getName())) {
+                return List.of(payment);
+            }
+            return null;
+        });
+
+        WorkerSettlementRepository settlementRepo = createProxy(WorkerSettlementRepository.class, (method, args) -> {
+            if ("save".equals(method.getName())) {
+                WorkerSettlement s = (WorkerSettlement) args[0];
+                s.setSettlementId(UUID.randomUUID());
+                return s;
+            }
+            return null;
+        });
+
+        WorkerSettlementItemRepository itemRepo = createProxy(WorkerSettlementItemRepository.class, (method, args) -> {
+            if ("saveAll".equals(method.getName())) {
+                return args[0];
+            }
+            return null;
+        });
+
+        SettlementBusinessDateCalculator dateCalc = new SettlementBusinessDateCalculator(
+                java.time.Clock.system(SettlementBusinessDateCalculator.SETTLEMENT_ZONE)
+        );
+
+        WorkerSettlementService service = new WorkerSettlementService(
+                workerRepo,
+                usersRepo,
+                credentialsRepo,
+                paymentRepo,
+                settlementRepo,
+                itemRepo,
+                null,
+                dateCalc
+        );
+
+        WorkerSettlement settlement = service.createSettlement(workerId, List.of(paymentId), businessDate, adminId);
+        assertNotNull(settlement);
+
+        // Verification of root cause fix:
+        // adminUser.getUserId() must be NULL before passing to saveAndFlush,
+        // so Spring Data JPA evaluates isNew(adminUser) == true -> em.persist().
+        // If userId were set, Spring Data JPA would call em.merge(), triggering
+        // "org.hibernate.AssertionFailure: null identifier (com.servicehub.serv.entity.Users)"
+        assertNull(preSaveUserIdRef.get(),
+                "Users.userId MUST be null before saving so Hibernate @MapsId derives it during persist()");
+        assertSame(adminCredentials, preSaveCredentialsRef.get(),
+                "Users.credentials MUST be set so Hibernate @MapsId can derive the identifier");
+
+        // The returned settlement must have a resolved admin with the correct ID
+        assertNotNull(settlement.getSettledBy());
+        assertEquals(adminId, settlement.getSettledBy().getUserId());
     }
 
     @SuppressWarnings("unchecked")

@@ -1022,7 +1022,6 @@ public class WorkerSettlementService {
             }
 
             Users adminUser = new Users();
-            adminUser.setUserId(credentials.getUserId());
             adminUser.setCredentials(credentials);
             adminUser.setFullName("Administrator");
             adminUser.setAge(30);
@@ -1036,7 +1035,11 @@ public class WorkerSettlementService {
             adminUser.setTermsAccepted(true);
 
             try {
-                return usersRepository.save(adminUser);
+                Users savedAdmin = usersRepository.saveAndFlush(adminUser);
+                if (savedAdmin != null && savedAdmin.getUserId() == null) {
+                    savedAdmin.setUserId(credentials.getUserId());
+                }
+                return savedAdmin;
             } catch (DataIntegrityViolationException ex) {
                 return usersRepository.findById(adminId)
                         .orElseThrow(() -> ex);
