@@ -49,9 +49,9 @@ batchDetailsContent.addEventListener("click", (event) => {
 });
 
 historyTableBody.addEventListener("click", (event) => {
-  const button = event.target.closest(".view-settlement-button");
-  if (button) {
-    viewSettlementDetails(button.dataset.settlementId);
+  const trigger = event.target.closest(".view-settlement-button, tr[data-settlement-id]");
+  if (trigger && trigger.dataset.settlementId) {
+    viewSettlementDetails(trigger.dataset.settlementId);
   }
 });
 
@@ -621,7 +621,7 @@ function renderHistory() {
   historyTableBody.innerHTML = settlementHistory
     .map(
       (settlement) => `
-        <tr class="border-b border-gray-800 last:border-0 transition-colors hover:bg-gray-800/40">
+        <tr class="border-b border-gray-800 last:border-0 transition-colors hover:bg-gray-800/40 cursor-pointer" data-settlement-id="${escapeHtml(settlement.settlementId || "")}">
           <td class="max-w-[190px] break-all px-5 py-4 text-xs text-gray-400">${escapeHtml(settlement.settlementId || "—")}</td>
           <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-300">${escapeHtml(formatBusinessDate(settlement.businessDate))}</td>
           <td class="px-5 py-4">
@@ -681,6 +681,10 @@ function updateHistoryWorkerOptions() {
 }
 
 async function viewSettlementDetails(settlementId) {
+  if (!settlementId) {
+    showMessage("Please select a valid settlement record.", "error");
+    return;
+  }
   activeSettlementId = settlementId;
   document.getElementById("settlementDetailsTitle").textContent =
     "Settlement Details";
@@ -695,9 +699,10 @@ async function viewSettlementDetails(settlementId) {
     renderSettlementDetails(details);
   } catch (error) {
     settlementDetailsContent.innerHTML = `
-      <p class="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
-        ${escapeHtml(error.message || "Unable to load settlement details.")}
-      </p>
+      <div class="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
+        <p class="font-medium text-red-200">Unable to load settlement details</p>
+        <p class="mt-1">${escapeHtml(error.message || "Request failed.")}</p>
+      </div>
     `;
     showMessage(error.message || "Unable to load settlement details.", "error");
   }

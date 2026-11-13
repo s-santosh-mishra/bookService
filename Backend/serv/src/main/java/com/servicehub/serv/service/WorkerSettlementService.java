@@ -1,5 +1,6 @@
 package com.servicehub.serv.service;
 
+import com.servicehub.serv.entity.Credentials;
 import com.servicehub.serv.entity.Payment;
 import com.servicehub.serv.entity.Users;
 import com.servicehub.serv.entity.Worker;
@@ -25,12 +26,15 @@ import com.servicehub.serv.enums.SettlementBatchStatus;
 import com.servicehub.serv.enums.UserRole;
 import com.servicehub.serv.exception.ResourceNotFoundException;
 import com.servicehub.serv.exception.SettlementConflictException;
+import com.servicehub.serv.repository.CredentialsRepository;
 import com.servicehub.serv.repository.PaymentRepository;
 import com.servicehub.serv.repository.UsersRepository;
 import com.servicehub.serv.repository.WorkerRepository;
 import com.servicehub.serv.repository.WorkerSettlementItemRepository;
 import com.servicehub.serv.repository.WorkerSettlementRepository;
 import com.servicehub.serv.repository.WorkerSettlementReversalRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +48,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.UUID;
@@ -53,6 +58,7 @@ public class WorkerSettlementService {
 
     private final WorkerRepository workerRepository;
     private final UsersRepository usersRepository;
+    private final CredentialsRepository credentialsRepository;
     private final PaymentRepository paymentRepository;
     private final WorkerSettlementRepository workerSettlementRepository;
     private final WorkerSettlementItemRepository workerSettlementItemRepository;
@@ -67,8 +73,23 @@ public class WorkerSettlementService {
             WorkerSettlementItemRepository workerSettlementItemRepository,
             WorkerSettlementReversalRepository workerSettlementReversalRepository,
             SettlementBusinessDateCalculator businessDateCalculator) {
+        this(workerRepository, usersRepository, null, paymentRepository, workerSettlementRepository,
+                workerSettlementItemRepository, workerSettlementReversalRepository, businessDateCalculator);
+    }
+
+    @Autowired
+    public WorkerSettlementService(
+            WorkerRepository workerRepository,
+            UsersRepository usersRepository,
+            CredentialsRepository credentialsRepository,
+            PaymentRepository paymentRepository,
+            WorkerSettlementRepository workerSettlementRepository,
+            WorkerSettlementItemRepository workerSettlementItemRepository,
+            WorkerSettlementReversalRepository workerSettlementReversalRepository,
+            SettlementBusinessDateCalculator businessDateCalculator) {
         this.workerRepository = workerRepository;
         this.usersRepository = usersRepository;
+        this.credentialsRepository = credentialsRepository;
         this.paymentRepository = paymentRepository;
         this.workerSettlementRepository = workerSettlementRepository;
         this.workerSettlementItemRepository = workerSettlementItemRepository;
@@ -109,12 +130,7 @@ public class WorkerSettlementService {
 
         validateBankDetails(worker);
 
-        Users admin = usersRepository.findById(adminId)
-                .orElseThrow(() -> new ResourceNotFoundException("Admin not found."));
-        if (admin.getCredentials() == null
-                || admin.getCredentials().getRole() != UserRole.ADMIN) {
-            throw new IllegalArgumentException("Settlement creator must be an admin.");
-        }
+        Users admin = getAdmin(adminId);
 
         List<Payment> selectedPayments =
                 paymentRepository.findEligiblePaymentsForWorkerSettlementForUpdate(
@@ -981,13 +997,53 @@ public class WorkerSettlementService {
     }
 
     private Users getAdmin(UUID adminId) {
-        Users admin = usersRepository.findById(adminId)
-                .orElseThrow(() -> new ResourceNotFoundException("Admin not found."));
-        if (admin.getCredentials() == null
-                || admin.getCredentials().getRole() != UserRole.ADMIN) {
-            throw new IllegalArgumentException("Settlement updates are restricted to admins.");
+        Optional<Users> userOpt = usersRepository.findById(adminId);
+        if (userOpt.isPresent()) {
+            Users admin = userOpt.get();
+            if (admin.getCredentials() == null
+                    || admin.getCredentials().getRole() != UserRole.ADMIN) {
+                throw new IllegalArgumentException("Settlement updates are restricted to admins.");
+            }
+            return admin;
         }
-        return admin;
+
+        if (credentialsRepository != null) {
+            Credentials credentials = credentialsRepository.findByUserIdForUpdate(adminId)
+                    .or(() -> credentialsRepository.findById(adminId))
+                    .orElseThrow(() -> new ResourceNotFoundException("Admin not found."));
+            if (credentials.getRole() != UserRole.ADMIN) {
+                throw new IllegalArgumentException("Settlement updates are restricted to admins.");
+            }
+
+            // Re-check users repository within the lock in case a concurrent request already saved it
+            userOpt = usersRepository.findById(adminId);
+            if (userOpt.isPresent()) {
+                return userOpt.get();
+            }
+
+            Users adminUser = new Users();
+            adminUser.setUserId(credentials.getUserId());
+            adminUser.setCredentials(credentials);
+            adminUser.setFullName("Administrator");
+            adminUser.setAge(30);
+            adminUser.setGender("OTHER");
+            adminUser.setPhone("0000000000");
+            adminUser.setAddressLine1("ServiceHub HQ");
+            adminUser.setCity("Bhubaneswar");
+            adminUser.setState("Odisha");
+            adminUser.setPinCode("751001");
+            adminUser.setActive(true);
+            adminUser.setTermsAccepted(true);
+
+            try {
+                return usersRepository.save(adminUser);
+            } catch (DataIntegrityViolationException ex) {
+                return usersRepository.findById(adminId)
+                        .orElseThrow(() -> ex);
+            }
+        }
+
+        throw new ResourceNotFoundException("Admin not found.");
     }
 
     private WorkerSettlementReversalDto toReversalDto(
