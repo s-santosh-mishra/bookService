@@ -45,7 +45,9 @@ public class CustomerServiceService {
                         service.getServiceId(),
                         service.getServiceName(),
                         service.getCategory().getCategoryId(),
-                        service.getCategory().getCategoryName()
+                        service.getCategory().getCategoryName(),
+                        service.getBasePricePerHour(),
+                        service.getMinimumServiceFee()
                 ))
                 .toList();
     }

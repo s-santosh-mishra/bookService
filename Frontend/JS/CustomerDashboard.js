@@ -520,6 +520,22 @@ function getRandomServices(services) {
   return shuffled.slice(0, 6);
 }
 
+function formatServicePrice(value) {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+  const num = Number(value);
+  if (Number.isNaN(num)) {
+    return null;
+  }
+  return num % 1 === 0
+    ? num.toLocaleString("en-IN")
+    : num.toLocaleString("en-IN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+}
+
 /* Create Service Card */
 
 function createServiceCard(service) {
@@ -530,74 +546,110 @@ function createServiceCard(service) {
     "border border-gray-800 " +
     "rounded-2xl p-6 " +
     "hover:border-violet-500/50 " +
-    "transition";
+    "transition " +
+    "flex flex-col justify-between";
 
   card.dataset.serviceName = service.serviceName || "";
 
   card.dataset.categoryId = service.categoryId || "";
 
+  if (service.basePricePerHour !== undefined && service.basePricePerHour !== null) {
+    card.dataset.basePrice = String(service.basePricePerHour);
+  }
+
+  if (service.minimumServiceFee !== undefined && service.minimumServiceFee !== null) {
+    card.dataset.minPrice = String(service.minimumServiceFee);
+  }
+
+  const basePriceFormatted = formatServicePrice(service.basePricePerHour);
+  const minPriceFormatted = formatServicePrice(service.minimumServiceFee);
+
+  const basePriceDisplay =
+    basePriceFormatted !== null
+      ? `₹${basePriceFormatted} <span class="text-xs font-normal text-gray-400">/ hour</span>`
+      : `<span class="text-gray-500">—</span>`;
+
+  const minPriceDisplay =
+    minPriceFormatted !== null
+      ? `₹${minPriceFormatted}`
+      : `<span class="text-gray-500">—</span>`;
+
   card.innerHTML = `
 
-        <div class="w-12 h-12
-                    rounded-xl
-                    bg-violet-900/30
-                    flex items-center
-                    justify-center
-                    mb-5">
+        <div>
+            <div class="w-12 h-12
+                        rounded-xl
+                        bg-violet-900/30
+                        flex items-center
+                        justify-center
+                        mb-5">
 
-            <i class="fa-solid
-                      ${getServiceIcon(service.serviceName)}
-                      text-violet-400">
+                <i class="fa-solid
+                          ${getServiceIcon(service.serviceName)}
+                          text-violet-400">
 
-            </i>
+                </i>
 
+            </div>
+
+
+            <p class="text-xs
+                      text-violet-400
+                      mb-2">
+
+                ${escapeHtml(service.categoryName)}
+
+            </p>
+
+
+            <h4 class="text-lg
+                       font-semibold
+                       mb-2">
+
+                ${escapeHtml(service.serviceName)}
+
+            </h4>
+
+
+            <p class="text-sm
+                      text-gray-400
+                      mb-5">
+
+                Professional service from
+                trusted workers.
+
+            </p>
         </div>
 
+        <div>
+            <div class="bg-gray-950/60 border border-gray-800/80 rounded-xl p-3 mb-4 space-y-1.5">
+                <div class="flex items-center justify-between text-xs">
+                    <span class="text-gray-400 font-medium">Base Price:</span>
+                    <span class="text-gray-100 font-semibold text-sm">${basePriceDisplay}</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                    <span class="text-gray-400 font-medium">Minimum Price:</span>
+                    <span class="text-violet-400 font-semibold text-sm">${minPriceDisplay}</span>
+                </div>
+            </div>
 
-        <p class="text-xs
-                  text-violet-400
-                  mb-2">
+            <button
+                class="book-service-button
+                       text-violet-400
+                       text-sm
+                       font-medium
+                       hover:text-violet-300
+                       transition"
+                data-service-id="${service.serviceId}">
 
-            ${escapeHtml(service.categoryName)}
+                Book Service
 
-        </p>
+                <i class="fa-solid
+                          fa-arrow-right
+                          ml-2"></i>
 
-
-        <h4 class="text-lg
-                   font-semibold
-                   mb-2">
-
-            ${escapeHtml(service.serviceName)}
-
-        </h4>
-
-
-        <p class="text-sm
-                  text-gray-400
-                  mb-5">
-
-            Professional service from
-            trusted workers.
-
-        </p>
-
-
-        <button
-            class="book-service-button
-                   text-violet-400
-                   text-sm
-                   font-medium
-                   hover:text-violet-300
-                   transition"
-            data-service-id="${service.serviceId}">
-
-            Book Service
-
-            <i class="fa-solid
-                      fa-arrow-right
-                      ml-2"></i>
-
-        </button>
+            </button>
+        </div>
 
     `;
 
@@ -2033,6 +2085,17 @@ function openCreateBooking(serviceId) {
 
   createBookingService.textContent = selectedBookingService.serviceName;
 
+  const pricingEl = document.getElementById("createBookingPricing");
+  if (pricingEl) {
+    const baseFmt = formatServicePrice(selectedBookingService.basePricePerHour);
+    const minFmt = formatServicePrice(selectedBookingService.minimumServiceFee);
+    if (baseFmt !== null && minFmt !== null) {
+      pricingEl.innerHTML = `Base Price: <span class="text-gray-200 font-medium">₹${baseFmt} / hour</span> &bull; Minimum Price: <span class="text-violet-400 font-medium">₹${minFmt}</span>`;
+    } else {
+      pricingEl.textContent = "";
+    }
+  }
+
   customerBookingNote.value = "";
 
   createBookingModal.classList.remove("hidden");
@@ -2046,6 +2109,11 @@ function closeCreateBooking() {
   createBookingModal.classList.add("hidden");
 
   document.body.classList.remove("overflow-hidden");
+
+  const pricingEl = document.getElementById("createBookingPricing");
+  if (pricingEl) {
+    pricingEl.textContent = "";
+  }
 
   selectedBookingService = null;
 }
